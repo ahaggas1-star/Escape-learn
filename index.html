@@ -15,7 +15,7 @@
           fontFamily: { sans: ['Cairo', 'sans-serif'] },
           colors: {
             darkbg: '#0F172A', panel: '#1E293B', blueApp: '#3B82F6', greenApp: '#10B981',
-            yellowApp: '#F59E0B', redApp: '#EF4444', purpleApp: '#8B5CF6', grayApp: '#64748B'
+            yellowApp: '#F59E0B', reَdApp: '#EF4444', purpleApp: '#8B5CF6', grayApp: '#64748B'
           }
         }
       }
@@ -46,7 +46,7 @@
     <div class="max-w-lg mx-auto mt-12 glass-panel rounded-3xl p-7 shadow-2xl">
       <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blueApp to-purpleApp flex items-center justify-center mb-5 shadow-lg shadow-blueApp/20"><i class="fa-solid fa-flask text-white text-2xl"></i></div>
       <h1 class="text-3xl font-black mb-2">مركز قيادة التعلّم والتجارب</h1>
-      <p class="text-gray-400 leading-relaxed mb-6">سجّل الدخول حتى تعمل المنصة بسحابتك الخاصة. البيانات محمية عبر RLS إذا شغلت ملف SQL المرفق.</p>
+      <p class="text-gray-400 leading-relaxed mb-6">سجّل الدخول بالبريد وكلمة المرور. البيانات محمية بسياسات RLS، ولا تظهر إلا لصاحب الحساب بعد تشغيل ملف SQL المرفق.</p>
       <div class="space-y-4">
         <input id="auth-email" type="email" placeholder="البريد الإلكتروني" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input" />
         <input id="auth-password" type="password" placeholder="كلمة المرور" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input" />
@@ -54,10 +54,11 @@
           <button onclick="signIn()" class="bg-blueApp hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all">دخول</button>
           <button onclick="signUp()" class="bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl border border-white/10 transition-all">إنشاء حساب</button>
         </div>
+        <p class="text-xs text-gray-500 leading-relaxed">بعد إنشاء حسابك الأول يمكنك تعطيل إنشاء الحسابات الجديدة من إعدادات Supabase Auth إذا أردت استخدامًا شخصيًا فقط.</p>
         <div class="p-4 rounded-xl bg-yellowApp/10 border border-yellowApp/20 text-yellowApp text-sm leading-relaxed">
-          <strong>مهم:</strong> إذا لم تضف مفاتيح Supabase داخل الكود، ستعمل المنصة في وضع تجريبي محلي داخل المتصفح فقط.
+          <strong>مهم:</strong> هذه النسخة تعمل بنظام تسجيل الدخول الحقيقي عبر Supabase Auth. شغّل ملف SQL المرفق، ثم أنشئ حسابك وسجّل الدخول.
         </div>
-        <button onclick="startLocalMode()" class="w-full text-gray-400 hover:text-white text-sm underline">استخدام وضع تجريبي محلي بدون سحابة</button>
+        
       </div>
     </div>
   </div>
