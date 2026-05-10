@@ -1,557 +1,480 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز قيادة التعلّم والتجارب | V2</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { 'sans': ['Cairo', 'sans-serif'] },
-                    colors: {
-                        darkbg: '#0F172A',
-                        panel: '#1E293B',
-                        blueApp: '#3B82F6',
-                        greenApp: '#10B981',
-                        yellowApp: '#F59E0B',
-                        redApp: '#EF4444',
-                        purpleApp: '#8B5CF6',
-                        grayApp: '#64748B'
-                    }
-                }
-            }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مركز قيادة التعلّم والتجارب | V3</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Cairo', 'sans-serif'] },
+          colors: {
+            darkbg: '#0F172A', panel: '#1E293B', blueApp: '#3B82F6', greenApp: '#10B981',
+            yellowApp: '#F59E0B', redApp: '#EF4444', purpleApp: '#8B5CF6', grayApp: '#64748B'
+          }
         }
-    </script>
-    
-    <style>
-        body { 
-            background-color: #0F172A; 
-            color: #F8FAFC; 
-            background-image: radial-gradient(circle at top right, rgba(30, 41, 59, 0.8) 0%, transparent 40%);
-            min-height: 100vh;
-        }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .glass-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.2s ease; }
-        .glass-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.1); }
-        .glow-input:focus { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); border-color: #3B82F6; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0F172A; }
-        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748B; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease-out forwards; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #toast { transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
-        .toast-show { opacity: 1 !important; transform: translateY(0) !important; }
-        
-        /* Empty state styling */
-        .empty-state { border: 2px dashed rgba(255,255,255,0.1); border-radius: 1rem; padding: 3rem; text-align: center; color: #64748B; }
-    </style>
+      }
+    };
+  </script>
+  <style>
+    body{background-color:#0F172A;color:#F8FAFC;background-image:radial-gradient(circle at top right,rgba(30,41,59,.82) 0%,transparent 40%);min-height:100vh}
+    .glass-panel{background:rgba(30,41,59,.72);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.06)}
+    .glass-card{background:rgba(15,23,42,.62);border:1px solid rgba(255,255,255,.06);transition:all .2s ease}
+    .glass-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.13)}
+    .glow-input:focus{outline:none;box-shadow:0 0 0 2px rgba(59,130,246,.48);border-color:#3B82F6}
+    ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:#0F172A}::-webkit-scrollbar-thumb{background:#475569;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#64748B}
+    .tab-content{display:none;animation:fadeIn .25s ease-out forwards}.tab-content.active{display:block}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    #toast{transition:opacity .25s,transform .25s;pointer-events:none}.toast-show{opacity:1!important;transform:translateY(0)!important}
+    .empty-state{border:2px dashed rgba(255,255,255,.10);border-radius:1rem;padding:2.5rem;text-align:center;color:#64748B;background:rgba(15,23,42,.35)}
+    .chip{font-size:10px;font-weight:800;padding:.25rem .5rem;border-radius:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08)}
+    mark{background:rgba(245,158,11,.35);color:#fff;border-radius:4px;padding:0 3px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:80;padding:1rem}.modal-backdrop.show{display:flex}
+    .thin-table td,.thin-table th{border-bottom:1px solid rgba(255,255,255,.07);padding:.7rem;text-align:right;vertical-align:top}
+    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  </style>
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base">
 
-    <aside class="w-20 md:w-64 flex-shrink-0 glass-panel border-l border-white/5 flex flex-col justify-between h-full z-20 transition-all duration-300">
-        <div>
-            <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-white/5 bg-panel/30">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blueApp to-purpleApp flex items-center justify-center shadow-lg shadow-blueApp/20">
-                    <i class="fa-solid fa-flask text-white text-xl"></i>
-                </div>
-                <div class="hidden md:block mr-3">
-                    <h1 class="font-black text-lg leading-tight tracking-tight">القيادة <span class="text-blueApp">والتجارب</span></h1>
-                </div>
+  <!-- شاشة تسجيل الدخول -->
+  <div id="auth-screen" class="hidden fixed inset-0 z-[100] bg-darkbg/95 backdrop-blur-xl p-6 overflow-y-auto">
+    <div class="max-w-lg mx-auto mt-12 glass-panel rounded-3xl p-7 shadow-2xl">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blueApp to-purpleApp flex items-center justify-center mb-5 shadow-lg shadow-blueApp/20"><i class="fa-solid fa-flask text-white text-2xl"></i></div>
+      <h1 class="text-3xl font-black mb-2">مركز قيادة التعلّم والتجارب</h1>
+      <p class="text-gray-400 leading-relaxed mb-6">سجّل الدخول حتى تعمل المنصة بسحابتك الخاصة. البيانات محمية عبر RLS إذا شغلت ملف SQL المرفق.</p>
+      <div class="space-y-4">
+        <input id="auth-email" type="email" placeholder="البريد الإلكتروني" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input" />
+        <input id="auth-password" type="password" placeholder="كلمة المرور" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input" />
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="signIn()" class="bg-blueApp hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all">دخول</button>
+          <button onclick="signUp()" class="bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl border border-white/10 transition-all">إنشاء حساب</button>
+        </div>
+        <div class="p-4 rounded-xl bg-yellowApp/10 border border-yellowApp/20 text-yellowApp text-sm leading-relaxed">
+          <strong>مهم:</strong> إذا لم تضف مفاتيح Supabase داخل الكود، ستعمل المنصة في وضع تجريبي محلي داخل المتصفح فقط.
+        </div>
+        <button onclick="startLocalMode()" class="w-full text-gray-400 hover:text-white text-sm underline">استخدام وضع تجريبي محلي بدون سحابة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- القائمة الجانبية -->
+  <aside class="w-20 md:w-72 flex-shrink-0 glass-panel border-l border-white/5 flex flex-col justify-between h-full z-20 transition-all duration-300">
+    <div>
+      <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-white/5 bg-panel/30">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blueApp to-purpleApp flex items-center justify-center shadow-lg shadow-blueApp/20"><i class="fa-solid fa-flask text-white text-xl"></i></div>
+        <div class="hidden md:block mr-3"><h1 class="font-black text-lg leading-tight tracking-tight">القيادة <span class="text-blueApp">والتجارب</span></h1><p class="text-[10px] text-gray-500 font-bold">V3</p></div>
+      </div>
+      <nav class="p-4 flex flex-col gap-2 mt-3">
+        <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blueApp/10 text-blueApp border border-blueApp/20 transition-all font-bold"><i class="fa-solid fa-compass text-lg w-5 text-center"></i><span class="hidden md:block">ماذا أفعل اليوم؟</span></button>
+        <button onclick="switchTab('capture')" id="btn-capture" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-bolt text-lg w-5 text-center text-yellowApp"></i><span class="hidden md:block">الالتقاط السريع</span></button>
+        <button onclick="switchTab('knowledge')" id="btn-knowledge" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-book-open text-lg w-5 text-center text-blueApp"></i><span class="hidden md:block">مكتبة المعرفة</span><span id="knowledge-count-badge" class="hidden md:flex mr-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span></button>
+        <button onclick="switchTab('mechanics')" id="btn-mechanics" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-puzzle-piece text-lg w-5 text-center text-purpleApp"></i><span class="hidden md:block">مكتبة الآليات</span><span id="mech-count-badge" class="hidden md:flex mr-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span></button>
+        <button onclick="switchTab('lab')" id="btn-lab" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-microscope text-lg w-5 text-center text-greenApp"></i><span class="hidden md:block">مختبر التجارب</span><span id="lab-count-badge" class="hidden md:flex mr-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span></button>
+        <button onclick="switchTab('production')" id="btn-production" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-industry text-lg w-5 text-center text-yellowApp"></i><span class="hidden md:block">ورشة الإنتاج</span><span id="projects-count-badge" class="hidden md:flex mr-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span></button>
+        <button onclick="switchTab('rules')" id="btn-rules" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold"><i class="fa-solid fa-scale-balanced text-lg w-5 text-center text-greenApp"></i><span class="hidden md:block">دستور التصميم</span><span id="rules-count-badge" class="hidden md:flex mr-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span></button>
+        <div id="cloud-status" class="mt-4 px-4 hidden md:flex items-center gap-2 text-xs text-yellowApp font-bold bg-yellowApp/10 py-2 rounded-lg border border-yellowApp/20 transition-all"><i class="fa-solid fa-gear animate-pulse"></i><span>تهيئة النظام</span></div>
+      </nav>
+    </div>
+    <div class="hidden md:block p-4 mt-auto mb-3 border-t border-white/5">
+      <div class="bg-panel rounded-xl p-4 border border-white/5 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 text-6xl text-white/5"><i class="fa-solid fa-scroll"></i></div>
+        <h3 class="font-bold text-gray-300 text-xs uppercase tracking-wider mb-2 flex items-center gap-2"><i class="fa-solid fa-scroll text-yellowApp"></i> آخر قواعد الدستور</h3>
+        <ul id="sidebar-rules" class="text-[11px] text-gray-400 space-y-2 leading-relaxed font-semibold"><li>لا توجد قواعد بعد.</li></ul>
+      </div>
+      <button onclick="signOut()" class="mt-3 w-full py-2 rounded-xl bg-white/5 hover:bg-redApp/10 text-gray-400 hover:text-redApp border border-white/5 text-xs font-bold transition-all"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto h-full relative scroll-smooth">
+    <!-- لوحة اليوم -->
+    <div id="tab-dashboard" class="tab-content active p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2">ماذا أفعل اليوم؟</h2><p class="text-gray-400">المكتبة للتخزين، هذه الصفحة للتنفيذ. ركز على التجربة والمشروع والقرار.</p></header>
+      <section class="grid grid-cols-2 md:grid-cols-6 gap-3 mb-7" id="metrics-grid"></section>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-panel p-6 rounded-2xl border-l-4 border-blueApp">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white"><i class="fa-solid fa-fire text-yellowApp"></i> خطة هجوم اليوم</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5"><div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-blueApp/20 text-blueApp"><i class="fa-solid fa-bullseye text-xs"></i></div><div><p class="text-xs text-gray-400 font-bold mb-1">هدف الأسبوع</p><p class="font-semibold">تحويل التعلم إلى تجربة ثم مشروع قابل للإنتاج.</p></div></div>
+              <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5"><div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-greenApp/20 text-greenApp"><i class="fa-solid fa-vial text-xs"></i></div><div><p class="text-xs text-gray-400 font-bold mb-1">تجربة اليوم</p><p class="font-semibold" id="dash-experiment">لا توجد تجارب نشطة.</p></div></div>
+              <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5"><div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-yellowApp/20 text-yellowApp"><i class="fa-solid fa-folder-tree text-xs"></i></div><div><p class="text-xs text-gray-400 font-bold mb-1">المشروع النشط</p><p class="font-semibold" id="dash-project">لا يوجد مشروع نشط.</p></div></div>
+              <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5"><div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-redApp/20 text-redApp"><i class="fa-solid fa-triangle-exclamation text-xs"></i></div><div><p class="text-xs text-gray-400 font-bold mb-1">أهم مشكلة مفتوحة</p><p class="font-semibold" id="dash-issue">لا توجد مشاكل مفتوحة.</p></div></div>
             </div>
-
-            <nav class="p-4 flex flex-col gap-2 mt-4">
-                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blueApp/10 text-blueApp border border-blueApp/20 transition-all font-bold">
-                    <i class="fa-solid fa-compass text-lg w-5 text-center"></i>
-                    <span class="hidden md:block">ماذا أفعل اليوم؟</span>
-                </button>
-                <button onclick="switchTab('capture')" id="btn-capture" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold">
-                    <i class="fa-solid fa-bolt text-lg w-5 text-center text-yellowApp"></i>
-                    <span class="hidden md:block">الالتقاط السريع</span>
-                </button>
-                <button onclick="switchTab('mechanics')" id="btn-mechanics" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold">
-                    <i class="fa-solid fa-puzzle-piece text-lg w-5 text-center text-purpleApp"></i>
-                    <span class="hidden md:block">مكتبة الآليات</span>
-                    <span id="mech-count-badge" class="hidden md:flex ml-auto bg-white/10 text-xs px-2 py-0.5 rounded-full">0</span>
-                </button>
-                <button onclick="switchTab('lab')" id="btn-lab" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all font-semibold">
-                    <i class="fa-solid fa-microscope text-lg w-5 text-center text-greenApp"></i>
-                    <span class="hidden md:block">مختبر التجارب</span>
-                </button>
-                <!-- Cloud Status Indicator -->
-                <div id="cloud-status" class="mt-4 px-4 hidden md:flex items-center gap-2 text-xs text-yellowApp font-bold bg-yellowApp/10 py-2 rounded-lg border border-yellowApp/20 transition-all">
-                    <i class="fa-solid fa-cloud animate-pulse"></i>
-                    <span>بانتظار الربط السحابي</span>
-                </div>
-            </nav>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div><h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-puzzle-piece text-purpleApp"></i> أحدث آليتين</h3><div id="dash-recent-mechanics" class="space-y-3"></div></div>
+            <div><h3 class="font-bold text-lg mb-3 flex items-center gap-2"><i class="fa-solid fa-book-open text-blueApp"></i> أحدث مصدرين</h3><div id="dash-recent-sources" class="space-y-3"></div></div>
+          </div>
         </div>
-
-        <div class="hidden md:block p-4 mt-auto mb-4 border-t border-white/5">
-            <div class="bg-panel rounded-xl p-4 border border-white/5 relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 text-6xl text-white/5"><i class="fa-solid fa-scale-balanced"></i></div>
-                <h3 class="font-bold text-gray-300 text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-scroll text-yellowApp"></i> دستور المنصة
-                </h3>
-                <ul class="text-[11px] text-gray-400 space-y-2 leading-relaxed font-semibold">
-                    <li><span class="text-redApp mr-1">•</span> لا أحفظ شيئاً بلا سبب.</li>
-                    <li><span class="text-redApp mr-1">•</span> الفشل يتحول إلى قاعدة.</li>
-                    <li><span class="text-greenApp mr-1">•</span> النجاح يتحول إلى نظام.</li>
-                    <li><span class="text-blueApp mr-1">•</span> الفكرة تشرح بكلماتي فقط.</li>
-                </ul>
-            </div>
+        <div class="space-y-5">
+          <div class="glass-panel p-5 rounded-2xl border-r-4 border-r-greenApp"><h3 class="font-bold text-lg mb-2">قاعدة يجب تذكرها</h3><p id="dash-rule" class="text-gray-300 leading-relaxed">لا توجد قاعدة معتمدة بعد.</p></div>
+          <div class="glass-panel p-5 rounded-2xl border-r-4 border-r-yellowApp"><h3 class="font-bold text-lg mb-2">قرار ينتظر الحسم</h3><p id="dash-decision" class="text-gray-300 leading-relaxed">لا توجد قرارات معلقة.</p></div>
         </div>
-    </aside>
-
-    <main class="flex-1 overflow-y-auto h-full relative scroll-smooth">
-        
-        <div id="tab-dashboard" class="tab-content active p-6 md:p-10 max-w-6xl mx-auto">
-            <header class="mb-8">
-                <h2 class="text-3xl font-black mb-2">ماذا أفعل اليوم؟</h2>
-                <p class="text-gray-400">المكتبة للتخزين، هذه الصفحة للتنفيذ. ركز على المهام أدناه.</p>
-            </header>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-blueApp">
-                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-white">
-                            <i class="fa-solid fa-fire text-yellowApp"></i> خطة هجوم اليوم
-                        </h3>
-                        <div class="space-y-3">
-                            <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5">
-                                <div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-blueApp/20 text-blueApp"><i class="fa-solid fa-bullseye text-xs"></i></div>
-                                <div>
-                                    <p class="text-xs text-gray-400 font-bold mb-1">هدف الأسبوع</p>
-                                    <p class="font-semibold">تصميم أول لغز للعبة سكيب روم جيبية واختباره بالورق.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 p-3 rounded-xl bg-darkbg border border-white/5">
-                                <div class="mt-1 w-6 h-6 rounded flex items-center justify-center bg-greenApp/20 text-greenApp"><i class="fa-solid fa-vial text-xs"></i></div>
-                                <div>
-                                    <p class="text-xs text-gray-400 font-bold mb-1">تجربة اليوم</p>
-                                    <p class="font-semibold" id="dash-experiment">اختر آلية من المكتبة للبدء بتجربتها.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-inbox text-gray-400"></i> أحدث الآليات المضافة</h3>
-                        </div>
-                        <div id="dash-recent-mechanics" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Populated dynamically -->
-                            <p class="text-sm text-gray-500">لا توجد آليات حديثة. أضف واحدة من الالتقاط السريع.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <h3 class="font-bold text-lg mb-2 flex items-center gap-2"><i class="fa-solid fa-flag text-greenApp"></i> أهدافي الحالية</h3>
-                    <div class="glass-card p-4 rounded-xl border-r-4 border-r-greenApp">
-                        <div class="flex justify-between mb-1">
-                            <h4 class="font-bold text-sm">بناء نظام لعب تنافسي</h4>
-                            <span class="w-2 h-2 rounded-full bg-greenApp animate-pulse mt-1.5"></span>
-                        </div>
-                        <span class="text-[10px] text-gray-400 block mb-3">حالة: نشط</span>
-                        <div class="w-full bg-darkbg rounded-full h-1.5">
-                            <div class="bg-greenApp h-1.5 rounded-full" style="width: 45%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-capture" class="tab-content p-6 md:p-10 max-w-4xl mx-auto">
-            <header class="mb-8">
-                <h2 class="text-3xl font-black mb-2 flex items-center gap-3">
-                    صندوق الالتقاط <span class="bg-yellowApp text-darkbg px-3 py-1 rounded-xl text-lg relative -top-1">الصارم</span>
-                </h2>
-                <p class="text-gray-400">لا يوجد زر حفظ بدون معالجة. املأ الحقول بكلماتك أنت لإنشاء بطاقة مصدر.</p>
-            </header>
-
-            <div class="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden">
-                <div class="absolute -top-32 -right-32 w-64 h-64 bg-blueApp/10 rounded-full blur-3xl"></div>
-                <div class="space-y-6 relative z-10">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">عنوان المصدر (ما هو؟)</label>
-                            <input type="text" id="cap-title" placeholder="مثال: مراجعة عن ديك سكيب" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة المتوقعة</label>
-                            <select id="cap-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm appearance-none">
-                                <option value="سهلة">🟢 سهلة التنفيذ</option>
-                                <option value="متوسطة">🟡 متوسطة (تحتاج اختبار)</option>
-                                <option value="معقدة">🔴 معقدة (تحتاج تطبيق مساعد)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="bg-darkbg/50 p-5 rounded-2xl border border-white/5 space-y-5">
-                        <h3 class="font-bold text-blueApp border-b border-white/5 pb-2 mb-4"><i class="fa-solid fa-filter text-sm"></i> فلتر الفهم (ممنوع النسخ)</h3>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">لماذا حفظته؟ (ما القيمة؟)</label>
-                            <textarea id="cap-why" rows="2" placeholder="لأن فيه فكرة مفيدة عن..." class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">الآلية / الفكرة المستخرجة بوضوح</label>
-                            <textarea id="cap-mechanic" rows="2" placeholder="كل لاعب يملك معلومة..." class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-300 mb-2">أين وكيف سأستخدمها؟ (التطبيق العملي)</label>
-                            <textarea id="cap-how" rows="2" placeholder="سأطبقها في لعبة البطاقات عن طريق..." class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4 pt-4 border-t border-white/5">
-                        <button onclick="handleSaveCapture()" class="flex-1 bg-blueApp hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blueApp/20 flex justify-center items-center gap-2 text-lg">
-                            <i class="fa-solid fa-box-archive"></i> اعتمد واقلبه إلى آلية
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-mechanics" class="tab-content p-6 md:p-10 max-w-6xl mx-auto">
-            <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div>
-                    <h2 class="text-3xl font-black mb-2">مكتبة الآليات</h2>
-                    <p class="text-gray-400">هنا لا تجمع المقالات، بل تجمع آليات عمل قابلة للتطبيق الفوري.</p>
-                </div>
-            </header>
-
-            <!-- Dynamic grid where cards will be rendered -->
-            <div id="mechanics-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Cards injected via JS -->
-            </div>
-        </div>
-
-        <div id="tab-lab" class="tab-content p-6 md:p-10 max-w-6xl mx-auto">
-            <header class="mb-8">
-                <h2 class="text-3xl font-black mb-2">مختبر التجارب وسجلات النتائج</h2>
-                <p class="text-gray-400">المكان الذي تموت فيه الأفكار النظرية، وتحيا المعرفة الحقيقية.</p>
-            </header>
-            <div class="grid grid-cols-1 gap-8" id="lab-container">
-                <div class="empty-state">
-                    <i class="fa-solid fa-microscope text-4xl mb-3 text-gray-600"></i>
-                    <p>لا توجد تجارب نشطة. اذهب إلى مكتبة الآليات وأرسل آلية إلى المختبر.</p>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Toast Component -->
-    <div id="toast" class="fixed bottom-6 right-6 md:right-1/2 md:translate-x-1/2 bg-panel border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 opacity-0 translate-y-4 z-50">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-greenApp text-xl"></i>
-        <div>
-            <p id="toast-title" class="font-bold text-sm">تم الإجراء</p>
-            <p id="toast-msg" class="text-xs text-gray-400">رسالة توضيحية هنا.</p>
-        </div>
+      </div>
     </div>
 
-    <script>
-        /* =========================================
-           SUPABASE CLOUD ENGINE
-           ========================================= */
-        
-        // 🚨 ضع مفاتيح Supabase الخاصة بك هنا 🚨
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
-        
-        const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE';
-        let supabaseClient;
-        
-        if (isSupabaseConfigured) {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
+    <!-- الالتقاط -->
+    <div id="tab-capture" class="tab-content p-6 md:p-10 max-w-4xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2 flex items-center gap-3">صندوق الالتقاط <span class="bg-yellowApp text-darkbg px-3 py-1 rounded-xl text-lg relative -top-1">الصارم</span></h2><p class="text-gray-400">لا يوجد حفظ بلا فهم. هذه البطاقة تتحول مباشرة إلى آلية قابلة للتجربة.</p></header>
+      <div class="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden">
+        <div class="absolute -top-32 -right-32 w-64 h-64 bg-blueApp/10 rounded-full blur-3xl"></div>
+        <div class="space-y-6 relative z-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">عنوان المصدر أو الفكرة</label><input type="text" id="cap-title" placeholder="مثال: مراجعة عن ديك سكيب" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm"></div>
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة المتوقعة</label><select id="cap-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm appearance-none"><option value="سهلة">سهلة التنفيذ</option><option value="متوسطة">متوسطة - تحتاج اختبار</option><option value="معقدة">معقدة - تحتاج تطبيق مساعد</option></select></div>
+          </div>
+          <div class="bg-darkbg/30 p-4 rounded-2xl border border-dashed border-gray-600 hover:border-blueApp/50 transition-colors relative text-center group">
+            <input type="file" id="cap-image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(event, 'capture')">
+            <div id="capture-image-prompt" class="space-y-2 pointer-events-none transition-opacity group-hover:opacity-70"><i class="fa-regular fa-image text-3xl text-gray-500"></i><p class="text-sm text-gray-400 font-semibold">أرفق صورة مرجعية اختيارية</p></div>
+            <div id="capture-image-preview-container" class="hidden relative w-full flex justify-center"><img id="capture-image-preview" src="" class="max-h-40 rounded-xl border border-white/10 shadow-lg object-contain"><button type="button" onclick="clearImagePreview(event, 'capture')" class="absolute -top-3 -right-3 bg-redApp text-white w-8 h-8 rounded-full flex items-center justify-center z-20 hover:scale-110 transition-transform shadow-lg"><i class="fa-solid fa-xmark"></i></button></div>
+          </div>
+          <div class="bg-darkbg/50 p-5 rounded-2xl border border-white/5 space-y-5">
+            <h3 class="font-bold text-blueApp border-b border-white/5 pb-2 mb-4"><i class="fa-solid fa-filter text-sm"></i> فلتر الفهم</h3>
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">لماذا حفظته؟</label><textarea id="cap-why" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none" placeholder="ما القيمة التي رأيتها؟"></textarea></div>
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">الآلية أو الفكرة المستخرجة</label><textarea id="cap-mechanic" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none" placeholder="اكتبها بكلماتك."></textarea></div>
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">أين وكيف سأستخدمها؟</label><textarea id="cap-how" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none" placeholder="مثال تطبيقي في مشروعك."></textarea></div>
+          </div>
+          <button onclick="handleSaveCapture()" id="save-capture-btn" class="w-full bg-blueApp hover:bg-blue-600 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blueApp/20 flex justify-center items-center gap-2 text-lg"><i class="fa-solid fa-box-archive"></i> اعتمد واقلبه إلى آلية</button>
+        </div>
+      </div>
+    </div>
 
-        let appData = {
-            mechanics: [],
-            experiments: []
-        };
+    <!-- مكتبة المعرفة -->
+    <div id="tab-knowledge" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2">مكتبة المعرفة</h2><p class="text-gray-400">ارفع مقالاتك وبحوثك ثم اسأل داخلها. النتائج مقاطع موثقة من محتواك، وليست إجابة ذكاء اصطناعي.</p></header>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <section class="glass-panel p-6 rounded-3xl">
+          <h3 class="text-xl font-black mb-5 flex items-center gap-2"><i class="fa-solid fa-file-arrow-up text-blueApp"></i> إضافة مصدر معرفي</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <input id="ks-title" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="عنوان المصدر" />
+            <select id="ks-type" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option>مقال</option><option>بحث</option><option>ملاحظة</option><option>مراجعة</option><option>تجربة مكتوبة</option><option>قاعدة</option><option>ملف خام</option></select>
+            <select id="ks-school" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option>عام</option><option>ديك سكيب</option><option>أنلوك</option><option>إكزت</option><option>ألعاب النقر والتصفح</option><option>تحقيقات ورقية</option><option>تطبيق مساعد</option></select>
+            <select id="ks-domain" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option>عام</option><option>ألغاز</option><option>بطاقات</option><option>قصة</option><option>تطبيق</option><option>تلميحات</option><option>اختبار لعب</option><option>إنتاج</option><option>تسويق</option></select>
+          </div>
+          <input id="ks-url" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4" placeholder="رابط اختياري" />
+          <textarea id="ks-summary" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4" placeholder="ملخص بكلماتي"></textarea>
+          <textarea id="ks-why" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4" placeholder="لماذا حفظته؟"></textarea>
+          <input id="ks-keywords" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4" placeholder="كلمات مفتاحية مفصولة بفواصل" />
+          <div class="bg-darkbg/30 p-4 rounded-2xl border border-dashed border-gray-600 mb-4">
+            <label class="block text-sm font-bold text-gray-300 mb-2">ملف اختياري</label>
+            <input id="ks-file" type="file" class="w-full text-sm text-gray-400 file:ml-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blueApp file:text-white file:font-bold" onchange="tryReadKnowledgeFile(event)" />
+            <p class="text-xs text-gray-500 mt-2">تستطيع قراءة ملفات النصوص مباشرة. ملفات PDF/Word تُحفظ كملف، لكن يفضل لصق النص يدويًا في هذه النسخة.</p>
+          </div>
+          <textarea id="ks-fulltext" rows="10" class="w-full bg-panel border border-white/10 rounded-xl p-3 glow-input mb-4 leading-relaxed" placeholder="الصق النص الكامل للمقال أو البحث هنا"></textarea>
+          <button onclick="saveKnowledgeSource()" id="save-knowledge-btn" class="w-full bg-blueApp hover:bg-blue-600 text-white font-black py-3 rounded-xl"><i class="fa-solid fa-database"></i> حفظ المصدر وتقطيعه للبحث</button>
+        </section>
 
-        // Initialize App & Fetch Data from Cloud
-        async function initApp() {
-            if (!isSupabaseConfigured) {
-                showToast("الوضع المحلي", "أضف مفاتيح Supabase لتفعيل السحابة.", "warning");
-                updateCloudStatus('warning', 'الرجاء إدخال المفاتيح (Keys)');
-                renderUI();
-                return;
-            }
+        <section class="glass-panel p-6 rounded-3xl">
+          <h3 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fa-solid fa-magnifying-glass text-yellowApp"></i> اسأل مكتبتي</h3>
+          <div class="p-3 rounded-xl bg-yellowApp/10 border border-yellowApp/20 text-yellowApp text-xs leading-relaxed mb-4">هذه نتيجة بحث داخل مكتبتك، وليست إجابة مولدة بالذكاء الاصطناعي. المنصة تعرض المقاطع الأقرب من مصادرك.</div>
+          <div class="flex gap-2 mb-4"><input id="library-question" class="flex-1 bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="مثال: كيف أصمم آلية رجوع عادلة؟" /><button onclick="askLibrary()" class="px-5 bg-yellowApp hover:bg-yellow-600 text-darkbg font-black rounded-xl">بحث</button></div>
+          <div id="library-results" class="space-y-4"></div>
+        </section>
+      </div>
+      <section class="mt-8"><h3 class="text-xl font-black mb-4">مصادري الأخيرة</h3><div id="knowledge-sources-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div></section>
+    </div>
 
-            updateCloudStatus('warning', 'جاري جلب البيانات...');
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('mechanics')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+    <!-- الآليات -->
+    <div id="tab-mechanics" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4"><div><h2 class="text-3xl font-black mb-2">مكتبة الآليات</h2><p class="text-gray-400">هنا لا تجمع المقالات، بل تجمع آليات عمل قابلة للتطبيق الفوري.</p></div></header>
+      <div id="mechanics-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+    </div>
 
-                if (error) throw error;
+    <!-- المختبر -->
+    <div id="tab-lab" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2">مختبر التجارب</h2><p class="text-gray-400">كل آلية تدخل المختبر كتجربة لها فرضية ونتيجة وقرار.</p></header>
+      <div id="experiments-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+    </div>
 
-                appData.mechanics = data || [];
-                updateCloudStatus('success', 'النظام متصل بالسحابة');
-                renderUI();
-            } catch (error) {
-                console.error("Supabase fetch error:", error);
-                updateCloudStatus('error', 'فشل الاتصال بقاعدة البيانات');
-                showToast("خطأ سحابي", "لم نتمكن من جلب بياناتك.", "error");
-            }
-        }
+    <!-- ورشة الإنتاج -->
+    <div id="tab-production" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2">ورشة الإنتاج</h2><p class="text-gray-400">المكان الذي تتحول فيه القواعد والتجارب إلى مشاريع وبطاقات وألغاز وقرارات.</p></header>
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <section class="glass-panel p-5 rounded-3xl xl:col-span-1">
+          <h3 class="text-xl font-black mb-4">إنشاء مشروع</h3>
+          <input id="proj-title" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3" placeholder="اسم المشروع" />
+          <input id="proj-type" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3" placeholder="نوع اللعبة" value="سكيب روم كرتي" />
+          <textarea id="proj-promise" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3" placeholder="وعد التجربة"></textarea>
+          <textarea id="proj-story" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3" placeholder="القصة المختصرة"></textarea>
+          <div class="grid grid-cols-2 gap-3 mb-3"><input id="proj-theme" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="الثيم" /><input id="proj-duration" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="المدة" /></div>
+          <label class="flex gap-2 items-center text-sm text-gray-300 mb-3"><input id="proj-two-teams" type="checkbox" class="accent-blueApp"> فيه فريقان</label>
+          <select id="proj-status" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4"><option>فكرة</option><option>هيكل</option><option>نموذج</option><option>اختبار</option><option>إنتاج بصري</option><option>جاهز</option><option>مؤرشف</option></select>
+          <button onclick="saveProject()" class="w-full bg-yellowApp hover:bg-yellow-600 text-darkbg font-black py-3 rounded-xl">إنشاء مشروع</button>
+        </section>
+        <section class="xl:col-span-2"><h3 class="text-xl font-black mb-4">المشاريع</h3><div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></section>
+      </div>
+      <div id="project-detail" class="mt-8 hidden"></div>
+    </div>
 
-        async function handleSaveCapture() {
-            const title = document.getElementById('cap-title').value.trim();
-            const difficulty = document.getElementById('cap-difficulty').value;
-            const why = document.getElementById('cap-why').value.trim();
-            const mechanic = document.getElementById('cap-mechanic').value.trim();
-            const how = document.getElementById('cap-how').value.trim();
+    <!-- دستور التصميم -->
+    <div id="tab-rules" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
+      <header class="mb-8"><h2 class="text-3xl font-black mb-2">دستور التصميم</h2><p class="text-gray-400">كل فشل أو نجاح يجب أن يتحول إلى قاعدة قابلة للتكرار.</p></header>
+      <div class="glass-panel p-6 rounded-3xl mb-6">
+        <h3 class="text-xl font-black mb-4">إضافة قاعدة يدويًا</h3>
+        <textarea id="rule-text" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3" placeholder="اكتب القاعدة..."></textarea>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3"><select id="rule-type" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option>قاعدة تصميم</option><option>تحذير</option><option>قاعدة إنتاج</option><option>قاعدة اختبار</option><option>قاعدة تطبيق</option></select><select id="rule-from" class="bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option>تجربة</option><option>فشل</option><option>نجاح</option><option>مصدر</option><option>قرار</option></select><button onclick="saveDesignRule()" class="bg-greenApp hover:bg-green-600 text-white font-black rounded-xl">حفظ القاعدة</button></div>
+      </div>
+      <div id="rules-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+    </div>
+  </main>
 
-            if(!title || !why || !mechanic || !how) {
-                showToast("الفلتر يرفض الإدخال!", "يجب ملء جميع الحقول بكلماتك.", "error");
-                return;
-            }
+  <!-- Modal -->
+  <div id="modal" class="modal-backdrop"><div class="glass-panel rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"><div class="flex justify-between items-center p-5 border-b border-white/10"><h3 id="modal-title" class="text-xl font-black"></h3><button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-redApp/20 text-gray-300 hover:text-redApp"><i class="fa-solid fa-xmark"></i></button></div><div id="modal-body" class="p-5"></div></div></div>
 
-            const newRecord = {
-                title: title,
-                difficulty: difficulty,
-                why: why,
-                mechanic: mechanic,
-                how: how,
-                status: 'pending'
-            };
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 md:right-1/2 md:translate-x-1/2 bg-panel border border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 opacity-0 translate-y-4 z-50"><i id="toast-icon" class="fa-solid fa-circle-check text-greenApp text-xl"></i><div><p id="toast-title" class="font-bold text-sm">تم الإجراء</p><p id="toast-msg" class="text-xs text-gray-400">رسالة توضيحية هنا.</p></div></div>
 
-            if (!isSupabaseConfigured) {
-                showToast("تنبيه", "السحابة غير مفعلة، لن يتم الحفظ.", "error");
-                return;
-            }
+<script>
+/* =========================================================
+   إعداد Supabase
+   ========================================================= */
+const SUPABASE_URL = 'https://oifryaiwcordvqffocbb.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZnJ5YWl3Y29yZHZxZmZvY2JiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MzQxMzYsImV4cCI6MjA5MzMxMDEzNn0.wpDMznPhno3NWuycU7qTvOMcBZyEcPuC4AiUv9d_6MA';
+const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY_HERE';
+let supabaseClient = null;
+let currentUser = null;
+let localMode = false;
+if (isSupabaseConfigured) supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            showToast("جاري المعالجة...", "يتم إرسال الآلية للسحابة...", "warning");
+const TABLES = ['mechanics','knowledge_sources','knowledge_chunks','experiments','design_rules','projects','project_cards','puzzles','playtests','issues','decisions','relations'];
+let appData = { mechanics:[], knowledge_sources:[], knowledge_chunks:[], experiments:[], design_rules:[], projects:[], project_cards:[], puzzles:[], playtests:[], issues:[], decisions:[], relations:[] };
+let selectedFiles = { capture:null, knowledge:null, project_card:null };
+let selectedProjectId = null;
 
-            try {
-                const { data, error } = await supabaseClient
-                    .from('mechanics')
-                    .insert([newRecord])
-                    .select();
+/* =========================================================
+   تشغيل التطبيق والمصادقة
+   ========================================================= */
+window.onload = initApp;
+async function initApp(){
+  if(!isSupabaseConfigured){
+    updateCloudStatus('warning','وضع محلي تجريبي');
+    startLocalMode();
+    return;
+  }
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session){
+    currentUser = data.session.user;
+    document.getElementById('auth-screen').classList.add('hidden');
+    updateCloudStatus('warning','جاري جلب البيانات...');
+    await loadAllData();
+  } else {
+    document.getElementById('auth-screen').classList.remove('hidden');
+    updateCloudStatus('warning','بانتظار تسجيل الدخول');
+  }
+}
+async function signIn(){
+  const email = val('auth-email'), password = val('auth-password');
+  if(!email || !password) return showToast('بيانات ناقصة','اكتب البريد وكلمة المرور.','error');
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error) return showToast('فشل الدخول', error.message, 'error');
+  currentUser = data.user; document.getElementById('auth-screen').classList.add('hidden'); await loadAllData(); showToast('تم الدخول','تم الاتصال بسحابتك.','success');
+}
+async function signUp(){
+  const email = val('auth-email'), password = val('auth-password');
+  if(!email || !password) return showToast('بيانات ناقصة','اكتب البريد وكلمة المرور.','error');
+  const { data, error } = await supabaseClient.auth.signUp({ email, password });
+  if(error) return showToast('فشل إنشاء الحساب', error.message, 'error');
+  currentUser = data.user; showToast('تم إنشاء الحساب','قد تحتاج تأكيد البريد حسب إعدادات Supabase.','success');
+}
+async function signOut(){
+  if(localMode){ localStorage.removeItem('escape_v3_local'); location.reload(); return; }
+  await supabaseClient.auth.signOut(); location.reload();
+}
+function startLocalMode(){
+  localMode = true; currentUser = { id:'local-user' }; document.getElementById('auth-screen').classList.add('hidden');
+  const raw = localStorage.getItem('escape_v3_local'); if(raw){ try{ appData = JSON.parse(raw); }catch(e){} }
+  updateCloudStatus('warning','وضع محلي غير سحابي'); renderUI();
+}
 
-                if (error) throw error;
+async function loadAllData(){
+  if(localMode){ renderUI(); return; }
+  try{
+    for(const t of TABLES){
+      const { data, error } = await supabaseClient.from(t).select('*').order('created_at',{ascending:false}).limit(1000);
+      if(error) throw error; appData[t] = data || [];
+    }
+    updateCloudStatus('success','النظام متصل بالسحابة'); renderUI();
+  }catch(error){ console.error(error); updateCloudStatus('error','فشل جلب البيانات'); showToast('خطأ سحابي','راجع الجداول وRLS وملف SQL.','error'); renderUI(); }
+}
+function persistLocal(){ if(localMode) localStorage.setItem('escape_v3_local', JSON.stringify(appData)); }
 
-                // Add to local state and re-render
-                if (data && data.length > 0) {
-                    appData.mechanics.unshift(data[0]);
-                }
-                
-                showToast("تم الاعتماد بنجاح", "تمت إضافة الآلية إلى قاعدة البيانات السحابية.", "success");
-                
-                // Clear form
-                document.getElementById('cap-title').value = '';
-                document.getElementById('cap-why').value = '';
-                document.getElementById('cap-mechanic').value = '';
-                document.getElementById('cap-how').value = '';
-                
-                renderUI();
-                setTimeout(() => { switchTab('mechanics'); }, 1000);
-            } catch (error) {
-                console.error("Insert error:", error);
-                showToast("فشل الحفظ", "حدث خطأ أثناء الاتصال بالسحابة.", "error");
-            }
-        }
+/* =========================================================
+   CRUD عام
+   ========================================================= */
+async function insertRecord(table, record){
+  if(localMode){ const item = { id: crypto.randomUUID(), created_at:new Date().toISOString(), updated_at:new Date().toISOString(), ...record }; appData[table].unshift(item); persistLocal(); return item; }
+  const { data, error } = await supabaseClient.from(table).insert([record]).select().single(); if(error) throw error; appData[table].unshift(data); return data;
+}
+async function updateRecord(table, id, patch){
+  if(localMode){ const i = appData[table].findIndex(x=>x.id===id); if(i>-1){ appData[table][i] = { ...appData[table][i], ...patch, updated_at:new Date().toISOString() }; persistLocal(); return appData[table][i]; } return null; }
+  const { data, error } = await supabaseClient.from(table).update(patch).eq('id',id).select().single(); if(error) throw error; const i = appData[table].findIndex(x=>x.id===id); if(i>-1) appData[table][i]=data; return data;
+}
+async function deleteRecord(table, id){
+  if(localMode){ appData[table]=appData[table].filter(x=>x.id!==id); persistLocal(); renderUI(); return; }
+  const { error } = await supabaseClient.from(table).delete().eq('id',id); if(error) throw error; appData[table]=appData[table].filter(x=>x.id!==id); renderUI();
+}
 
-        async function deleteMechanic(id) {
-            if (!isSupabaseConfigured) return;
+/* =========================================================
+   ملفات وصور
+   ========================================================= */
+function previewImage(event, key){
+  const file = event.target.files[0]; if(!file) return; selectedFiles[key]=file;
+  const reader = new FileReader(); reader.onload = e => { document.getElementById(`${key}-image-prompt`)?.classList.add('hidden'); document.getElementById(`${key}-image-preview-container`)?.classList.remove('hidden'); const img = document.getElementById(`${key}-image-preview`); if(img) img.src=e.target.result; }; reader.readAsDataURL(file);
+}
+function clearImagePreview(event, key){ if(event) event.stopPropagation(); selectedFiles[key]=null; const input = document.getElementById(`${key}-image`); if(input) input.value=''; document.getElementById(`${key}-image-prompt`)?.classList.remove('hidden'); document.getElementById(`${key}-image-preview-container`)?.classList.add('hidden'); const img=document.getElementById(`${key}-image-preview`); if(img) img.src=''; }
+async function uploadPrivateFile(bucket, file){
+  if(!file) return { bucket:null, path:null };
+  if(localMode){ return { bucket:'local', path: await fileToDataUrl(file) }; }
+  const safe = file.name.replace(/[^a-zA-Z0-9._-]/g,'_'); const path = `${currentUser.id}/${Date.now()}_${safe}`;
+  const { error } = await supabaseClient.storage.from(bucket).upload(path, file, { upsert:false }); if(error) throw error;
+  return { bucket, path };
+}
+function fileToDataUrl(file){ return new Promise((resolve,reject)=>{ const r=new FileReader(); r.onload=()=>resolve(r.result); r.onerror=reject; r.readAsDataURL(file); }); }
+async function hydrateSignedImages(){
+  const imgs = document.querySelectorAll('[data-private-bucket][data-private-path]');
+  for(const el of imgs){ const bucket=el.dataset.privateBucket, path=el.dataset.privatePath; if(!path) continue; if(bucket==='local'){ el.src=path; continue; }
+    try{ const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 3600); if(!error && data?.signedUrl) el.src=data.signedUrl; }catch(e){}
+  }
+}
+async function tryReadKnowledgeFile(event){
+  const file = event.target.files[0]; if(!file) return; selectedFiles.knowledge = file;
+  if(file.type.startsWith('text/') || file.name.endsWith('.md')){ const text = await file.text(); document.getElementById('ks-fulltext').value = text; showToast('تمت قراءة الملف','تم وضع النص في خانة النص الكامل.','success'); }
+  else showToast('تم اختيار الملف','سيُحفظ الملف، لكن انسخ نصه يدويًا في خانة النص الكامل للبحث داخله.','warning');
+}
 
-            try {
-                const { error } = await supabaseClient
-                    .from('mechanics')
-                    .delete()
-                    .eq('id', id);
+/* =========================================================
+   تطبيع العربية والبحث
+   ========================================================= */
+function normalizeArabic(text=''){
+  return String(text)
+    .replace(/[\u064B-\u0652\u0670]/g,'')
+    .replace(/[أإآا]/g,'ا')
+    .replace(/ى/g,'ي')
+    .replace(/ؤ/g,'و').replace(/ئ/g,'ي')
+    .replace(/ة/g,'ه')
+    .replace(/[\u0640]/g,'')
+    .replace(/[^\u0600-\u06FFa-zA-Z0-9\s]/g,' ')
+    .replace(/\s+/g,' ').trim().toLowerCase();
+}
+function tokenize(text){ const stop = new Set(['في','من','على','الى','إلى','عن','ما','ماذا','كيف','هل','هذا','هذه','ذلك','التي','الذي','مع','او','أو','ثم','كل','بين','داخل','عند','لكن','انه','أن','ان','لا']); return normalizeArabic(text).split(' ').filter(w=>w.length>1 && !stop.has(w)); }
+function chunkText(text, size=900){ const paras = String(text||'').split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean); const chunks=[]; let buf=''; for(const p of paras){ if((buf+'\n'+p).length>size && buf){ chunks.push(buf.trim()); buf=p; } else buf += (buf?'\n\n':'') + p; } if(buf.trim()) chunks.push(buf.trim()); return chunks.length?chunks:[String(text||'').slice(0,size)]; }
+function scoreChunk(chunk, qTokens){ const n = chunk.normalized_text || normalizeArabic(chunk.chunk_text); let score=0; for(const t of qTokens){ const re = new RegExp(`(^| )${escapeReg(t)}( |$)`,'g'); const m = n.match(re); if(m) score += m.length * 3; if((chunk.title||'').includes(t)) score += 2; } return score; }
+function highlight(text, tokens){ let out = escapeHtml(text); tokens.slice(0,12).forEach(t=>{ if(t.length<2) return; const raw = escapeReg(t); out = out.replace(new RegExp(`(${raw})`,'gi'), '<mark>$1</mark>'); }); return out; }
+function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
-                if (error) throw error;
+/* =========================================================
+   الآليات والالتقاط
+   ========================================================= */
+async function handleSaveCapture(){
+  const title=val('cap-title'), difficulty=val('cap-difficulty'), why=val('cap-why'), mechanic=val('cap-mechanic'), how=val('cap-how');
+  if(!title || !why || !mechanic || !how) return showToast('الفلتر يرفض الإدخال','املأ جميع الحقول بكلماتك.','error');
+  toggleBtn('save-capture-btn', true);
+  try{ const up = await uploadPrivateFile('puzzle_images', selectedFiles.capture); await insertRecord('mechanics',{title,difficulty,why,mechanic,how,image_bucket:up.bucket,image_path:up.path,status:'pending'}); clearFields(['cap-title','cap-why','cap-mechanic','cap-how']); clearImagePreview(null,'capture'); renderUI(); showToast('تم الاعتماد','تم حفظ الآلية.','success'); setTimeout(()=>switchTab('mechanics'),700); }
+  catch(e){ console.error(e); showToast('فشل الحفظ','راجع الاتصال أو سياسات التخزين.','error'); }
+  finally{ toggleBtn('save-capture-btn', false); }
+}
+async function sendToLab(id){
+  const m = appData.mechanics.find(x=>x.id===id); if(!m) return;
+  try{ await updateRecord('mechanics', id, { status:'lab' }); const exists = appData.experiments.find(e=>e.mechanic_id===id && ['planned','active'].includes(e.status)); if(!exists){ await insertRecord('experiments',{ mechanic_id:id, title:`تجربة: ${m.title}`, question:'ما السؤال الذي نريد اختباره؟', hypothesis:m.how || '', materials:'بطاقات ورقية أو نموذج أولي بسيط', method:'اختبار سريع على لاعب أو مجموعة صغيرة', what_to_observe:'هل فهم اللاعب المطلوب؟ أين توقف؟ هل احتاج تلميحًا؟', success_signals:'يفهم اللاعب العلاقة ويشرح الحل بعده', failure_signals:'توقف طويل، تفسير خاطئ، أو شعور بالظلم', status:'planned' }); } renderUI(); showToast('تم النقل للمختبر','تم إنشاء تجربة مرتبطة بالآلية.','success'); setTimeout(()=>switchTab('lab'),700); }
+  catch(e){ console.error(e); showToast('فشل النقل','راجع جدول experiments أو السياسات.','error'); }
+}
 
-                appData.mechanics = appData.mechanics.filter(m => m.id !== id);
-                renderUI();
-                showToast("تم الحذف", "تم مسح الآلية من السحابة.", "warning");
-            } catch (error) {
-                showToast("خطأ", "فشل الحذف من السحابة.", "error");
-            }
-        }
+/* =========================================================
+   مكتبة المعرفة
+   ========================================================= */
+async function saveKnowledgeSource(){
+  const title=val('ks-title'), full_text=val('ks-fulltext'); if(!title || !full_text) return showToast('بيانات ناقصة','العنوان والنص الكامل مطلوبان للبحث.','error');
+  toggleBtn('save-knowledge-btn', true);
+  try{
+    const up = await uploadPrivateFile('knowledge_files', selectedFiles.knowledge);
+    const source = await insertRecord('knowledge_sources',{ title, source_type:val('ks-type'), school:val('ks-school'), domain:val('ks-domain'), url:val('ks-url'), summary:val('ks-summary'), why:val('ks-why'), keywords:val('ks-keywords'), full_text, file_bucket:up.bucket, file_path:up.path, status:'raw' });
+    const chunks = chunkText(full_text).map((c,i)=>({ source_id:source.id, chunk_index:i, title, chunk_text:c, normalized_text:normalizeArabic(c), tags:val('ks-keywords') }));
+    for(const ch of chunks){ await insertRecord('knowledge_chunks', ch); }
+    clearFields(['ks-title','ks-url','ks-summary','ks-why','ks-keywords','ks-fulltext']); document.getElementById('ks-file').value=''; selectedFiles.knowledge=null;
+    renderUI(); showToast('تم حفظ المصدر',`تم إنشاء ${chunks.length} مقطع قابل للبحث.`,'success');
+  }catch(e){ console.error(e); showToast('فشل حفظ المصدر','راجع الجداول أو سياسات الملفات.','error'); }
+  finally{ toggleBtn('save-knowledge-btn', false); }
+}
+function askLibrary(){
+  const q = val('library-question'); const box=document.getElementById('library-results'); if(!q) return showToast('اكتب سؤالًا','السؤال مطلوب.','error');
+  const tokens = [...new Set(tokenize(q))]; if(!tokens.length){ box.innerHTML='<div class="empty-state">السؤال قصير جدًا.</div>'; return; }
+  const results = appData.knowledge_chunks.map(c=>({ chunk:c, score:scoreChunk(c,tokens), source:appData.knowledge_sources.find(s=>s.id===c.source_id) })).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,8);
+  if(!results.length){ box.innerHTML='<div class="empty-state">لم أجد مقاطع مطابقة في مكتبتك. جرّب كلمات مختلفة أو أضف مصادر أكثر.</div>'; return; }
+  box.innerHTML = results.map(r=>`<div class="glass-card p-4 rounded-2xl"><div class="flex justify-between gap-3 mb-2"><h4 class="font-black text-white">${escapeHtml(r.source?.title||r.chunk.title||'مصدر')}</h4><span class="chip text-yellowApp">قرب: ${r.score}</span></div><p class="text-xs text-gray-400 mb-3">${escapeHtml(r.source?.source_type||'مصدر')} • ${escapeHtml(r.source?.school||'عام')} • ${escapeHtml(r.source?.domain||'عام')}</p><div class="bg-darkbg/60 border border-white/5 p-3 rounded-xl text-sm leading-relaxed text-gray-200 max-h-52 overflow-y-auto">${highlight(r.chunk.chunk_text, tokens)}</div><div class="flex flex-wrap gap-2 mt-3"><button onclick="prefillMechanicFromChunk('${r.chunk.id}')" class="px-3 py-2 rounded-lg bg-purpleApp/10 text-purpleApp border border-purpleApp/20 font-bold text-xs">حوّل إلى آلية</button><button onclick="makeRuleFromChunk('${r.chunk.id}')" class="px-3 py-2 rounded-lg bg-greenApp/10 text-greenApp border border-greenApp/20 font-bold text-xs">أضف للدستور</button><button onclick="openSourceModal('${r.source?.id||''}')" class="px-3 py-2 rounded-lg bg-white/5 text-gray-300 border border-white/10 font-bold text-xs">افتح المصدر</button></div></div>`).join('');
+}
+function prefillMechanicFromChunk(id){ const c=appData.knowledge_chunks.find(x=>x.id===id); const s=appData.knowledge_sources.find(x=>x.id===c?.source_id); if(!c) return; setVal('cap-title', s?.title || c.title || 'آلية من مكتبة المعرفة'); setVal('cap-why', s?.why || 'مستخرج من مكتبة المعرفة'); setVal('cap-mechanic', c.chunk_text.slice(0,600)); setVal('cap-how','اكتب هنا كيف ستطبق هذه الفكرة في مشروعك.'); switchTab('capture'); showToast('تم النقل','راجِع النص وحوله إلى آلية بكلماتك قبل الحفظ.','warning'); }
+async function makeRuleFromChunk(id){ const c=appData.knowledge_chunks.find(x=>x.id===id); if(!c) return; await insertRecord('design_rules',{rule_text:c.chunk_text.slice(0,700), rule_type:'قاعدة تصميم', came_from:'مصدر'}); renderUI(); showToast('تمت إضافة قاعدة','راجع دستور التصميم لتنقيحها.','success'); }
+function openSourceModal(id){ const s=appData.knowledge_sources.find(x=>x.id===id); if(!s) return; showModal('مصدر معرفي', `<h3 class="text-xl font-black mb-2">${escapeHtml(s.title)}</h3><p class="text-gray-400 mb-4">${escapeHtml(s.source_type)} • ${escapeHtml(s.school)} • ${escapeHtml(s.domain)}</p><div class="bg-darkbg border border-white/10 rounded-xl p-4 whitespace-pre-wrap leading-relaxed max-h-[55vh] overflow-y-auto">${escapeHtml(s.full_text||'')}</div>`); }
 
-        async function sendToLab(id) {
-            if (!isSupabaseConfigured) return;
+/* =========================================================
+   التجارب والدستور
+   ========================================================= */
+function openExperimentResult(id){ const e=appData.experiments.find(x=>x.id===id); if(!e) return; showModal('تسجيل نتيجة التجربة', `<input type="hidden" id="res-id" value="${e.id}"><label class="block mb-2 text-gray-300 font-bold">ماذا حدث فعليًا؟</label><textarea id="res-actual" rows="4" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3">${escapeHtml(e.actual_result||'')}</textarea><label class="block mb-2 text-gray-300 font-bold">القرار</label><select id="res-decision" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-3"><option>اعتماد</option><option>تعديل</option><option>رفض</option><option>إعادة اختبار</option></select><label class="block mb-2 text-gray-300 font-bold">القاعدة المستخلصة</label><textarea id="res-rule" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input mb-4">${escapeHtml(e.extracted_rule||'')}</textarea><button onclick="saveExperimentResult()" class="w-full bg-greenApp hover:bg-green-600 text-white font-black py-3 rounded-xl">حفظ النتيجة</button>`); }
+async function saveExperimentResult(){ const id=val('res-id'), actual=val('res-actual'), decision=val('res-decision'), rule=val('res-rule'); if(!id) return; try{ await updateRecord('experiments', id, {actual_result:actual, decision, extracted_rule:rule, status: decision==='اعتماد'?'approved': decision==='رفض'?'rejected':'tested'}); if(rule){ await insertRecord('design_rules',{rule_text:rule, rule_type:'قاعدة اختبار', came_from:decision==='رفض'?'فشل':'تجربة', experiment_id:id}); } closeModal(); renderUI(); showToast('تم حفظ النتيجة','تم تحديث التجربة والدستور.','success'); }catch(e){ console.error(e); showToast('فشل الحفظ','راجع السياسات.','error'); } }
+async function saveDesignRule(){ const rule_text=val('rule-text'); if(!rule_text) return showToast('اكتب القاعدة','لا يمكن حفظ قاعدة فارغة.','error'); await insertRecord('design_rules',{rule_text, rule_type:val('rule-type'), came_from:val('rule-from')}); setVal('rule-text',''); renderUI(); showToast('تم الحفظ','تمت إضافة القاعدة للدستور.','success'); }
 
-            const mechanicIndex = appData.mechanics.findIndex(m => m.id === id);
-            if(mechanicIndex === -1) return;
+/* =========================================================
+   ورشة الإنتاج
+   ========================================================= */
+async function saveProject(){ const title=val('proj-title'); if(!title) return showToast('اسم المشروع مطلوب','اكتب اسم المشروع.','error'); try{ await insertRecord('projects',{title, game_type:val('proj-type'), promise:val('proj-promise'), story:val('proj-story'), theme:val('proj-theme'), expected_duration:val('proj-duration'), has_two_teams:document.getElementById('proj-two-teams').checked, status:val('proj-status')}); clearFields(['proj-title','proj-promise','proj-story','proj-theme','proj-duration']); renderUI(); showToast('تم إنشاء المشروع','افتح المشروع لإضافة بطاقات وألغاز.','success'); }catch(e){ console.error(e); showToast('فشل إنشاء المشروع','راجع جدول projects.','error'); } }
+function openProject(id){ selectedProjectId=id; renderProjectDetail(); document.getElementById('project-detail').scrollIntoView({behavior:'smooth'}); }
+function renderProjectDetail(){ const p=appData.projects.find(x=>x.id===selectedProjectId); const box=document.getElementById('project-detail'); if(!p){box.classList.add('hidden'); return;} box.classList.remove('hidden'); const cards=appData.project_cards.filter(x=>x.project_id===p.id); const puzzles=appData.puzzles.filter(x=>x.project_id===p.id); const issues=appData.issues.filter(x=>x.project_id===p.id); const decisions=appData.decisions.filter(x=>x.project_id===p.id); box.innerHTML = `
+  <div class="glass-panel p-6 rounded-3xl"><div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6"><div><h3 class="text-2xl font-black">${escapeHtml(p.title)}</h3><p class="text-gray-400 mt-1">${escapeHtml(p.game_type||'')} • ${escapeHtml(p.status||'')}</p><p class="text-gray-300 mt-3 leading-relaxed">${escapeHtml(p.promise||'لا يوجد وعد تجربة مكتوب.')}</p></div><button onclick="selectedProjectId=null; renderProjectDetail()" class="px-4 py-2 bg-white/5 rounded-xl text-gray-300">إغلاق</button></div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="glass-card p-3 rounded-xl"><p class="text-xs text-gray-400">البطاقات</p><p class="text-xl font-black">${cards.length}</p></div><div class="glass-card p-3 rounded-xl"><p class="text-xs text-gray-400">الألغاز</p><p class="text-xl font-black">${puzzles.length}</p></div><div class="glass-card p-3 rounded-xl"><p class="text-xs text-gray-400">مشاكل مفتوحة</p><p class="text-xl font-black text-redApp">${issues.filter(i=>i.status!=='مغلقة').length}</p></div><div class="glass-card p-3 rounded-xl"><p class="text-xs text-gray-400">قرارات</p><p class="text-xl font-black">${decisions.length}</p></div></div>
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5"><div>${projectCardForm(p.id)}${renderMiniList('بطاقات المشروع', cards.map(c=>`${c.card_number||''} — ${c.title}`))}</div><div>${puzzleForm(p.id)}${renderMiniList('ألغاز المشروع', puzzles.map(z=>z.title))}</div><div>${issueForm(p.id)}${decisionForm(p.id)}${renderMiniList('المشاكل المفتوحة', issues.map(i=>`${i.issue_type}: ${i.description}`))}${renderLinkMap(p)}</div></div></div>`; }
+function projectCardForm(projectId){ return `<div class="bg-darkbg/45 border border-white/10 rounded-2xl p-4 mb-4"><h4 class="font-black mb-3">إضافة بطاقة</h4><input id="card-num" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="رقم البطاقة"><input id="card-title" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="اسم البطاقة"><select id="card-type" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2"><option>مشهد</option><option>عنصر</option><option>لغز</option><option>وثيقة</option><option>نتيجة</option><option>تلميح</option><option>تطبيق</option><option>نهاية</option></select><textarea id="card-function" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="وظيفة البطاقة"></textarea><button onclick="saveProjectCard('${projectId}')" class="w-full bg-blueApp hover:bg-blue-600 rounded-xl py-2 font-bold">حفظ بطاقة</button></div>`; }
+async function saveProjectCard(projectId){ if(!val('card-title')) return showToast('اسم البطاقة مطلوب','اكتب اسم البطاقة.','error'); await insertRecord('project_cards',{project_id:projectId, card_number:val('card-num'), title:val('card-title'), card_type:val('card-type'), function_in_game:val('card-function')}); clearFields(['card-num','card-title','card-function']); renderUI(); openProject(projectId); showToast('تم حفظ البطاقة','أضيفت للمشروع.','success'); }
+function puzzleForm(projectId){ return `<div class="bg-darkbg/45 border border-white/10 rounded-2xl p-4 mb-4"><h4 class="font-black mb-3">إضافة لغز</h4><input id="puzzle-title" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="اسم اللغز"><textarea id="puzzle-question" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="السؤال الظاهر للاعب"></textarea><textarea id="puzzle-solution" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="الحل وطريقته"></textarea><div class="grid grid-cols-3 gap-2 text-xs mb-2"><label><input id="puz-back" type="checkbox" class="accent-blueApp"> رجوع</label><label><input id="puz-assemble" type="checkbox" class="accent-blueApp"> تركيب</label><label><input id="puz-coop" type="checkbox" class="accent-blueApp"> تعاون</label></div><button onclick="savePuzzle('${projectId}')" class="w-full bg-purpleApp hover:bg-purple-600 rounded-xl py-2 font-bold">حفظ لغز</button></div>`; }
+async function savePuzzle(projectId){ if(!val('puzzle-title')) return showToast('اسم اللغز مطلوب','اكتب اسم اللغز.','error'); await insertRecord('puzzles',{project_id:projectId, title:val('puzzle-title'), player_question:val('puzzle-question'), solution:val('puzzle-solution'), has_backtracking:document.getElementById('puz-back').checked, has_card_assembly:document.getElementById('puz-assemble').checked, needs_cooperation:document.getElementById('puz-coop').checked}); clearFields(['puzzle-title','puzzle-question','puzzle-solution']); renderUI(); openProject(projectId); showToast('تم حفظ اللغز','أضيف للمشروع.','success'); }
+function issueForm(projectId){ return `<div class="bg-darkbg/45 border border-white/10 rounded-2xl p-4 mb-4"><h4 class="font-black mb-3">مشكلة</h4><select id="issue-type" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2"><option>توجيه</option><option>منطق</option><option>صعوبة</option><option>صورة</option><option>نص</option><option>تطبيق</option><option>تعاون</option><option>تنافس</option><option>حرق مبكر</option><option>إنتاج</option></select><textarea id="issue-desc" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="وصف المشكلة"></textarea><button onclick="saveIssue('${projectId}')" class="w-full bg-redApp/80 hover:bg-redApp rounded-xl py-2 font-bold">حفظ مشكلة</button></div>`; }
+async function saveIssue(projectId){ if(!val('issue-desc')) return; await insertRecord('issues',{project_id:projectId, issue_type:val('issue-type'), description:val('issue-desc'), status:'مفتوحة'}); setVal('issue-desc',''); renderUI(); openProject(projectId); }
+function decisionForm(projectId){ return `<div class="bg-darkbg/45 border border-white/10 rounded-2xl p-4 mb-4"><h4 class="font-black mb-3">قرار</h4><textarea id="dec-text" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="ماذا قررنا؟"></textarea><textarea id="dec-reason" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-2 mb-2" placeholder="لماذا؟"></textarea><button onclick="saveDecision('${projectId}')" class="w-full bg-greenApp hover:bg-green-600 rounded-xl py-2 font-bold">حفظ قرار</button></div>`; }
+async function saveDecision(projectId){ if(!val('dec-text')) return; await insertRecord('decisions',{project_id:projectId, decision_text:val('dec-text'), reason:val('dec-reason')}); clearFields(['dec-text','dec-reason']); renderUI(); openProject(projectId); }
+function renderMiniList(title, items){ return `<div class="mb-4"><h4 class="font-bold mb-2 text-gray-300">${title}</h4>${items.length?`<ul class="space-y-2 text-sm text-gray-400">${items.slice(0,6).map(i=>`<li class="bg-darkbg/45 border border-white/5 rounded-lg p-2">${escapeHtml(i)}</li>`).join('')}</ul>`:'<div class="text-xs text-gray-500">لا توجد بيانات.</div>'}</div>`; }
+function renderLinkMap(p){ return `<div class="bg-darkbg/45 border border-white/10 rounded-2xl p-4"><h4 class="font-black mb-3">خريطة الربط</h4><div class="text-xs text-gray-400 leading-7">مصدر معرفي ← آلية ← تجربة ← نتيجة ← قاعدة ← <span class="text-yellowApp font-bold">${escapeHtml(p.title)}</span> ← بطاقة أو لغز</div></div>`; }
 
-            showToast("جاري التحديث...", "إرسال للسحابة...", "warning");
+/* =========================================================
+   Rendering
+   ========================================================= */
+function renderUI(){ renderDashboard(); renderKnowledge(); renderMechanics(); renderExperiments(); renderProjects(); renderRules(); updateBadges(); hydrateSignedImages(); }
+function renderDashboard(){
+  const metrics=[['المصادر',appData.knowledge_sources.length,'book-open','blueApp'],['الآليات',appData.mechanics.length,'puzzle-piece','purpleApp'],['التجارب',appData.experiments.length,'microscope','greenApp'],['المشاريع',appData.projects.length,'industry','yellowApp'],['المشاكل المفتوحة',appData.issues.filter(i=>i.status!=='مغلقة').length,'triangle-exclamation','redApp'],['القواعد',appData.design_rules.length,'scale-balanced','greenApp']];
+  document.getElementById('metrics-grid').innerHTML = metrics.map(m=>`<div class="glass-card rounded-2xl p-4"><i class="fa-solid fa-${m[2]} text-${m[3]} mb-2"></i><p class="text-2xl font-black">${m[1]}</p><p class="text-xs text-gray-400 font-bold">${m[0]}</p></div>`).join('');
+  const activeExp=appData.experiments.find(e=>['planned','active','tested'].includes(e.status)); setText('dash-experiment', activeExp?activeExp.title:'لا توجد تجارب نشطة.');
+  const activeProj=appData.projects.find(p=>p.status!=='مؤرشف'); setText('dash-project', activeProj?`${activeProj.title} — ${activeProj.status}`:'لا يوجد مشروع نشط.');
+  const issue=appData.issues.find(i=>i.status!=='مغلقة'); setText('dash-issue', issue?`${issue.issue_type}: ${issue.description}`:'لا توجد مشاكل مفتوحة.');
+  const rule=appData.design_rules[0]; setText('dash-rule', rule?rule.rule_text:'لا توجد قاعدة معتمدة بعد.');
+  const decision=appData.decisions[0]; setText('dash-decision', decision?decision.decision_text:'لا توجد قرارات معلقة.');
+  document.getElementById('dash-recent-mechanics').innerHTML = cardList(appData.mechanics.slice(0,2), x=>x.title, x=>x.how, 'purpleApp');
+  document.getElementById('dash-recent-sources').innerHTML = cardList(appData.knowledge_sources.slice(0,2), x=>x.title, x=>x.summary||x.why, 'blueApp');
+}
+function cardList(arr, titleFn, bodyFn, color){ if(!arr.length) return '<div class="empty-state p-5">لا توجد بيانات.</div>'; return arr.map(x=>`<div class="glass-card p-4 rounded-xl border-t-2 border-t-${color}"><h4 class="font-black mb-1 truncate">${escapeHtml(titleFn(x)||'بدون عنوان')}</h4><p class="text-xs text-gray-400 line-clamp-2">${escapeHtml(bodyFn(x)||'')}</p></div>`).join(''); }
+function renderKnowledge(){
+  document.getElementById('knowledge-sources-grid').innerHTML = appData.knowledge_sources.length ? appData.knowledge_sources.map(s=>`<div class="glass-card p-4 rounded-2xl"><h4 class="font-black mb-1">${escapeHtml(s.title)}</h4><p class="text-xs text-gray-400 mb-2">${escapeHtml(s.source_type)} • ${escapeHtml(s.school)} • ${escapeHtml(s.domain)}</p><p class="text-sm text-gray-300 line-clamp-2">${escapeHtml(s.summary||s.why||'')}</p><button onclick="openSourceModal('${s.id}')" class="mt-3 text-xs bg-white/5 px-3 py-2 rounded-lg">فتح</button></div>`).join('') : '<div class="empty-state col-span-full">لا توجد مصادر محفوظة.</div>';
+}
+function renderMechanics(){ const grid=document.getElementById('mechanics-grid'); if(!appData.mechanics.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد آليات. ابدأ من الالتقاط السريع أو مكتبة المعرفة.</div>'; return; } grid.innerHTML=appData.mechanics.map(m=>{ const color=m.status==='lab'?'blueApp':m.status==='approved'?'greenApp':'yellowApp'; const status=m.status==='lab'?'في المختبر':m.status==='approved'?'معتمدة':'تحتاج تجربة'; return `<div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full">${m.image_path?`<div class="w-full h-44 bg-darkbg overflow-hidden"><img data-private-bucket="${m.image_bucket}" data-private-path="${m.image_path}" class="w-full h-full object-cover opacity-80"></div>`:''}<div class="bg-${color}/20 border-b border-${color}/30 px-5 py-3 flex justify-between"><span class="text-${color} font-bold text-xs">${status}</span><span class="chip">${escapeHtml(m.difficulty||'متوسطة')}</span></div><div class="p-5 flex-1"><h3 class="text-xl font-black mb-3">${escapeHtml(m.title)}</h3><div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">الآلية</p><p class="text-sm text-gray-300 leading-relaxed">${escapeHtml(m.mechanic||'')}</p></div><div class="bg-darkbg/50 p-3 rounded-xl"><p class="text-[10px] text-gray-500 font-bold mb-1">التطبيق</p><p class="text-sm text-blueApp font-semibold leading-relaxed">${escapeHtml(m.how||'')}</p></div></div><div class="p-4 bg-panel/50 border-t border-white/5 flex gap-2">${m.status==='lab'?'<button disabled class="flex-1 bg-white/5 text-gray-500 py-2 rounded-lg text-xs font-bold">قيد التجربة</button>':`<button onclick="sendToLab('${m.id}')" class="flex-1 bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 py-2 rounded-lg text-xs font-bold">إرسال للمختبر</button>`}<button onclick="deleteRecord('mechanics','${m.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg"><i class="fa-regular fa-trash-can"></i></button></div></div>`; }).join(''); hydrateSignedImages(); }
+function renderExperiments(){ const grid=document.getElementById('experiments-grid'); if(!appData.experiments.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد تجارب. أرسل آلية إلى المختبر.</div>'; return; } grid.innerHTML=appData.experiments.map(e=>`<div class="glass-panel p-5 rounded-2xl border-r-4 border-r-yellowApp"><div class="flex justify-between gap-3 mb-2"><h3 class="text-xl font-black">${escapeHtml(e.title)}</h3><span class="chip">${escapeHtml(e.status)}</span></div><p class="text-xs text-gray-400 mb-3">السؤال: ${escapeHtml(e.question||'غير محدد')}</p><div class="bg-darkbg/55 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold">الفرضية</p><p class="text-sm text-gray-300">${escapeHtml(e.hypothesis||'')}</p></div><div class="bg-darkbg/55 p-3 rounded-xl mb-4"><p class="text-[10px] text-gray-500 font-bold">ماذا أراقب؟</p><p class="text-sm text-gray-300">${escapeHtml(e.what_to_observe||'')}</p></div>${e.extracted_rule?`<div class="bg-greenApp/10 border border-greenApp/20 p-3 rounded-xl mb-3 text-sm text-greenApp">قاعدة: ${escapeHtml(e.extracted_rule)}</div>`:''}<button onclick="openExperimentResult('${e.id}')" class="w-full bg-greenApp/10 hover:bg-greenApp/20 text-greenApp border border-greenApp/20 py-2 rounded-xl font-bold">تسجيل النتيجة</button></div>`).join(''); }
+function renderProjects(){ const grid=document.getElementById('projects-grid'); if(!appData.projects.length){ grid.innerHTML='<div class="empty-state col-span-full">لا توجد مشاريع بعد.</div>'; } else grid.innerHTML=appData.projects.map(p=>{ const issues=appData.issues.filter(i=>i.project_id===p.id && i.status!=='مغلقة').length; return `<div class="glass-card p-5 rounded-2xl"><div class="flex justify-between mb-2"><h3 class="font-black text-lg">${escapeHtml(p.title)}</h3><span class="chip text-yellowApp">${escapeHtml(p.status)}</span></div><p class="text-xs text-gray-400 mb-3">${escapeHtml(p.game_type||'')} • ${p.has_two_teams?'فريقان':'مسار عادي'}</p><p class="text-sm text-gray-300 line-clamp-2 mb-4">${escapeHtml(p.promise||p.story||'')}</p><div class="grid grid-cols-3 gap-2 text-center text-xs mb-4"><div class="bg-darkbg/60 rounded-lg p-2">بطاقات<br><b>${appData.project_cards.filter(c=>c.project_id===p.id).length}</b></div><div class="bg-darkbg/60 rounded-lg p-2">ألغاز<br><b>${appData.puzzles.filter(z=>z.project_id===p.id).length}</b></div><div class="bg-darkbg/60 rounded-lg p-2 text-redApp">مشاكل<br><b>${issues}</b></div></div><button onclick="openProject('${p.id}')" class="w-full bg-yellowApp/10 hover:bg-yellowApp/20 text-yellowApp border border-yellowApp/20 py-2 rounded-xl font-bold">فتح المشروع</button></div>`; }).join(''); if(selectedProjectId) renderProjectDetail(); }
+function renderRules(){ const grid=document.getElementById('rules-grid'); grid.innerHTML = appData.design_rules.length ? appData.design_rules.map(r=>`<div class="glass-card p-5 rounded-2xl border-t-2 border-t-greenApp"><div class="flex justify-between gap-2 mb-3"><span class="chip text-greenApp">${escapeHtml(r.rule_type||'قاعدة')}</span><span class="chip">من: ${escapeHtml(r.came_from||'غير محدد')}</span></div><p class="text-gray-200 leading-relaxed font-semibold">${escapeHtml(r.rule_text)}</p></div>`).join('') : '<div class="empty-state col-span-full">لا توجد قواعد بعد.</div>'; const sidebar=document.getElementById('sidebar-rules'); sidebar.innerHTML = appData.design_rules.slice(0,4).map(r=>`<li><span class="text-greenApp mr-1">•</span>${escapeHtml(r.rule_text).slice(0,90)}</li>`).join('') || '<li>لا توجد قواعد بعد.</li>'; }
+function updateBadges(){ setText('mech-count-badge', appData.mechanics.length); setText('knowledge-count-badge', appData.knowledge_sources.length); setText('lab-count-badge', appData.experiments.length); setText('projects-count-badge', appData.projects.length); setText('rules-count-badge', appData.design_rules.length); }
 
-            try {
-                const { error } = await supabaseClient
-                    .from('mechanics')
-                    .update({ status: 'lab' })
-                    .eq('id', id);
-
-                if (error) throw error;
-
-                appData.mechanics[mechanicIndex].status = 'lab';
-                renderUI();
-                showToast("تم النقل للمختبر", `تم التحديث في قاعدة البيانات السحابية.`, "success");
-                setTimeout(() => { switchTab('lab'); }, 1000);
-            } catch (error) {
-                showToast("خطأ", "فشل التحديث في السحابة.", "error");
-            }
-        }
-
-        /* =========================================
-           UI & RENDERING LOGIC
-           ========================================= */
-
-        function updateCloudStatus(status, message) {
-            const indicator = document.getElementById('cloud-status');
-            if(!indicator) return;
-            
-            let color = status === 'success' ? 'greenApp' : (status === 'error' ? 'redApp' : 'yellowApp');
-            let icon = status === 'success' ? 'fa-cloud-arrow-up' : (status === 'error' ? 'fa-cloud-xmark' : 'fa-gear');
-            let pulse = status === 'warning' ? 'animate-pulse' : '';
-
-            indicator.className = `mt-4 px-4 hidden md:flex items-center gap-2 text-xs text-${color} font-bold bg-${color}/10 py-2 rounded-lg border border-${color}/20`;
-            indicator.innerHTML = `<i class="fa-solid ${icon} ${pulse}"></i><span>${message}</span>`;
-        }
-
-        function renderUI() {
-            renderMechanicsLibrary();
-            renderDashboard();
-            updateBadges();
-        }
-
-        function updateBadges() {
-            const count = appData.mechanics.length;
-            document.getElementById('mech-count-badge').innerText = count;
-        }
-
-        function renderMechanicsLibrary() {
-            const grid = document.getElementById('mechanics-grid');
-            grid.innerHTML = ''; // Clear current
-
-            if(appData.mechanics.length === 0) {
-                grid.innerHTML = `<div class="col-span-full empty-state">لا توجد آليات محفوظة سحابياً. اذهب للالتقاط السريع لتبدأ!</div>`;
-                return;
-            }
-
-            // Normal loop (since data is fetched order by created_at desc)
-            for(let i = 0; i < appData.mechanics.length; i++) {
-                const item = appData.mechanics[i];
-                
-                let statusColor = item.status === 'lab' ? 'blueApp' : 'yellowApp';
-                let statusIcon = item.status === 'lab' ? 'fa-microscope' : 'fa-flask';
-                let statusText = item.status === 'lab' ? 'في المختبر' : 'تحتاج تجربة';
-                let btnHTML = item.status === 'lab' 
-                    ? `<button disabled class="flex-1 bg-white/5 text-gray-500 text-xs font-bold py-2.5 rounded-lg border border-white/5 cursor-not-allowed">قيد التجربة حالياً</button>`
-                    : `<button onclick="sendToLab('${item.id}')" class="flex-1 bg-blueApp/10 hover:bg-blueApp/20 text-blueApp text-xs font-bold py-2.5 rounded-lg transition-colors border border-blueApp/20"><i class="fa-solid fa-paper-plane mr-1"></i> إرسال للمختبر</button>`;
-
-                const cardHTML = `
-                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full animate-fade-in">
-                    <div class="bg-${statusColor}/20 border-b border-${statusColor}/30 px-5 py-3 flex justify-between items-center">
-                        <span class="text-${statusColor} font-bold text-xs flex items-center gap-2"><i class="fa-solid ${statusIcon}"></i> ${statusText}</span>
-                        <span class="text-xs bg-darkbg/50 px-2 py-1 rounded text-gray-300 border border-white/5">صعوبة: ${item.difficulty}</span>
-                    </div>
-                    <div class="p-5 flex-1 space-y-4">
-                        <h3 class="text-xl font-bold text-white">${item.title}</h3>
-                        
-                        <div class="space-y-3 mt-4">
-                            <div class="bg-darkbg/50 p-3 rounded-lg border border-white/5">
-                                <p class="text-[10px] text-gray-500 font-bold mb-1">الآلية:</p>
-                                <p class="text-sm text-gray-300 leading-relaxed">${item.mechanic}</p>
-                            </div>
-                            <div class="bg-darkbg/50 p-3 rounded-lg border border-white/5">
-                                <p class="text-[10px] text-gray-500 font-bold mb-1">كيف سأطبقها:</p>
-                                <p class="text-sm text-blueApp leading-relaxed font-semibold">${item.how}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="px-5 py-4 bg-panel/50 border-t border-white/5 flex gap-2">
-                        ${btnHTML}
-                        <button onclick="deleteMechanic('${item.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg transition-colors border border-redApp/20" title="حذف">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </div>
-                </div>`;
-                grid.insertAdjacentHTML('beforeend', cardHTML);
-            }
-        }
-
-        function renderDashboard() {
-            const recentGrid = document.getElementById('dash-recent-mechanics');
-            recentGrid.innerHTML = '';
-            
-            // Get first 2 mechanics
-            const recent = appData.mechanics.slice(0, 2);
-            
-            if(recent.length === 0) {
-                recentGrid.innerHTML = `<p class="text-sm text-gray-500">لا توجد بيانات.</p>`;
-            } else {
-                recent.forEach(item => {
-                    recentGrid.insertAdjacentHTML('beforeend', `
-                        <div class="glass-card p-4 rounded-xl border-t-2 border-t-yellowApp">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[10px] uppercase font-bold bg-yellowApp/20 text-yellowApp px-2 py-1 rounded">آلية جديدة</span>
-                            </div>
-                            <h4 class="font-bold text-sm mb-1 truncate">${item.title}</h4>
-                            <p class="text-xs text-gray-400 line-clamp-2">${item.how}</p>
-                        </div>
-                    `);
-                });
-            }
-
-            const inLab = appData.mechanics.filter(m => m.status === 'lab');
-            const expText = inLab.length > 0 ? `لديك (${inLab.length}) تجربة في المختبر تنتظر التنفيذ.` : `لا توجد تجارب نشطة. اختر آلية واختبرها.`;
-            document.getElementById('dash-experiment').innerText = expText;
-        }
-
-        /* =========================================
-           UTILITIES
-           ========================================= */
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blueApp/10', 'text-blueApp', 'border-blueApp/20');
-                btn.classList.add('text-gray-400', 'border-transparent');
-            });
-
-            document.getElementById('tab-' + tabId).classList.add('active');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.remove('text-gray-400', 'border-transparent');
-            activeBtn.classList.add('bg-blueApp/10', 'text-blueApp', 'border', 'border-blueApp/20');
-            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function showToast(title, msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-title').innerText = title;
-            document.getElementById('toast-msg').innerText = msg;
-            
-            const icon = document.getElementById('toast-icon');
-            if(type === 'error') {
-                icon.className = 'fa-solid fa-circle-xmark text-redApp text-xl';
-            } else if (type === 'warning') {
-                icon.className = 'fa-solid fa-triangle-exclamation text-yellowApp text-xl';
-            } else {
-                icon.className = 'fa-solid fa-circle-check text-greenApp text-xl';
-            }
-
-            toast.classList.add('toast-show');
-            setTimeout(() => { toast.classList.remove('toast-show'); }, 3000);
-        }
-
-        // Start the app!
-        window.onload = initApp;
-    </script>
+/* =========================================================
+   Utilities
+   ========================================================= */
+function switchTab(tabId){ document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(btn=>{btn.classList.remove('bg-blueApp/10','text-blueApp','border-blueApp/20','border');btn.classList.add('text-gray-400','border-transparent');}); document.getElementById('tab-'+tabId).classList.add('active'); const activeBtn=document.getElementById('btn-'+tabId); activeBtn.classList.remove('text-gray-400','border-transparent'); activeBtn.classList.add('bg-blueApp/10','text-blueApp','border','border-blueApp/20'); document.querySelector('main').scrollTo({top:0,behavior:'smooth'}); }
+function showToast(title,msg,type='success'){ const toast=document.getElementById('toast'); setText('toast-title',title); setText('toast-msg',msg); const icon=document.getElementById('toast-icon'); icon.className = type==='error'?'fa-solid fa-circle-xmark text-redApp text-xl': type==='warning'?'fa-solid fa-triangle-exclamation text-yellowApp text-xl':'fa-solid fa-circle-check text-greenApp text-xl'; toast.classList.add('toast-show'); setTimeout(()=>toast.classList.remove('toast-show'),3200); }
+function updateCloudStatus(status,message){ const el=document.getElementById('cloud-status'); const color=status==='success'?'greenApp':status==='error'?'redApp':'yellowApp'; const icon=status==='success'?'fa-cloud-arrow-up':status==='error'?'fa-cloud-xmark':'fa-gear'; const pulse=status==='warning'?'animate-pulse':''; el.className=`mt-4 px-4 hidden md:flex items-center gap-2 text-xs text-${color} font-bold bg-${color}/10 py-2 rounded-lg border border-${color}/20 transition-all`; el.innerHTML=`<i class="fa-solid ${icon} ${pulse}"></i><span>${message}</span>`; }
+function showModal(title, body){ setText('modal-title',title); document.getElementById('modal-body').innerHTML=body; document.getElementById('modal').classList.add('show'); }
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function val(id){ return (document.getElementById(id)?.value||'').trim(); } function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=v; } function setText(id,v){ const el=document.getElementById(id); if(el) el.innerText=v; }
+function clearFields(ids){ ids.forEach(id=>setVal(id,'')); }
+function toggleBtn(id, disabled){ const btn=document.getElementById(id); if(!btn) return; btn.disabled=disabled; btn.classList.toggle('opacity-50',disabled); btn.classList.toggle('cursor-not-allowed',disabled); }
+function escapeHtml(str=''){ return String(str).replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+</script>
 </body>
 </html>
