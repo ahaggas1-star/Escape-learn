@@ -125,8 +125,9 @@
       <div class="glass-panel p-6 md:p-8 rounded-3xl relative overflow-hidden">
         <div class="absolute -top-32 -right-32 w-64 h-64 bg-blueApp/10 rounded-full blur-3xl"></div>
         <div class="space-y-6 relative z-10">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div><label class="block text-sm font-bold text-gray-300 mb-2">عنوان المصدر أو الفكرة</label><input type="text" id="cap-title" placeholder="مثال: مراجعة عن ديك سكيب" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm"></div>
+            <div><label class="block text-sm font-bold text-gray-300 mb-2">مدرسة الآلية</label><select id="cap-school" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm appearance-none"><option value="عام">عام / غير مصنف</option><option value="ديك سكيب">ديك سكيب</option><option value="أنلوك">أنلوك</option><option value="إكزت">إكزت</option><option value="50 Clues / نقر وتصفح">50 Clues / نقر وتصفح</option><option value="Escape Tales">Escape Tales</option><option value="Side Quest">Side Quest</option><option value="Holiday Hijinks">Holiday Hijinks</option><option value="MysteryLocks">MysteryLocks</option><option value="Escape Room Geeks">Escape Room Geeks</option><option value="Lock Paper Scissors">Lock Paper Scissors</option><option value="تحقيقات ورقية">تحقيقات ورقية</option><option value="تطبيق مساعد">تطبيق مساعد</option></select></div>
             <div><label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة المتوقعة</label><select id="cap-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm appearance-none"><option value="سهلة">سهلة التنفيذ</option><option value="متوسطة">متوسطة - تحتاج اختبار</option><option value="معقدة">معقدة - تحتاج تطبيق مساعد</option></select></div>
           </div>
           <div class="bg-purpleApp/10 p-4 rounded-2xl border border-purpleApp/20">
@@ -205,6 +206,13 @@
     <!-- الآليات -->
     <div id="tab-mechanics" class="tab-content p-6 md:p-10 max-w-7xl mx-auto">
       <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4"><div><h2 class="text-3xl font-black mb-2">مكتبة الآليات</h2><p class="text-gray-400">هنا لا تجمع المقالات، بل تجمع آليات عمل قابلة للتطبيق الفوري.</p></div></header>
+      <div class="glass-panel p-4 rounded-2xl mb-6 border border-white/10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="md:col-span-2"><label class="block text-xs font-bold text-gray-400 mb-2">بحث داخل الآليات</label><input id="mechanics-search" oninput="renderMechanics()" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="ابحث بعنوان، آلية، مدرسة، أو كلمة داخل الحقول"></div>
+          <div><label class="block text-xs font-bold text-gray-400 mb-2">فلترة حسب المدرسة</label><select id="mechanics-school-filter" onchange="renderMechanics()" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option value="all">كل المدارس</option><option value="عام">عام / غير مصنف</option><option value="ديك سكيب">ديك سكيب</option><option value="أنلوك">أنلوك</option><option value="إكزت">إكزت</option><option value="50 Clues / نقر وتصفح">50 Clues / نقر وتصفح</option><option value="Escape Tales">Escape Tales</option><option value="Side Quest">Side Quest</option><option value="Holiday Hijinks">Holiday Hijinks</option><option value="MysteryLocks">MysteryLocks</option><option value="Escape Room Geeks">Escape Room Geeks</option><option value="Lock Paper Scissors">Lock Paper Scissors</option><option value="تحقيقات ورقية">تحقيقات ورقية</option><option value="تطبيق مساعد">تطبيق مساعد</option></select></div>
+        </div>
+        <p id="mechanics-filter-summary" class="text-xs text-gray-500 mt-3">يعرض كل الآليات.</p>
+      </div>
       <div id="mechanics-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
     </div>
 
@@ -432,6 +440,44 @@ function normalizeDifficultyValue(value=''){
   if(['سهلة','متوسطة','معقدة'].includes(raw)) return raw;
   return raw;
 }
+
+
+function schoolList(){
+  return ['عام','ديك سكيب','أنلوك','إكزت','50 Clues / نقر وتصفح','Escape Tales','Side Quest','Holiday Hijinks','MysteryLocks','Escape Room Geeks','Lock Paper Scissors','تحقيقات ورقية','تطبيق مساعد'];
+}
+function normalizeSchoolValue(value=''){
+  const raw = String(value || '').trim();
+  if(!raw) return 'عام';
+  const n = normalizeArabic(raw);
+  const map = [
+    ['ديك سكيب', ['ديك سكيب','deckscape','deck scape']],
+    ['أنلوك', ['انلوك','أنلوك','unlock','unlock!']],
+    ['إكزت', ['اكزت','إكزت','exit','exit the game']],
+    ['50 Clues / نقر وتصفح', ['50 clues','50clues','نقر','تصفح','point and click','point-and-click']],
+    ['Escape Tales', ['escape tales','اسكيب تيلز','إسكيب تيلز']],
+    ['Side Quest', ['side quest','سايد كويست']],
+    ['Holiday Hijinks', ['holiday hijinks','هوليدي']],
+    ['MysteryLocks', ['mysterylocks','mystery locks','مستري لوكس']],
+    ['Escape Room Geeks', ['escape room geeks','geeks']],
+    ['Lock Paper Scissors', ['lock paper scissors','lps']],
+    ['تحقيقات ورقية', ['تحقيق','تحقيقات','ملف قضية','case file','detective']],
+    ['تطبيق مساعد', ['تطبيق','ويب اب','web app','companion app']]
+  ];
+  for(const [label, aliases] of map){
+    if(aliases.some(a=> n.includes(normalizeArabic(a)) || raw.toLowerCase().includes(String(a).toLowerCase()))) return label;
+  }
+  return schoolList().includes(raw) ? raw : raw;
+}
+function renderSchoolOptions(selected='عام'){
+  const normalized = normalizeSchoolValue(selected);
+  const list = schoolList();
+  const finalList = list.includes(normalized) ? list : [normalized, ...list];
+  return finalList.map(x=>`<option value="${escapeHtml(x)}" ${x===normalized?'selected':''}>${escapeHtml(x)}</option>`).join('');
+}
+function getMechanicSchool(m){
+  const sections = parseMechanicHow(m?.how || '');
+  return normalizeSchoolValue(sections['المدرسة'] || 'عام');
+}
 function setCaptureFieldFromJson(id, value){
   if(!value) return 0;
   const el = document.getElementById(id);
@@ -454,6 +500,7 @@ function fillCaptureFromJsonObject(json){
   const flat = flattenJsonObject(item);
   let filled = 0;
   filled += setCaptureFieldFromJson('cap-title', pickJsonValue(flat, ['title','sourceTitle','source_title','name','عنوان','عنوان المصدر','اسم','اسم الآلية','اسم الالية']));
+  filled += setCaptureFieldFromJson('cap-school', normalizeSchoolValue(pickJsonValue(flat, ['school','gameSchool','game_school','category','classification','family','line','مدرسة','المدرسة','مدرسة الآلية','مدرسة الالية','تصنيف','التصنيف','العائلة'])));
   filled += setCaptureFieldFromJson('cap-difficulty', normalizeDifficultyValue(pickJsonValue(flat, ['difficulty','expectedDifficulty','expected_difficulty','level','درجة الصعوبة','الصعوبة','مستوى الصعوبة'])));
   filled += setCaptureFieldFromJson('cap-why', pickJsonValue(flat, ['why','reason','value','importance','whySaved','why_saved','لماذا حفظته','لماذا','سبب الحفظ','القيمة','قيمة الفكرة']));
   filled += setCaptureFieldFromJson('cap-mechanic', pickJsonValue(flat, ['mechanic','mechanism','idea','extractedMechanic','extracted_mechanic','coreMechanic','core_mechanic','الآلية','الالية','الفكرة المستخرجة','الآلية أو الفكرة المستخرجة','الفكرة']));
@@ -486,6 +533,7 @@ async function importCaptureJson(event){
 function clearCaptureForm(){
   clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app','cap-image-urls']);
   const diff = document.getElementById('cap-difficulty'); if(diff) diff.value = 'سهلة';
+  const school = document.getElementById('cap-school'); if(school) school.value = 'عام';
   clearImagePreview(null,'capture');
   const jsonInput = document.getElementById('cap-json'); if(jsonInput) jsonInput.value = '';
   showToast('تم التفريغ','تم تفريغ حقول صندوق الالتقاط.','success');
@@ -493,6 +541,7 @@ function clearCaptureForm(){
 function downloadCaptureJsonTemplate(){
   const template = {
     title: 'تقسيم الديك إلى مسارات ملوّنة متوازية',
+    school: 'ديك سكيب',
     difficulty: 'متوسطة',
     why: 'لأنها تكسر الخطية وتوزع العمل بين اللاعبين بشكل طبيعي.',
     mechanic: 'تقسيم الكروت إلى مسارات واضحة، وكل مسار يعطي نتيجة جزئية تُدمج لاحقًا.',
@@ -540,8 +589,9 @@ function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 /* =========================================================
    الآليات والالتقاط
    ========================================================= */
-function buildMechanicHow(howBase, practical, success, risk, app){
+function buildMechanicHow(school, howBase, practical, success, risk, app){
   return [
+    `المدرسة\n${school || 'عام'}`,
     `أين وكيف سأستخدمها؟\n${howBase}`,
     `تطبيق عملي\n${practical}`,
     `شروط نجاح الآلية\n${success}`,
@@ -555,15 +605,15 @@ function parseImageUrls(text=''){
   return [...new Set(urls)];
 }
 async function handleSaveCapture(){
-  const title=val('cap-title'), difficulty=val('cap-difficulty'), why=val('cap-why'), mechanic=val('cap-mechanic'), howBase=val('cap-how'), practical=val('cap-practical'), success=val('cap-success'), risk=val('cap-risk'), app=val('cap-app');
-  if(!title || !why || !mechanic || !howBase || !practical || !success || !risk || !app) return showToast('الفلتر يرفض الإدخال','املأ جميع حقول الفهم قبل الاعتماد.','error');
-  const how = buildMechanicHow(howBase, practical, success, risk, app);
+  const title=val('cap-title'), school=val('cap-school') || 'عام', difficulty=val('cap-difficulty'), why=val('cap-why'), mechanic=val('cap-mechanic'), howBase=val('cap-how'), practical=val('cap-practical'), success=val('cap-success'), risk=val('cap-risk'), app=val('cap-app');
+  if(!title || !school || !why || !mechanic || !howBase || !practical || !success || !risk || !app) return showToast('الفلتر يرفض الإدخال','املأ جميع حقول الفهم قبل الاعتماد.','error');
+  const how = buildMechanicHow(school, howBase, practical, success, risk, app);
   const imageUrls = parseImageUrls(val('cap-image-urls'));
   toggleBtn('save-capture-btn', true);
   try{
     const up = imageUrls.length ? { bucket:'urls', path: JSON.stringify(imageUrls) } : await uploadPrivateFile('puzzle_images', selectedFiles.capture);
     await insertRecord('mechanics',{title,difficulty,why,mechanic,how,image_bucket:up.bucket,image_path:up.path,status:'pending'});
-    clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app','cap-image-urls']); clearImagePreview(null,'capture'); renderUI(); showToast('تم الاعتماد','تم حفظ الآلية.','success'); setTimeout(()=>switchTab('mechanics'),700);
+    clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app','cap-image-urls']); setVal('cap-school','عام'); clearImagePreview(null,'capture'); renderUI(); showToast('تم الاعتماد','تم حفظ الآلية.','success'); setTimeout(()=>switchTab('mechanics'),700);
   }
   catch(e){ console.error(e); showToast('فشل الحفظ','راجع الاتصال أو سياسات التخزين.','error'); }
   finally{ toggleBtn('save-capture-btn', false); }
@@ -598,7 +648,7 @@ function askLibrary(){
   if(!results.length){ box.innerHTML='<div class="empty-state">لم أجد مقاطع مطابقة في مكتبتك. جرّب كلمات مختلفة أو أضف مصادر أكثر.</div>'; return; }
   box.innerHTML = results.map(r=>`<div class="glass-card p-4 rounded-2xl"><div class="flex justify-between gap-3 mb-2"><h4 class="font-black text-white">${escapeHtml(r.source?.title||r.chunk.title||'مصدر')}</h4><span class="chip text-yellowApp">قرب: ${r.score}</span></div><p class="text-xs text-gray-400 mb-3">${escapeHtml(r.source?.source_type||'مصدر')} • ${escapeHtml(r.source?.school||'عام')} • ${escapeHtml(r.source?.domain||'عام')}</p><div class="bg-darkbg/60 border border-white/5 p-3 rounded-xl text-sm leading-relaxed text-gray-200 max-h-52 overflow-y-auto">${highlight(r.chunk.chunk_text, tokens)}</div><div class="flex flex-wrap gap-2 mt-3"><button onclick="prefillMechanicFromChunk('${r.chunk.id}')" class="px-3 py-2 rounded-lg bg-purpleApp/10 text-purpleApp border border-purpleApp/20 font-bold text-xs">حوّل إلى آلية</button><button onclick="makeRuleFromChunk('${r.chunk.id}')" class="px-3 py-2 rounded-lg bg-greenApp/10 text-greenApp border border-greenApp/20 font-bold text-xs">أضف للدستور</button><button onclick="openSourceModal('${r.source?.id||''}')" class="px-3 py-2 rounded-lg bg-white/5 text-gray-300 border border-white/10 font-bold text-xs">افتح المصدر</button></div></div>`).join('');
 }
-function prefillMechanicFromChunk(id){ const c=appData.knowledge_chunks.find(x=>x.id===id); const s=appData.knowledge_sources.find(x=>x.id===c?.source_id); if(!c) return; setVal('cap-title', s?.title || c.title || 'آلية من مكتبة المعرفة'); setVal('cap-why', s?.why || 'مستخرج من مكتبة المعرفة'); setVal('cap-mechanic', c.chunk_text.slice(0,600)); setVal('cap-how','اكتب هنا كيف ستطبق هذه الفكرة في مشروعك.'); setVal('cap-practical','اكتب مثالًا تطبيقيًا مباشرًا.'); setVal('cap-success','اكتب شروط نجاح الآلية.'); setVal('cap-risk','اكتب الخطر التصميمي المحتمل.'); setVal('cap-app','اكتب كيف يمكن للتطبيق دعم هذه الآلية.'); switchTab('capture'); showToast('تم النقل','راجِع النص وحوله إلى آلية بكلماتك قبل الحفظ.','warning'); }
+function prefillMechanicFromChunk(id){ const c=appData.knowledge_chunks.find(x=>x.id===id); const s=appData.knowledge_sources.find(x=>x.id===c?.source_id); if(!c) return; setVal('cap-title', s?.title || c.title || 'آلية من مكتبة المعرفة'); setVal('cap-school', normalizeSchoolValue(s?.school || 'عام')); setVal('cap-why', s?.why || 'مستخرج من مكتبة المعرفة'); setVal('cap-mechanic', c.chunk_text.slice(0,600)); setVal('cap-how','اكتب هنا كيف ستطبق هذه الفكرة في مشروعك.'); setVal('cap-practical','اكتب مثالًا تطبيقيًا مباشرًا.'); setVal('cap-success','اكتب شروط نجاح الآلية.'); setVal('cap-risk','اكتب الخطر التصميمي المحتمل.'); setVal('cap-app','اكتب كيف يمكن للتطبيق دعم هذه الآلية.'); switchTab('capture'); showToast('تم النقل','راجِع النص وحوله إلى آلية بكلماتك قبل الحفظ.','warning'); }
 async function makeRuleFromChunk(id){ const c=appData.knowledge_chunks.find(x=>x.id===id); if(!c) return; await insertRecord('design_rules',{rule_text:c.chunk_text.slice(0,700), rule_type:'قاعدة تصميم', came_from:'مصدر'}); renderUI(); showToast('تمت إضافة قاعدة','راجع دستور التصميم لتنقيحها.','success'); }
 function openSourceModal(id){ const s=appData.knowledge_sources.find(x=>x.id===id); if(!s) return; showModal('مصدر معرفي', `<h3 class="text-xl font-black mb-2">${escapeHtml(s.title)}</h3><p class="text-gray-400 mb-4">${escapeHtml(s.source_type)} • ${escapeHtml(s.school)} • ${escapeHtml(s.domain)}</p><div class="bg-darkbg border border-white/10 rounded-xl p-4 whitespace-pre-wrap leading-relaxed max-h-[55vh] overflow-y-auto">${escapeHtml(s.full_text||'')}</div>`); }
 
@@ -650,7 +700,7 @@ function renderKnowledge(){
 }
 function mechanicSectionHtml(label, value, color='blueApp'){ if(!value) return ''; return `<div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">${escapeHtml(label)}</p><p class="text-sm text-${color} font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(value)}</p></div>`; }
 function parseMechanicHow(text=''){
-  const labels = ['أين وكيف سأستخدمها؟','تطبيق عملي','شروط نجاح الآلية','الخطر التصميمي','تطوير مناسب للتطبيق'];
+  const labels = ['المدرسة','أين وكيف سأستخدمها؟','تطبيق عملي','شروط نجاح الآلية','الخطر التصميمي','تطوير مناسب للتطبيق'];
   const sections = {};
   const normalized = String(text||'').trim();
   if(!normalized) return sections;
@@ -704,8 +754,9 @@ function openEditMechanic(id){
   showModal('تعديل الآلية', `
     <input type="hidden" id="edit-mechanic-id" value="${escapeHtml(m.id)}">
     <div class="space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div><label class="block text-sm font-bold text-gray-300 mb-2">عنوان الآلية</label><input id="edit-title" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input" value="${escapeHtml(m.title||'')}"></div>
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">مدرسة الآلية</label><select id="edit-school" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${renderSchoolOptions(sections['المدرسة'] || 'عام')}</select></div>
         <div><label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة</label><select id="edit-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option value="سهلة" ${difficulty==='سهلة'?'selected':''}>سهلة التنفيذ</option><option value="متوسطة" ${difficulty==='متوسطة'?'selected':''}>متوسطة - تحتاج اختبار</option><option value="معقدة" ${difficulty==='معقدة'?'selected':''}>معقدة - تحتاج تطبيق مساعد</option></select></div>
       </div>
       <div><label class="block text-sm font-bold text-gray-300 mb-2">لماذا حفظته؟</label><textarea id="edit-why" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(m.why||'')}</textarea></div>
@@ -728,10 +779,10 @@ function openEditMechanic(id){
 }
 async function saveMechanicEdit(){
   const id = val('edit-mechanic-id'); const m = appData.mechanics.find(x=>x.id===id); if(!m) return;
-  const title=val('edit-title'), difficulty=val('edit-difficulty'), why=val('edit-why'), mechanic=val('edit-mechanic'), howBase=val('edit-how');
+  const title=val('edit-title'), school=val('edit-school') || 'عام', difficulty=val('edit-difficulty'), why=val('edit-why'), mechanic=val('edit-mechanic'), howBase=val('edit-how');
   const practical=val('edit-practical'), success=val('edit-success'), risk=val('edit-risk'), app=val('edit-app');
   if(!title || !why || !mechanic || !howBase) return showToast('بيانات ناقصة','العنوان وسبب الحفظ والآلية وطريقة الاستخدام مطلوبة.','error');
-  const patch = { title, difficulty, why, mechanic, how: buildMechanicHow(howBase, practical, success, risk, app) };
+  const patch = { title, difficulty, why, mechanic, how: buildMechanicHow(school, howBase, practical, success, risk, app) };
   const urls = parseImageUrls(val('edit-image-urls'));
   if(urls.length){ patch.image_bucket='urls'; patch.image_path=JSON.stringify(urls); }
   else if(document.getElementById('edit-clear-images')?.checked){ patch.image_bucket=null; patch.image_path=null; }
@@ -741,11 +792,28 @@ async function saveMechanicEdit(){
 function renderMechanics(){
   const grid=document.getElementById('mechanics-grid');
   if(!appData.mechanics.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد آليات. ابدأ من الالتقاط السريع أو مكتبة المعرفة.</div>'; return; }
-  grid.innerHTML=appData.mechanics.map(m=>{
+  const schoolFilter = val('mechanics-school-filter') || 'all';
+  const query = normalizeArabic(val('mechanics-search') || '');
+  const list = appData.mechanics.filter(m=>{
+    const sections=parseMechanicHow(m.how||'');
+    const school = normalizeSchoolValue(sections['المدرسة'] || 'عام');
+    const bySchool = schoolFilter === 'all' || normalizeSchoolValue(schoolFilter) === school;
+    const searchable = normalizeArabic([m.title,m.difficulty,m.why,m.mechanic,m.how,school].join(' '));
+    const byQuery = !query || searchable.includes(query);
+    return bySchool && byQuery;
+  });
+  const summary=document.getElementById('mechanics-filter-summary');
+  if(summary){
+    const schoolText = schoolFilter === 'all' ? 'كل المدارس' : schoolFilter;
+    summary.innerText = `المعروض: ${list.length} من ${appData.mechanics.length} — المدرسة: ${schoolText}${query ? ' — البحث: ' + val('mechanics-search') : ''}`;
+  }
+  if(!list.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد آليات مطابقة للفلتر الحالي.</div>'; return; }
+  grid.innerHTML=list.map(m=>{
     const color=m.status==='lab'?'blueApp':m.status==='approved'?'greenApp':'yellowApp';
     const status=m.status==='lab'?'في المختبر':m.status==='approved'?'معتمدة':'تحتاج تجربة';
     const sections=parseMechanicHow(m.how||'');
-    return `<div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full">${renderMechanicImages(m)}<div class="bg-${color}/20 border-b border-${color}/30 px-5 py-3 flex justify-between"><span class="text-${color} font-bold text-xs">${status}</span><span class="chip">${escapeHtml(m.difficulty||'متوسطة')}</span></div><div class="p-5 flex-1"><h3 class="text-xl font-black mb-3">${escapeHtml(m.title)}</h3><div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">الآلية</p><p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(m.mechanic||'')}</p></div>${mechanicSectionHtml('أين وكيف سأستخدمها؟', sections['أين وكيف سأستخدمها؟'], 'blueApp')}${mechanicSectionHtml('تطبيق عملي', sections['تطبيق عملي'], 'greenApp')}${mechanicSectionHtml('شروط نجاح الآلية', sections['شروط نجاح الآلية'], 'yellowApp')}${mechanicSectionHtml('الخطر التصميمي', sections['الخطر التصميمي'], 'redApp')}${mechanicSectionHtml('تطوير مناسب للتطبيق', sections['تطوير مناسب للتطبيق'], 'purpleApp')}</div><div class="p-4 bg-panel/50 border-t border-white/5 flex flex-wrap gap-2"><button onclick="openEditMechanic('${m.id}')" class="flex-1 min-w-[110px] bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 py-2 rounded-lg text-xs font-bold"><i class="fa-regular fa-pen-to-square"></i> تعديل</button>${m.status==='lab'?'<button disabled class="flex-1 min-w-[110px] bg-white/5 text-gray-500 py-2 rounded-lg text-xs font-bold">قيد التجربة</button>':`<button onclick="sendToLab('${m.id}')" class="flex-1 min-w-[110px] bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 py-2 rounded-lg text-xs font-bold">إرسال للمختبر</button>`}<button onclick="deleteRecord('mechanics','${m.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg"><i class="fa-regular fa-trash-can"></i></button></div></div>`;
+    const school = normalizeSchoolValue(sections['المدرسة'] || 'عام');
+    return `<div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full">${renderMechanicImages(m)}<div class="bg-${color}/20 border-b border-${color}/30 px-5 py-3 flex justify-between gap-2"><span class="text-${color} font-bold text-xs">${status}</span><div class="flex gap-2 flex-wrap justify-end"><span class="chip text-purpleApp">${escapeHtml(school)}</span><span class="chip">${escapeHtml(m.difficulty||'متوسطة')}</span></div></div><div class="p-5 flex-1"><h3 class="text-xl font-black mb-3">${escapeHtml(m.title)}</h3><div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">الآلية</p><p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(m.mechanic||'')}</p></div>${mechanicSectionHtml('أين وكيف سأستخدمها؟', sections['أين وكيف سأستخدمها؟'], 'blueApp')}${mechanicSectionHtml('تطبيق عملي', sections['تطبيق عملي'], 'greenApp')}${mechanicSectionHtml('شروط نجاح الآلية', sections['شروط نجاح الآلية'], 'yellowApp')}${mechanicSectionHtml('الخطر التصميمي', sections['الخطر التصميمي'], 'redApp')}${mechanicSectionHtml('تطوير مناسب للتطبيق', sections['تطوير مناسب للتطبيق'], 'purpleApp')}</div><div class="p-4 bg-panel/50 border-t border-white/5 flex flex-wrap gap-2"><button onclick="openEditMechanic('${m.id}')" class="flex-1 min-w-[110px] bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 py-2 rounded-lg text-xs font-bold"><i class="fa-regular fa-pen-to-square"></i> تعديل</button>${m.status==='lab'?'<button disabled class="flex-1 min-w-[110px] bg-white/5 text-gray-500 py-2 rounded-lg text-xs font-bold">قيد التجربة</button>':`<button onclick="sendToLab('${m.id}')" class="flex-1 min-w-[110px] bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 py-2 rounded-lg text-xs font-bold">إرسال للمختبر</button>`}<button onclick="deleteRecord('mechanics','${m.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg"><i class="fa-regular fa-trash-can"></i></button></div></div>`;
   }).join('');
   hydrateSignedImages();
 }
