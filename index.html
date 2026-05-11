@@ -434,8 +434,18 @@ function setCaptureFieldFromJson(id, value){
   el.value = String(value).trim();
   return 1;
 }
+function getCaptureJsonRoot(json){
+  if(Array.isArray(json)) return json[0] || {};
+  if(json && typeof json === 'object'){
+    const candidateKeys = ['capture','captureEntry','mechanicEntry','entry','data'];
+    for(const key of candidateKeys){
+      if(json[key] && typeof json[key] === 'object') return json[key];
+    }
+  }
+  return json || {};
+}
 function fillCaptureFromJsonObject(json){
-  const item = Array.isArray(json) ? json[0] : (json.capture || json.mechanicEntry || json.mechanic || json);
+  const item = getCaptureJsonRoot(json);
   const flat = flattenJsonObject(item);
   let filled = 0;
   filled += setCaptureFieldFromJson('cap-title', pickJsonValue(flat, ['title','sourceTitle','source_title','name','عنوان','عنوان المصدر','اسم','اسم الآلية','اسم الالية']));
