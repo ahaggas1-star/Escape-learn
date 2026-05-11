@@ -683,8 +683,10 @@ function getMechanicImageEntries(m){
   return [{type:'private', bucket:m.image_bucket, path:m.image_path}];
 }
 function renderImageTag(entry, cls){
-  if(entry.type === 'url') return `<img src="${escapeHtml(entry.src)}" referrerpolicy="no-referrer" class="${cls}" onerror="this.style.opacity=.25;this.alt='تعذر تحميل الصورة';">`;
-  return `<img data-private-bucket="${escapeHtml(entry.bucket||'')}" data-private-path="${escapeHtml(entry.path||'')}" class="${cls}">`;
+  const finalCls = `${cls} cursor-zoom-in transition-transform duration-200 hover:scale-[1.02]`;
+  const clickAttrs = `onclick="openImageViewerFromElement(this)" title="اضغط لعرض الصورة بالحجم الكامل"`;
+  if(entry.type === 'url') return `<img src="${escapeHtml(entry.src)}" referrerpolicy="no-referrer" class="${finalCls}" ${clickAttrs} onerror="this.style.opacity=.25;this.alt='تعذر تحميل الصورة';">`;
+  return `<img data-private-bucket="${escapeHtml(entry.bucket||'')}" data-private-path="${escapeHtml(entry.path||'')}" class="${finalCls}" ${clickAttrs}>`;
 }
 function renderMechanicImages(m){
   const entries = getMechanicImageEntries(m);
@@ -760,6 +762,15 @@ function showToast(title,msg,type='success'){ const toast=document.getElementByI
 function updateCloudStatus(status,message){ const el=document.getElementById('cloud-status'); const color=status==='success'?'greenApp':status==='error'?'redApp':'yellowApp'; const icon=status==='success'?'fa-cloud-arrow-up':status==='error'?'fa-cloud-xmark':'fa-gear'; const pulse=status==='warning'?'animate-pulse':''; el.className=`mt-4 px-4 hidden md:flex items-center gap-2 text-xs text-${color} font-bold bg-${color}/10 py-2 rounded-lg border border-${color}/20 transition-all`; el.innerHTML=`<i class="fa-solid ${icon} ${pulse}"></i><span>${message}</span>`; }
 function showModal(title, body){ setText('modal-title',title); document.getElementById('modal-body').innerHTML=body; document.getElementById('modal').classList.add('show'); }
 function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+function openImageViewerFromElement(img){
+  const src = img?.currentSrc || img?.src || img?.getAttribute('src') || '';
+  if(!src) return showToast('الصورة لم تجهز بعد','انتظر لحظة حتى يكتمل تحميل الصورة ثم اضغط مرة أخرى.','warning');
+  openImageViewer(src);
+}
+function openImageViewer(src){
+  const safeSrc = escapeHtml(src);
+  showModal('عرض الصورة', `<div class="bg-darkbg/80 rounded-2xl border border-white/10 p-3"><img src="${safeSrc}" referrerpolicy="no-referrer" class="w-full max-h-[72vh] object-contain rounded-xl bg-darkbg"></div><div class="mt-4 flex justify-center"><button onclick="window.open('${safeSrc}','_blank','noopener,noreferrer')" class="px-4 py-2 rounded-xl bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 font-bold text-sm"><i class="fa-solid fa-up-right-from-square"></i> فتح الصورة في تبويب جديد</button></div>`);
+}
 function val(id){ return (document.getElementById(id)?.value||'').trim(); } function setVal(id,v){ const el=document.getElementById(id); if(el) el.value=v; } function setText(id,v){ const el=document.getElementById(id); if(el) el.innerText=v; }
 function clearFields(ids){ ids.forEach(id=>setVal(id,'')); }
 function toggleBtn(id, disabled){ const btn=document.getElementById(id); if(!btn) return; btn.disabled=disabled; btn.classList.toggle('opacity-50',disabled); btn.classList.toggle('cursor-not-allowed',disabled); }
