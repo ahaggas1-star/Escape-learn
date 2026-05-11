@@ -129,6 +129,19 @@
             <div><label class="block text-sm font-bold text-gray-300 mb-2">عنوان المصدر أو الفكرة</label><input type="text" id="cap-title" placeholder="مثال: مراجعة عن ديك سكيب" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm"></div>
             <div><label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة المتوقعة</label><select id="cap-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 text-white glow-input text-sm appearance-none"><option value="سهلة">سهلة التنفيذ</option><option value="متوسطة">متوسطة - تحتاج اختبار</option><option value="معقدة">معقدة - تحتاج تطبيق مساعد</option></select></div>
           </div>
+          <div class="bg-purpleApp/10 p-4 rounded-2xl border border-purpleApp/20">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 class="font-black text-purpleApp flex items-center gap-2"><i class="fa-solid fa-file-code"></i> استيراد بطاقة من ملف JSON</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">ارفع ملف JSON منسق، وسيتم تعبئة حقول الالتقاط السريع تلقائيًا. إذا كان الملف يحتوي قائمة، سيُستخدم أول عنصر فيها.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="downloadCaptureJsonTemplate()" class="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 text-xs font-bold"><i class="fa-solid fa-download"></i> قالب JSON</button>
+                <button type="button" onclick="clearCaptureForm()" class="px-3 py-2 rounded-lg bg-redApp/10 hover:bg-redApp/20 text-redApp border border-redApp/20 text-xs font-bold"><i class="fa-solid fa-eraser"></i> تفريغ الحقول</button>
+              </div>
+            </div>
+            <input id="cap-json" type="file" accept=".json,application/json" onchange="importCaptureJson(event)" class="w-full text-sm text-gray-400 file:ml-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-purpleApp file:text-white file:font-bold file:cursor-pointer" />
+          </div>
           <div class="bg-darkbg/30 p-4 rounded-2xl border border-dashed border-gray-600 hover:border-blueApp/50 transition-colors relative text-center group">
             <input type="file" id="cap-image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="previewImage(event, 'capture')">
             <div id="capture-image-prompt" class="space-y-2 pointer-events-none transition-opacity group-hover:opacity-70"><i class="fa-regular fa-image text-3xl text-gray-500"></i><p class="text-sm text-gray-400 font-semibold">أرفق صورة مرجعية اختيارية</p></div>
@@ -350,6 +363,136 @@ async function tryReadKnowledgeFile(event){
   const file = event.target.files[0]; if(!file) return; selectedFiles.knowledge = file;
   if(file.type.startsWith('text/') || file.name.endsWith('.md')){ const text = await file.text(); document.getElementById('ks-fulltext').value = text; showToast('تمت قراءة الملف','تم وضع النص في خانة النص الكامل.','success'); }
   else showToast('تم اختيار الملف','سيُحفظ الملف، لكن انسخ نصه يدويًا في خانة النص الكامل للبحث داخله.','warning');
+}
+
+/* =========================================================
+   استيراد JSON لصندوق الالتقاط
+   ========================================================= */
+function normalizeJsonKey(key=''){
+  return normalizeArabic(String(key)).replace(/[\s_\-:.]/g,'').toLowerCase();
+}
+function stringifyJsonValue(value){
+  if(value === null || value === undefined) return '';
+  if(Array.isArray(value)) return value.map(stringifyJsonValue).filter(Boolean).join('\n');
+  if(typeof value === 'object'){
+    const preferred = value.text || value.content || value.value || value.body || value.description || value.summary;
+    if(preferred) return stringifyJsonValue(preferred);
+    return Object.entries(value).map(([k,v]) => `${k}: ${stringifyJsonValue(v)}`).filter(x=>x.trim() !== ':').join('\n');
+  }
+  return String(value).trim();
+}
+function flattenJsonObject(value, map={}, parent=''){
+  if(value === null || value === undefined) return map;
+  if(Array.isArray(value)){
+    value.forEach((item, index)=>flattenJsonObject(item, map, `${parent}.${index}`));
+    return map;
+  }
+  if(typeof value === 'object'){
+    for(const [key, child] of Object.entries(value)){
+      const path = parent ? `${parent}.${key}` : key;
+      if(child !== null && typeof child === 'object'){
+        flattenJsonObject(child, map, path);
+      }else{
+        const normalizedKey = normalizeJsonKey(key);
+        const normalizedPath = normalizeJsonKey(path);
+        const textValue = stringifyJsonValue(child);
+        if(textValue){
+          if(!map[normalizedKey]) map[normalizedKey] = textValue;
+          if(!map[normalizedPath]) map[normalizedPath] = textValue;
+        }
+      }
+    }
+    return map;
+  }
+  if(parent) map[normalizeJsonKey(parent)] = stringifyJsonValue(value);
+  return map;
+}
+function pickJsonValue(flat, aliases){
+  for(const alias of aliases){
+    const key = normalizeJsonKey(alias);
+    if(flat[key]) return flat[key];
+  }
+  for(const [key,value] of Object.entries(flat)){
+    if(aliases.some(alias => key.includes(normalizeJsonKey(alias)))) return value;
+  }
+  return '';
+}
+function normalizeDifficultyValue(value=''){
+  const raw = String(value || '').trim();
+  const n = normalizeArabic(raw);
+  if(!raw) return '';
+  if(n.includes('سهل') || /easy/i.test(raw)) return 'سهلة';
+  if(n.includes('معقد') || n.includes('صعب') || /hard|complex/i.test(raw)) return 'معقدة';
+  if(n.includes('متوسط') || /medium|moderate/i.test(raw)) return 'متوسطة';
+  if(['سهلة','متوسطة','معقدة'].includes(raw)) return raw;
+  return raw;
+}
+function setCaptureFieldFromJson(id, value){
+  if(!value) return 0;
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  el.value = String(value).trim();
+  return 1;
+}
+function fillCaptureFromJsonObject(json){
+  const item = Array.isArray(json) ? json[0] : (json.capture || json.mechanicEntry || json.mechanic || json);
+  const flat = flattenJsonObject(item);
+  let filled = 0;
+  filled += setCaptureFieldFromJson('cap-title', pickJsonValue(flat, ['title','sourceTitle','source_title','name','عنوان','عنوان المصدر','اسم','اسم الآلية','اسم الالية']));
+  filled += setCaptureFieldFromJson('cap-difficulty', normalizeDifficultyValue(pickJsonValue(flat, ['difficulty','expectedDifficulty','expected_difficulty','level','درجة الصعوبة','الصعوبة','مستوى الصعوبة'])));
+  filled += setCaptureFieldFromJson('cap-why', pickJsonValue(flat, ['why','reason','value','importance','whySaved','why_saved','لماذا حفظته','لماذا','سبب الحفظ','القيمة','قيمة الفكرة']));
+  filled += setCaptureFieldFromJson('cap-mechanic', pickJsonValue(flat, ['mechanic','mechanism','idea','extractedMechanic','extracted_mechanic','coreMechanic','core_mechanic','الآلية','الالية','الفكرة المستخرجة','الآلية أو الفكرة المستخرجة','الفكرة']));
+  filled += setCaptureFieldFromJson('cap-how', pickJsonValue(flat, ['how','usage','useCase','use_case','application','whereToUse','where_to_use','اين وكيف ساستخدمها','أين وكيف سأستخدمها','كيف سأستخدمها','طريقة الاستخدام','مكان الاستخدام']));
+  filled += setCaptureFieldFromJson('cap-practical', pickJsonValue(flat, ['practical','practicalApplication','practical_application','example','appliedExample','applied_example','تطبيق عملي','مثال تطبيقي','مثال عملي']));
+  filled += setCaptureFieldFromJson('cap-success', pickJsonValue(flat, ['success','successConditions','success_conditions','conditions','requirements','شروط نجاح','شروط نجاح الآلية','شروط نجاح الالية','الشروط']));
+  filled += setCaptureFieldFromJson('cap-risk', pickJsonValue(flat, ['risk','designRisk','design_risk','danger','failureRisk','failure_risk','pitfall','الخطر التصميمي','خطر التصميم','المخاطر','خطر']));
+  filled += setCaptureFieldFromJson('cap-app', pickJsonValue(flat, ['app','appDevelopment','app_development','digitalSupport','digital_support','companionApp','companion_app','تطوير مناسب للتطبيق','تطوير التطبيق','دور التطبيق','دعم التطبيق']));
+  return filled;
+}
+async function importCaptureJson(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const json = JSON.parse(text);
+    const filled = fillCaptureFromJsonObject(json);
+    if(!filled) return showToast('لم يتم التعرف على الحقول','راجع أسماء المفاتيح داخل ملف JSON أو استخدم القالب.','warning');
+    showToast('تم استيراد JSON',`تمت تعبئة ${filled} حقول في صندوق الالتقاط.`,'success');
+  }catch(error){
+    console.error(error);
+    showToast('ملف JSON غير صالح','تأكد أن الملف بصيغة JSON صحيحة.','error');
+  }finally{
+    event.target.value = '';
+  }
+}
+function clearCaptureForm(){
+  clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app']);
+  const diff = document.getElementById('cap-difficulty'); if(diff) diff.value = 'سهلة';
+  clearImagePreview(null,'capture');
+  const jsonInput = document.getElementById('cap-json'); if(jsonInput) jsonInput.value = '';
+  showToast('تم التفريغ','تم تفريغ حقول صندوق الالتقاط.','success');
+}
+function downloadCaptureJsonTemplate(){
+  const template = {
+    title: 'تقسيم الديك إلى مسارات ملوّنة متوازية',
+    difficulty: 'متوسطة',
+    why: 'لأنها تكسر الخطية وتوزع العمل بين اللاعبين بشكل طبيعي.',
+    mechanic: 'تقسيم الكروت إلى مسارات واضحة، وكل مسار يعطي نتيجة جزئية تُدمج لاحقًا.',
+    how: 'أستخدمها في لعبة فريقين بحيث يحصل كل فريق على ملفات داخلية مختلفة، وكل لاعب يمسك مسارًا.',
+    practicalApplication: 'الفريق الأحمر يحصل على ٤ ملفات: الطاقة، الأبواب، الكاميرات، الاتصالات. كل ملف يحتوي ٦–٨ كروت، وفي النهاية يدمجون النتائج لفتح المرحلة التالية.',
+    successConditions: 'وجود نقطة دمج لاحقة، توازن صعوبة المسارات، تنويع نوع التفكير، وعدم ترك أي مسار منفصلًا بالكامل.',
+    designRisk: 'إذا لم توجد نقطة دمج بين المسارات، سيتحول الفريق إلى أفراد منفصلين بدل تجربة اجتماعية تعاونية.',
+    appDevelopment: 'يعرض التطبيق شاشة تقدم لكل مسار، ويطلب دمج النتائج بترتيب محدد، ويمنع القفز إلى الحل النهائي قبل اكتمال المتطلبات.'
+  };
+  const blob = new Blob([JSON.stringify(template, null, 2)], {type:'application/json;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'capture-template.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 /* =========================================================
