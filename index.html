@@ -147,6 +147,11 @@
             <div id="capture-image-prompt" class="space-y-2 pointer-events-none transition-opacity group-hover:opacity-70"><i class="fa-regular fa-image text-3xl text-gray-500"></i><p class="text-sm text-gray-400 font-semibold">أرفق صورة مرجعية اختيارية</p></div>
             <div id="capture-image-preview-container" class="hidden relative w-full flex justify-center"><img id="capture-image-preview" src="" class="max-h-40 rounded-xl border border-white/10 shadow-lg object-contain"><button type="button" onclick="clearImagePreview(event, 'capture')" class="absolute -top-3 -right-3 bg-redApp text-white w-8 h-8 rounded-full flex items-center justify-center z-20 hover:scale-110 transition-transform shadow-lg"><i class="fa-solid fa-xmark"></i></button></div>
           </div>
+          <div class="bg-darkbg/30 p-4 rounded-2xl border border-white/10">
+            <label class="block text-sm font-bold text-gray-300 mb-2"><i class="fa-solid fa-link text-blueApp"></i> روابط صور مرجعية اختيارية</label>
+            <textarea id="cap-image-urls" rows="3" class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none" placeholder="ضع كل رابط صورة مباشر في سطر مستقل. مثال: https://example.com/image.jpg"></textarea>
+            <p class="text-xs text-gray-500 mt-2 leading-relaxed">استخدم روابط صور مباشرة لتقليل البيانات المخزنة. بعض المواقع تمنع العرض المباشر؛ الأفضل روابط تنتهي بـ jpg أو png أو webp.</p>
+          </div>
           <div class="bg-darkbg/50 p-5 rounded-2xl border border-white/5 space-y-5">
             <h3 class="font-bold text-blueApp border-b border-white/5 pb-2 mb-4"><i class="fa-solid fa-filter text-sm"></i> فلتر الفهم</h3>
             <div><label class="block text-sm font-bold text-gray-300 mb-2">لماذا حفظته؟</label><textarea id="cap-why" rows="2" class="w-full bg-panel border border-white/10 rounded-xl p-3 text-white glow-input text-sm resize-none" placeholder="ما القيمة التي رأيتها؟"></textarea></div>
@@ -457,6 +462,9 @@ function fillCaptureFromJsonObject(json){
   filled += setCaptureFieldFromJson('cap-success', pickJsonValue(flat, ['success','successConditions','success_conditions','conditions','requirements','شروط نجاح','شروط نجاح الآلية','شروط نجاح الالية','الشروط']));
   filled += setCaptureFieldFromJson('cap-risk', pickJsonValue(flat, ['risk','designRisk','design_risk','danger','failureRisk','failure_risk','pitfall','الخطر التصميمي','خطر التصميم','المخاطر','خطر']));
   filled += setCaptureFieldFromJson('cap-app', pickJsonValue(flat, ['app','appDevelopment','app_development','digitalSupport','digital_support','companionApp','companion_app','تطوير مناسب للتطبيق','تطوير التطبيق','دور التطبيق','دعم التطبيق']));
+  const importedImages = pickJsonValue(flat, ['imageUrls','image_urls','images','imageLinks','image_links','referenceImages','reference_images','روابط الصور','صور','روابط صور']);
+  if(Array.isArray(importedImages)) filled += setCaptureFieldFromJson('cap-image-urls', importedImages.join('\n'));
+  else filled += setCaptureFieldFromJson('cap-image-urls', importedImages);
   return filled;
 }
 async function importCaptureJson(event){
@@ -476,7 +484,7 @@ async function importCaptureJson(event){
   }
 }
 function clearCaptureForm(){
-  clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app']);
+  clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app','cap-image-urls']);
   const diff = document.getElementById('cap-difficulty'); if(diff) diff.value = 'سهلة';
   clearImagePreview(null,'capture');
   const jsonInput = document.getElementById('cap-json'); if(jsonInput) jsonInput.value = '';
@@ -492,7 +500,11 @@ function downloadCaptureJsonTemplate(){
     practicalApplication: 'الفريق الأحمر يحصل على ٤ ملفات: الطاقة، الأبواب، الكاميرات، الاتصالات. كل ملف يحتوي ٦–٨ كروت، وفي النهاية يدمجون النتائج لفتح المرحلة التالية.',
     successConditions: 'وجود نقطة دمج لاحقة، توازن صعوبة المسارات، تنويع نوع التفكير، وعدم ترك أي مسار منفصلًا بالكامل.',
     designRisk: 'إذا لم توجد نقطة دمج بين المسارات، سيتحول الفريق إلى أفراد منفصلين بدل تجربة اجتماعية تعاونية.',
-    appDevelopment: 'يعرض التطبيق شاشة تقدم لكل مسار، ويطلب دمج النتائج بترتيب محدد، ويمنع القفز إلى الحل النهائي قبل اكتمال المتطلبات.'
+    appDevelopment: 'يعرض التطبيق شاشة تقدم لكل مسار، ويطلب دمج النتائج بترتيب محدد، ويمنع القفز إلى الحل النهائي قبل اكتمال المتطلبات.',
+    imageUrls: [
+      'https://example.com/reference-1.jpg',
+      'https://example.com/reference-2.png'
+    ]
   };
   const blob = new Blob([JSON.stringify(template, null, 2)], {type:'application/json;charset=utf-8'});
   const url = URL.createObjectURL(blob);
@@ -528,18 +540,31 @@ function escapeReg(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 /* =========================================================
    الآليات والالتقاط
    ========================================================= */
-async function handleSaveCapture(){
-  const title=val('cap-title'), difficulty=val('cap-difficulty'), why=val('cap-why'), mechanic=val('cap-mechanic'), howBase=val('cap-how'), practical=val('cap-practical'), success=val('cap-success'), risk=val('cap-risk'), app=val('cap-app');
-  if(!title || !why || !mechanic || !howBase || !practical || !success || !risk || !app) return showToast('الفلتر يرفض الإدخال','املأ جميع حقول الفهم قبل الاعتماد.','error');
-  const how = [
+function buildMechanicHow(howBase, practical, success, risk, app){
+  return [
     `أين وكيف سأستخدمها؟\n${howBase}`,
     `تطبيق عملي\n${practical}`,
     `شروط نجاح الآلية\n${success}`,
     `الخطر التصميمي\n${risk}`,
     `تطوير مناسب للتطبيق\n${app}`
   ].join('\n\n');
+}
+function parseImageUrls(text=''){
+  const values = Array.isArray(text) ? text : String(text||'').split(/[\n,]+/);
+  const urls = values.map(x=>String(x).trim()).filter(Boolean).filter(x=>/^https?:\/\//i.test(x));
+  return [...new Set(urls)];
+}
+async function handleSaveCapture(){
+  const title=val('cap-title'), difficulty=val('cap-difficulty'), why=val('cap-why'), mechanic=val('cap-mechanic'), howBase=val('cap-how'), practical=val('cap-practical'), success=val('cap-success'), risk=val('cap-risk'), app=val('cap-app');
+  if(!title || !why || !mechanic || !howBase || !practical || !success || !risk || !app) return showToast('الفلتر يرفض الإدخال','املأ جميع حقول الفهم قبل الاعتماد.','error');
+  const how = buildMechanicHow(howBase, practical, success, risk, app);
+  const imageUrls = parseImageUrls(val('cap-image-urls'));
   toggleBtn('save-capture-btn', true);
-  try{ const up = await uploadPrivateFile('puzzle_images', selectedFiles.capture); await insertRecord('mechanics',{title,difficulty,why,mechanic,how,image_bucket:up.bucket,image_path:up.path,status:'pending'}); clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app']); clearImagePreview(null,'capture'); renderUI(); showToast('تم الاعتماد','تم حفظ الآلية.','success'); setTimeout(()=>switchTab('mechanics'),700); }
+  try{
+    const up = imageUrls.length ? { bucket:'urls', path: JSON.stringify(imageUrls) } : await uploadPrivateFile('puzzle_images', selectedFiles.capture);
+    await insertRecord('mechanics',{title,difficulty,why,mechanic,how,image_bucket:up.bucket,image_path:up.path,status:'pending'});
+    clearFields(['cap-title','cap-why','cap-mechanic','cap-how','cap-practical','cap-success','cap-risk','cap-app','cap-image-urls']); clearImagePreview(null,'capture'); renderUI(); showToast('تم الاعتماد','تم حفظ الآلية.','success'); setTimeout(()=>switchTab('mechanics'),700);
+  }
   catch(e){ console.error(e); showToast('فشل الحفظ','راجع الاتصال أو سياسات التخزين.','error'); }
   finally{ toggleBtn('save-capture-btn', false); }
 }
@@ -645,7 +670,83 @@ function parseMechanicHow(text=''){
   if(!Object.keys(sections).length) sections['أين وكيف سأستخدمها؟'] = normalized;
   return sections;
 }
-function renderMechanics(){ const grid=document.getElementById('mechanics-grid'); if(!appData.mechanics.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد آليات. ابدأ من الالتقاط السريع أو مكتبة المعرفة.</div>'; return; } grid.innerHTML=appData.mechanics.map(m=>{ const color=m.status==='lab'?'blueApp':m.status==='approved'?'greenApp':'yellowApp'; const status=m.status==='lab'?'في المختبر':m.status==='approved'?'معتمدة':'تحتاج تجربة'; const sections=parseMechanicHow(m.how||''); return `<div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full">${m.image_path?`<div class="w-full h-44 bg-darkbg overflow-hidden"><img data-private-bucket="${m.image_bucket}" data-private-path="${m.image_path}" class="w-full h-full object-cover opacity-80"></div>`:''}<div class="bg-${color}/20 border-b border-${color}/30 px-5 py-3 flex justify-between"><span class="text-${color} font-bold text-xs">${status}</span><span class="chip">${escapeHtml(m.difficulty||'متوسطة')}</span></div><div class="p-5 flex-1"><h3 class="text-xl font-black mb-3">${escapeHtml(m.title)}</h3><div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">الآلية</p><p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(m.mechanic||'')}</p></div>${mechanicSectionHtml('أين وكيف سأستخدمها؟', sections['أين وكيف سأستخدمها؟'], 'blueApp')}${mechanicSectionHtml('تطبيق عملي', sections['تطبيق عملي'], 'greenApp')}${mechanicSectionHtml('شروط نجاح الآلية', sections['شروط نجاح الآلية'], 'yellowApp')}${mechanicSectionHtml('الخطر التصميمي', sections['الخطر التصميمي'], 'redApp')}${mechanicSectionHtml('تطوير مناسب للتطبيق', sections['تطوير مناسب للتطبيق'], 'purpleApp')}</div><div class="p-4 bg-panel/50 border-t border-white/5 flex gap-2">${m.status==='lab'?'<button disabled class="flex-1 bg-white/5 text-gray-500 py-2 rounded-lg text-xs font-bold">قيد التجربة</button>':`<button onclick="sendToLab('${m.id}')" class="flex-1 bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 py-2 rounded-lg text-xs font-bold">إرسال للمختبر</button>`}<button onclick="deleteRecord('mechanics','${m.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg"><i class="fa-regular fa-trash-can"></i></button></div></div>`; }).join(''); hydrateSignedImages(); }
+function getMechanicImageEntries(m){
+  if(!m || !m.image_path) return [];
+  if(m.image_bucket === 'urls'){
+    let urls=[];
+    try{
+      const parsed = JSON.parse(m.image_path);
+      urls = Array.isArray(parsed) ? parsed : [parsed];
+    }catch(e){ urls = parseImageUrls(m.image_path); }
+    return parseImageUrls(urls).map(src=>({type:'url', src}));
+  }
+  return [{type:'private', bucket:m.image_bucket, path:m.image_path}];
+}
+function renderImageTag(entry, cls){
+  if(entry.type === 'url') return `<img src="${escapeHtml(entry.src)}" referrerpolicy="no-referrer" class="${cls}" onerror="this.style.opacity=.25;this.alt='تعذر تحميل الصورة';">`;
+  return `<img data-private-bucket="${escapeHtml(entry.bucket||'')}" data-private-path="${escapeHtml(entry.path||'')}" class="${cls}">`;
+}
+function renderMechanicImages(m){
+  const entries = getMechanicImageEntries(m);
+  if(!entries.length) return '';
+  if(entries.length === 1){
+    return `<div class="mechanic-img-box w-full h-44 bg-darkbg overflow-hidden">${renderImageTag(entries[0], 'w-full h-full object-cover opacity-85')}</div>`;
+  }
+  return `<div class="mechanic-img-box bg-darkbg p-2 grid grid-cols-2 gap-2">${entries.slice(0,6).map(e=>`<div class="h-32 rounded-xl overflow-hidden border border-white/10 bg-panel">${renderImageTag(e, 'w-full h-full object-cover opacity-85')}</div>`).join('')}</div>`;
+}
+function openEditMechanic(id){
+  const m = appData.mechanics.find(x=>x.id===id); if(!m) return;
+  const sections = parseMechanicHow(m.how||'');
+  const imageUrls = m.image_bucket === 'urls' ? getMechanicImageEntries(m).map(e=>e.src).join('\n') : '';
+  const difficulty = m.difficulty || 'متوسطة';
+  showModal('تعديل الآلية', `
+    <input type="hidden" id="edit-mechanic-id" value="${escapeHtml(m.id)}">
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">عنوان الآلية</label><input id="edit-title" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input" value="${escapeHtml(m.title||'')}"></div>
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">درجة الصعوبة</label><select id="edit-difficulty" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input"><option value="سهلة" ${difficulty==='سهلة'?'selected':''}>سهلة التنفيذ</option><option value="متوسطة" ${difficulty==='متوسطة'?'selected':''}>متوسطة - تحتاج اختبار</option><option value="معقدة" ${difficulty==='معقدة'?'selected':''}>معقدة - تحتاج تطبيق مساعد</option></select></div>
+      </div>
+      <div><label class="block text-sm font-bold text-gray-300 mb-2">لماذا حفظته؟</label><textarea id="edit-why" rows="2" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(m.why||'')}</textarea></div>
+      <div><label class="block text-sm font-bold text-gray-300 mb-2">الآلية أو الفكرة المستخرجة</label><textarea id="edit-mechanic" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(m.mechanic||'')}</textarea></div>
+      <div><label class="block text-sm font-bold text-gray-300 mb-2">أين وكيف سأستخدمها؟</label><textarea id="edit-how" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(sections['أين وكيف سأستخدمها؟']||'')}</textarea></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">تطبيق عملي</label><textarea id="edit-practical" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(sections['تطبيق عملي']||'')}</textarea></div>
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">شروط نجاح الآلية</label><textarea id="edit-success" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(sections['شروط نجاح الآلية']||'')}</textarea></div>
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">الخطر التصميمي</label><textarea id="edit-risk" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(sections['الخطر التصميمي']||'')}</textarea></div>
+        <div><label class="block text-sm font-bold text-gray-300 mb-2">تطوير مناسب للتطبيق</label><textarea id="edit-app" rows="3" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input">${escapeHtml(sections['تطوير مناسب للتطبيق']||'')}</textarea></div>
+      </div>
+      <div class="bg-blueApp/10 border border-blueApp/20 p-4 rounded-2xl">
+        <label class="block text-sm font-bold text-blueApp mb-2"><i class="fa-solid fa-link"></i> روابط الصور</label>
+        <textarea id="edit-image-urls" rows="4" class="w-full bg-darkbg border border-white/10 rounded-xl p-3 glow-input" placeholder="ضع كل رابط صورة مباشر في سطر مستقل">${escapeHtml(imageUrls)}</textarea>
+        <p class="text-xs text-gray-400 mt-2 leading-relaxed">إذا أضفت روابط هنا سيتم استخدامها بدل الصورة المرفوعة. اتركها فارغة للحفاظ على الصورة الحالية. فعّل الحذف فقط إذا تريد إزالة كل الصور.</p>
+        <label class="mt-3 flex items-center gap-2 text-xs text-redApp font-bold"><input id="edit-clear-images" type="checkbox" class="accent-redApp"> حذف الصور الحالية إذا كانت خانة الروابط فارغة</label>
+      </div>
+      <button onclick="saveMechanicEdit()" class="w-full bg-blueApp hover:bg-blue-600 text-white font-black py-3 rounded-xl"><i class="fa-solid fa-floppy-disk"></i> حفظ التعديلات</button>
+    </div>`);
+}
+async function saveMechanicEdit(){
+  const id = val('edit-mechanic-id'); const m = appData.mechanics.find(x=>x.id===id); if(!m) return;
+  const title=val('edit-title'), difficulty=val('edit-difficulty'), why=val('edit-why'), mechanic=val('edit-mechanic'), howBase=val('edit-how');
+  const practical=val('edit-practical'), success=val('edit-success'), risk=val('edit-risk'), app=val('edit-app');
+  if(!title || !why || !mechanic || !howBase) return showToast('بيانات ناقصة','العنوان وسبب الحفظ والآلية وطريقة الاستخدام مطلوبة.','error');
+  const patch = { title, difficulty, why, mechanic, how: buildMechanicHow(howBase, practical, success, risk, app) };
+  const urls = parseImageUrls(val('edit-image-urls'));
+  if(urls.length){ patch.image_bucket='urls'; patch.image_path=JSON.stringify(urls); }
+  else if(document.getElementById('edit-clear-images')?.checked){ patch.image_bucket=null; patch.image_path=null; }
+  try{ await updateRecord('mechanics', id, patch); closeModal(); renderUI(); showToast('تم التعديل','تم تحديث الآلية بنجاح.','success'); }
+  catch(e){ console.error(e); showToast('فشل التعديل','راجع الاتصال أو صلاحيات الجدول.','error'); }
+}
+function renderMechanics(){
+  const grid=document.getElementById('mechanics-grid');
+  if(!appData.mechanics.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد آليات. ابدأ من الالتقاط السريع أو مكتبة المعرفة.</div>'; return; }
+  grid.innerHTML=appData.mechanics.map(m=>{
+    const color=m.status==='lab'?'blueApp':m.status==='approved'?'greenApp':'yellowApp';
+    const status=m.status==='lab'?'في المختبر':m.status==='approved'?'معتمدة':'تحتاج تجربة';
+    const sections=parseMechanicHow(m.how||'');
+    return `<div class="glass-panel rounded-2xl overflow-hidden border border-white/10 flex flex-col h-full">${renderMechanicImages(m)}<div class="bg-${color}/20 border-b border-${color}/30 px-5 py-3 flex justify-between"><span class="text-${color} font-bold text-xs">${status}</span><span class="chip">${escapeHtml(m.difficulty||'متوسطة')}</span></div><div class="p-5 flex-1"><h3 class="text-xl font-black mb-3">${escapeHtml(m.title)}</h3><div class="bg-darkbg/50 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold mb-1">الآلية</p><p class="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(m.mechanic||'')}</p></div>${mechanicSectionHtml('أين وكيف سأستخدمها؟', sections['أين وكيف سأستخدمها؟'], 'blueApp')}${mechanicSectionHtml('تطبيق عملي', sections['تطبيق عملي'], 'greenApp')}${mechanicSectionHtml('شروط نجاح الآلية', sections['شروط نجاح الآلية'], 'yellowApp')}${mechanicSectionHtml('الخطر التصميمي', sections['الخطر التصميمي'], 'redApp')}${mechanicSectionHtml('تطوير مناسب للتطبيق', sections['تطوير مناسب للتطبيق'], 'purpleApp')}</div><div class="p-4 bg-panel/50 border-t border-white/5 flex flex-wrap gap-2"><button onclick="openEditMechanic('${m.id}')" class="flex-1 min-w-[110px] bg-white/5 hover:bg-white/10 text-gray-200 border border-white/10 py-2 rounded-lg text-xs font-bold"><i class="fa-regular fa-pen-to-square"></i> تعديل</button>${m.status==='lab'?'<button disabled class="flex-1 min-w-[110px] bg-white/5 text-gray-500 py-2 rounded-lg text-xs font-bold">قيد التجربة</button>':`<button onclick="sendToLab('${m.id}')" class="flex-1 min-w-[110px] bg-blueApp/10 hover:bg-blueApp/20 text-blueApp border border-blueApp/20 py-2 rounded-lg text-xs font-bold">إرسال للمختبر</button>`}<button onclick="deleteRecord('mechanics','${m.id}')" class="px-3 bg-redApp/10 hover:bg-redApp/20 text-redApp rounded-lg"><i class="fa-regular fa-trash-can"></i></button></div></div>`;
+  }).join('');
+  hydrateSignedImages();
+}
 function renderExperiments(){ const grid=document.getElementById('experiments-grid'); if(!appData.experiments.length){ grid.innerHTML='<div class="col-span-full empty-state">لا توجد تجارب. أرسل آلية إلى المختبر.</div>'; return; } grid.innerHTML=appData.experiments.map(e=>`<div class="glass-panel p-5 rounded-2xl border-r-4 border-r-yellowApp"><div class="flex justify-between gap-3 mb-2"><h3 class="text-xl font-black">${escapeHtml(e.title)}</h3><span class="chip">${escapeHtml(e.status)}</span></div><p class="text-xs text-gray-400 mb-3">السؤال: ${escapeHtml(e.question||'غير محدد')}</p><div class="bg-darkbg/55 p-3 rounded-xl mb-3"><p class="text-[10px] text-gray-500 font-bold">الفرضية</p><p class="text-sm text-gray-300">${escapeHtml(e.hypothesis||'')}</p></div><div class="bg-darkbg/55 p-3 rounded-xl mb-4"><p class="text-[10px] text-gray-500 font-bold">ماذا أراقب؟</p><p class="text-sm text-gray-300">${escapeHtml(e.what_to_observe||'')}</p></div>${e.extracted_rule?`<div class="bg-greenApp/10 border border-greenApp/20 p-3 rounded-xl mb-3 text-sm text-greenApp">قاعدة: ${escapeHtml(e.extracted_rule)}</div>`:''}<button onclick="openExperimentResult('${e.id}')" class="w-full bg-greenApp/10 hover:bg-greenApp/20 text-greenApp border border-greenApp/20 py-2 rounded-xl font-bold">تسجيل النتيجة</button></div>`).join(''); }
 function renderProjects(){ const grid=document.getElementById('projects-grid'); if(!appData.projects.length){ grid.innerHTML='<div class="empty-state col-span-full">لا توجد مشاريع بعد.</div>'; } else grid.innerHTML=appData.projects.map(p=>{ const issues=appData.issues.filter(i=>i.project_id===p.id && i.status!=='مغلقة').length; return `<div class="glass-card p-5 rounded-2xl"><div class="flex justify-between mb-2"><h3 class="font-black text-lg">${escapeHtml(p.title)}</h3><span class="chip text-yellowApp">${escapeHtml(p.status)}</span></div><p class="text-xs text-gray-400 mb-3">${escapeHtml(p.game_type||'')} • ${p.has_two_teams?'فريقان':'مسار عادي'}</p><p class="text-sm text-gray-300 line-clamp-2 mb-4">${escapeHtml(p.promise||p.story||'')}</p><div class="grid grid-cols-3 gap-2 text-center text-xs mb-4"><div class="bg-darkbg/60 rounded-lg p-2">بطاقات<br><b>${appData.project_cards.filter(c=>c.project_id===p.id).length}</b></div><div class="bg-darkbg/60 rounded-lg p-2">ألغاز<br><b>${appData.puzzles.filter(z=>z.project_id===p.id).length}</b></div><div class="bg-darkbg/60 rounded-lg p-2 text-redApp">مشاكل<br><b>${issues}</b></div></div><button onclick="openProject('${p.id}')" class="w-full bg-yellowApp/10 hover:bg-yellowApp/20 text-yellowApp border border-yellowApp/20 py-2 rounded-xl font-bold">فتح المشروع</button></div>`; }).join(''); if(selectedProjectId) renderProjectDetail(); }
 function renderRules(){ const grid=document.getElementById('rules-grid'); grid.innerHTML = appData.design_rules.length ? appData.design_rules.map(r=>`<div class="glass-card p-5 rounded-2xl border-t-2 border-t-greenApp"><div class="flex justify-between gap-2 mb-3"><span class="chip text-greenApp">${escapeHtml(r.rule_type||'قاعدة')}</span><span class="chip">من: ${escapeHtml(r.came_from||'غير محدد')}</span></div><p class="text-gray-200 leading-relaxed font-semibold">${escapeHtml(r.rule_text)}</p></div>`).join('') : '<div class="empty-state col-span-full">لا توجد قواعد بعد.</div>'; const sidebar=document.getElementById('sidebar-rules'); sidebar.innerHTML = appData.design_rules.slice(0,4).map(r=>`<li><span class="text-greenApp mr-1">•</span>${escapeHtml(r.rule_text).slice(0,90)}</li>`).join('') || '<li>لا توجد قواعد بعد.</li>'; }
