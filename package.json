@@ -1,0 +1,17 @@
+{
+  "name": "ghars-platform",
+  "private": true,
+  "version": "0.0.1",
+  "description": "منصة غرس - منصة قيم أسرية تحوّل القيم التربوية إلى أهداف ومهام عملية مع تلعيب آمن",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "echo \"TODO: تشغيل apps/web بعد بناء المرحلة 3\" && exit 0",
+    "lint": "echo \"TODO: إعداد ESLint في packages/config\" && exit 0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
