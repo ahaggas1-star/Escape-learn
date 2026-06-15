@@ -34,3 +34,6 @@ supabase/.temp
 # misc
 *.tsbuildinfo
 coverage/
+
+# next generated
+apps/web/next-env.d.ts
