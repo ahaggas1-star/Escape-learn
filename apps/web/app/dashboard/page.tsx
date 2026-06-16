@@ -55,7 +55,7 @@ export default async function DashboardPage() {
           )}
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-3">
+        <section className="grid gap-3 sm:grid-cols-2">
           <Link href="/values" className="card transition hover:border-ghars-500">
             <h3 className="font-bold text-ghars-700">اختيار قيمة</h3>
             <p className="mt-1 text-sm text-ghars-500">
@@ -71,6 +71,10 @@ export default async function DashboardPage() {
           <Link href="/reports" className="card transition hover:border-ghars-500">
             <h3 className="font-bold text-ghars-700">التقارير</h3>
             <p className="mt-1 text-sm text-ghars-500">تقارير الابن والأسرة ومؤشرات عامة.</p>
+          </Link>
+          <Link href="/leaderboard" className="card transition hover:border-ghars-500">
+            <h3 className="font-bold text-ghars-700">ترتيب الأسر</h3>
+            <p className="mt-1 text-sm text-ghars-500">تنافس أسري محفّز ومجهول الهوية.</p>
           </Link>
         </section>
       </main>
