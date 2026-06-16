@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "غرس — منصة القيم الأسرية",
+  title: "قِيَم — منصة القيم الأسرية",
   description:
     "منصة أسرية تحوّل القيم التربوية إلى أهداف ومهام عملية مع تلعيب آمن.",
 };

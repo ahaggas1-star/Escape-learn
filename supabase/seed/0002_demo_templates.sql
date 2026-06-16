@@ -17,7 +17,7 @@ select
   true
 from core_values cv
 join sub_values sv on sv.core_value_id = cv.id and sv.key = 'organization'
-join age_stages ast on ast.key = 'late_childhood'
+join age_stages ast on ast.key = 'middle_childhood'
 where cv.key = 'commitment';
 
 -- مهام جاهزة مرتبطة بنفس القيمة/الفرعية
@@ -32,7 +32,7 @@ select
   t.child_instructions_ar, t.guardian_guidelines_ar, t.success_criteria_ar, true
 from core_values cv
 join sub_values sv on sv.core_value_id = cv.id and sv.key = 'organization'
-join age_stages ast on ast.key = 'late_childhood'
+join age_stages ast on ast.key = 'middle_childhood'
 join (values
   ('راجع قائمة مهامك قبل النوم',
    'قبل النوم، راجع مهام اليوم وحدّد ما أنجزته وما تبقّى.',

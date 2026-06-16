@@ -15,7 +15,7 @@ begin
   end if;
   select id into v_commit from core_values where key = 'commitment';
   select id into v_org from sub_values where key = 'organization';
-  select id into v_stage from age_stages where key = 'late_childhood';
+  select id into v_stage from age_stages where key = 'middle_childhood';
 
   for d in select * from (values
       ('أسرة الأمل (تجريبية)','سالم',12),

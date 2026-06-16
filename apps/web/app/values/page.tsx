@@ -34,18 +34,30 @@ export default async function ValuesPage() {
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
-            {values.map((v) => (
-              <Link
-                key={v.id}
-                href={`/values/${v.id}`}
-                className="card transition hover:border-ghars-500"
-              >
-                <h2 className="text-lg font-bold text-ghars-700">{v.label_ar}</h2>
-                {v.description_ar ? (
-                  <p className="mt-1 text-sm text-ghars-500">{v.description_ar}</p>
-                ) : null}
-              </Link>
-            ))}
+            {values.map((v, i) => {
+              const accents = [
+                "border-t-4 border-t-ghars-500",
+                "border-t-4 border-t-joy-400",
+                "border-t-4 border-t-sky-500",
+                "border-t-4 border-t-bloom-500",
+              ];
+              const emojis = ["🤝", "💚", "👀", "⏰"];
+              return (
+                <Link
+                  key={v.id}
+                  href={`/values/${v.id}`}
+                  className={`card transition hover:border-ghars-500 ${accents[i % accents.length]}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{emojis[i % emojis.length]}</span>
+                    <h2 className="text-lg font-bold text-ghars-700">{v.label_ar}</h2>
+                  </div>
+                  {v.description_ar ? (
+                    <p className="mt-1 text-sm text-ghars-500">{v.description_ar}</p>
+                  ) : null}
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>
