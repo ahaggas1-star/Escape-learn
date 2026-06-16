@@ -31,15 +31,15 @@ export default async function LeaderboardPage() {
 
         {/* شريط موضع أسرتكم */}
         {board.self ? (
-          <section className="card bg-ghars-600 text-white">
-            <p className="text-sm opacity-90">موضع أسرتكم</p>
+          <section className="rounded-3xl bg-gradient-to-l from-ghars-500 to-joy-400 p-5 text-white shadow-soft">
+            <p className="text-sm opacity-90">🏆 موضع أسرتكم</p>
             <div className="mt-1 flex items-end justify-between">
-              <p className="text-2xl font-extrabold">المركز {board.self.rank} من {board.total}</p>
+              <p className="font-display text-3xl font-extrabold">المركز {board.self.rank} من {board.total}</p>
               {board.selfTopPercent != null ? (
-                <p className="text-sm opacity-90">ضمن أعلى {board.selfTopPercent}%</p>
+                <p className="rounded-full bg-white/20 px-3 py-1 text-sm font-bold">ضمن أعلى {board.selfTopPercent}%</p>
               ) : null}
             </div>
-            <p className="mt-1 text-xs opacity-80">
+            <p className="mt-1 text-xs opacity-90">
               {board.self.total_xp} XP · {board.self.approved_tasks} مهمة معتمدة
             </p>
           </section>

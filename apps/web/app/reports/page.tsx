@@ -8,10 +8,10 @@ export const dynamic = "force-dynamic";
 
 function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
-    <div className="rounded-xl border border-ghars-100 p-3 text-center">
-      <p className="text-2xl font-extrabold text-ghars-700">{value}</p>
-      <p className="text-xs text-ghars-500">{label}</p>
-      {hint ? <p className="mt-0.5 text-[10px] text-ghars-500">{hint}</p> : null}
+    <div className="stat">
+      <p className="stat-value">{value}</p>
+      <p className="stat-label">{label}</p>
+      {hint ? <p className="mt-0.5 text-[10px] text-ghars-400">{hint}</p> : null}
     </div>
   );
 }

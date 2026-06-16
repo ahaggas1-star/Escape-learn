@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getChildProgress } from "@/lib/gamification";
 import { CompleteTaskCard } from "./CompleteTaskCard";
 import { RewardBoxCard } from "./RewardBoxCard";
+import { LevelBadge } from "@/components/ui/LevelBadge";
+import { ProgressBar } from "@/components/ui/ProgressBar";
+import { Chip } from "@/components/ui/Chip";
 
 export const dynamic = "force-dynamic";
 
@@ -80,25 +83,15 @@ export default async function ChildPage({
         </div>
 
         {/* التقدم والمستوى */}
-        <section className="card">
-          <div className="mb-2 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-ghars-500">المستوى الحالي</p>
-              <p className="text-lg font-bold text-ghars-700">
-                {progress.level?.label_ar ?? "—"}
-              </p>
-            </div>
+        <section className="card bg-gradient-to-br from-white to-ghars-50">
+          <div className="mb-3 flex items-center justify-between">
+            <LevelBadge levelKey={progress.level?.key} label={progress.level?.label_ar} size="lg" />
             <div className="text-left">
-              <p className="text-sm text-ghars-500">مجموع XP</p>
-              <p className="text-lg font-bold text-ghars-700">{progress.totalXp}</p>
+              <p className="stat-value text-joy-500">{progress.totalXp}</p>
+              <p className="stat-label">مجموع XP</p>
             </div>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-ghars-100">
-            <div
-              className="h-full rounded-full bg-ghars-500 transition-all"
-              style={{ width: `${progress.progressPct}%` }}
-            />
-          </div>
+          <ProgressBar value={progress.progressPct} />
           {progress.nextLevel ? (
             <p className="mt-1.5 text-xs text-ghars-500">
               نحو «{progress.nextLevel.label_ar}» — {progress.xpIntoLevel} من {progress.xpForNextLevel} XP
@@ -111,15 +104,11 @@ export default async function ChildPage({
         {/* الشارات */}
         {badges.length > 0 ? (
           <section className="card">
-            <h2 className="mb-2 font-bold text-ghars-700">الشارات</h2>
+            <h2 className="mb-2 font-display font-bold text-ghars-700">الشارات</h2>
             <div className="flex flex-wrap gap-2">
               {badges.map((b, i) => {
                 const badge = Array.isArray(b.badges) ? b.badges[0] : b.badges;
-                return (
-                  <span key={i} className="rounded-full bg-ghars-100 px-3 py-1 text-xs font-medium text-ghars-700">
-                    🏅 {badge?.label_ar}
-                  </span>
-                );
+                return <Chip key={i} tone="ghars">🏅 {badge?.label_ar}</Chip>;
               })}
             </div>
           </section>
@@ -144,11 +133,7 @@ export default async function ChildPage({
             <div className="flex flex-wrap gap-2">
               {achievements.map((a, i) => {
                 const ach = Array.isArray(a.achievements) ? a.achievements[0] : a.achievements;
-                return (
-                  <span key={i} className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
-                    ⭐ {ach?.label_ar}
-                  </span>
-                );
+                return <Chip key={i} tone="joy">⭐ {ach?.label_ar}</Chip>;
               })}
             </div>
           </section>

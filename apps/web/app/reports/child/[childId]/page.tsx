@@ -8,9 +8,9 @@ export const dynamic = "force-dynamic";
 
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-xl border border-ghars-100 p-3 text-center">
-      <p className="text-2xl font-extrabold text-ghars-700">{value}</p>
-      <p className="text-xs text-ghars-500">{label}</p>
+    <div className="stat">
+      <p className="stat-value">{value}</p>
+      <p className="stat-label">{label}</p>
     </div>
   );
 }

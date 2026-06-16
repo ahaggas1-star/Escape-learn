@@ -21,12 +21,13 @@ export default async function DashboardPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div>
-          <h1 className="text-xl font-extrabold text-ghars-700">
+        <div className="rounded-3xl bg-gradient-to-l from-ghars-500 to-ghars-600 p-5 text-white shadow-soft">
+          <p className="text-sm opacity-90">أهلًا بك 👋</p>
+          <h1 className="font-display text-2xl font-extrabold">
             {family.name ? `أسرة ${family.name}` : "أسرتي"}
           </h1>
-          <p className="text-sm text-ghars-500">
-            اختر قيمة، حوّلها إلى أهداف ومهام، وتابِع تقدّم أبنائك.
+          <p className="mt-1 text-sm opacity-90">
+            اختر قيمة، حوّلها إلى أهداف ومهام، وتابِع تقدّم أبنائك 🌱
           </p>
         </div>
 
@@ -62,30 +63,23 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-3 sm:grid-cols-2">
-          <Link href="/values" className="card transition hover:border-ghars-500">
-            <h3 className="font-bold text-ghars-700">اختيار قيمة</h3>
-            <p className="mt-1 text-sm text-ghars-500">
-              ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام.
-            </p>
-          </Link>
-          <Link href="/review" className="card transition hover:border-ghars-500">
-            <h3 className="font-bold text-ghars-700">المراجعة والاعتماد</h3>
-            <p className="mt-1 text-sm text-ghars-500">
-              اعتمد إنجازات الأبناء وامنح XP.
-            </p>
-          </Link>
-          <Link href="/reports" className="card transition hover:border-ghars-500">
-            <h3 className="font-bold text-ghars-700">التقارير</h3>
-            <p className="mt-1 text-sm text-ghars-500">تقارير الابن والأسرة ومؤشرات عامة.</p>
-          </Link>
-          <Link href="/leaderboard" className="card transition hover:border-ghars-500">
-            <h3 className="font-bold text-ghars-700">ترتيب الأسر</h3>
-            <p className="mt-1 text-sm text-ghars-500">تنافس أسري محفّز ومجهول الهوية.</p>
-          </Link>
+          {[
+            { href: "/values", icon: "🌱", bg: "from-ghars-50 to-ghars-100", title: "اختيار قيمة", desc: "ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام." },
+            { href: "/review", icon: "✅", bg: "from-sky-50 to-sky-100", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح XP." },
+            { href: "/reports", icon: "📊", bg: "from-grape-50 to-grape-100", title: "التقارير", desc: "تقارير الابن والأسرة ومؤشرات عامة." },
+            { href: "/leaderboard", icon: "🏆", bg: "from-joy-50 to-joy-100", title: "ترتيب الأسر", desc: "تنافس أسري محفّز ومجهول الهوية." },
+          ].map((a) => (
+            <Link key={a.href} href={a.href} className={`card bg-gradient-to-br ${a.bg} transition hover:-translate-y-0.5 hover:shadow-soft`}>
+              <div className="mb-1 text-2xl">{a.icon}</div>
+              <h3 className="font-display font-bold text-ghars-800">{a.title}</h3>
+              <p className="mt-0.5 text-sm text-ghars-600">{a.desc}</p>
+            </Link>
+          ))}
           {isStaff ? (
-            <Link href="/admin" className="card border-joy-400 transition hover:border-joy-500">
-              <h3 className="font-bold text-ghars-700">لوحة إدارة المحتوى</h3>
-              <p className="mt-1 text-sm text-ghars-500">إدارة القيم والأهداف والمهام الجاهزة.</p>
+            <Link href="/admin" className="card bg-gradient-to-br from-bloom-50 to-bloom-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+              <div className="mb-1 text-2xl">🛠️</div>
+              <h3 className="font-display font-bold text-ghars-800">لوحة إدارة المحتوى</h3>
+              <p className="mt-0.5 text-sm text-ghars-600">إدارة القيم والأهداف والمهام الجاهزة.</p>
             </Link>
           ) : null}
         </section>

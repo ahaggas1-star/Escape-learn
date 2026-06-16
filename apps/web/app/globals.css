@@ -1,3 +1,6 @@
+/* خطوط عربية مرحة (تُحمَّل في المتصفح) */
+@import url("https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,33 +10,73 @@
 }
 
 body {
-  @apply bg-ghars-50 text-ghars-900 antialiased;
+  @apply min-h-screen text-ghars-900 antialiased;
+  font-family: "Tajawal", system-ui, Tahoma, Arial, sans-serif;
+  /* خلفية فرائحية: تدرّج ناعم + بقع لونية خفيفة */
+  background-color: #f6fef9;
+  background-image:
+    radial-gradient(40rem 40rem at 110% -10%, rgba(245, 158, 11, 0.10), transparent 60%),
+    radial-gradient(36rem 36rem at -10% 10%, rgba(14, 165, 233, 0.10), transparent 60%),
+    radial-gradient(30rem 30rem at 50% 120%, rgba(236, 72, 153, 0.08), transparent 60%);
+  background-attachment: fixed;
 }
 
-.container-app {
-  @apply mx-auto w-full max-w-3xl px-4 py-6;
+h1, h2, h3, .font-display {
+  font-family: "Baloo Bhaijaan 2", "Tajawal", system-ui, sans-serif;
 }
 
-.card {
-  @apply rounded-2xl border border-ghars-100 bg-white p-5 shadow-sm;
-}
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-3xl px-4 py-6;
+  }
 
-.btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition;
-}
+  .card {
+    @apply rounded-3xl border border-white/70 bg-white/90 p-5 shadow-card backdrop-blur-sm;
+  }
 
-.btn-primary {
-  @apply btn bg-ghars-600 text-white hover:bg-ghars-700;
-}
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-bold transition active:scale-95 disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-ghars-500 text-white shadow-soft hover:bg-ghars-600;
+  }
+  .btn-ghost {
+    @apply btn bg-ghars-50 text-ghars-700 hover:bg-ghars-100;
+  }
+  .btn-joy {
+    @apply btn bg-joy-400 text-joy-900 shadow-soft hover:bg-joy-500;
+  }
 
-.btn-ghost {
-  @apply btn bg-ghars-100 text-ghars-700 hover:bg-ghars-100/70;
-}
+  .input {
+    @apply w-full rounded-2xl border border-ghars-100 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-ghars-400 focus:ring-4 focus:ring-ghars-500/15;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-ghars-700;
+  }
 
-.input {
-  @apply w-full rounded-xl border border-ghars-100 bg-white px-3 py-2.5 text-sm outline-none focus:border-ghars-500 focus:ring-2 focus:ring-ghars-500/20;
-}
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
+  }
 
-.label {
-  @apply mb-1.5 block text-sm font-medium text-ghars-700;
+  .stat {
+    @apply rounded-2xl border border-white/70 bg-white/80 p-3 text-center shadow-card;
+  }
+  .stat-value {
+    @apply font-display text-2xl font-extrabold text-ghars-700;
+  }
+  .stat-label {
+    @apply text-xs text-ghars-500;
+  }
+
+  .page-title {
+    @apply font-display text-2xl font-extrabold text-ghars-800;
+  }
+
+  /* شريط تقدّم مرح بتدرّج لوني */
+  .progress {
+    @apply h-3.5 w-full overflow-hidden rounded-full bg-ghars-100;
+  }
+  .progress-fill {
+    @apply h-full rounded-full bg-gradient-to-l from-ghars-400 via-joy-400 to-ghars-500 transition-all duration-500;
+  }
 }
