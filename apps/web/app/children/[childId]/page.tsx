@@ -1,0 +1,172 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Header } from "@/components/Header";
+import { getGuardianContext } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { getChildProgress } from "@/lib/gamification";
+import { CompleteTaskCard } from "./CompleteTaskCard";
+
+export const dynamic = "force-dynamic";
+
+type AssignedRow = {
+  id: string;
+  status: string;
+  tasks:
+    | { title_ar: string; description_ar: string | null; base_xp: number; proof: string }
+    | { title_ar: string; description_ar: string | null; base_xp: number; proof: string }[]
+    | null;
+};
+
+const ACTIVE = ["assigned", "in_progress", "redo_requested"];
+
+export default async function ChildPage({
+  params,
+}: {
+  params: { childId: string };
+}) {
+  const { email, family, children } = await getGuardianContext();
+  const child = children.find((c) => c.id === params.childId);
+  if (!family || !child) notFound();
+
+  const supabase = createClient();
+
+  const [progress, { data: atData }, { data: badgeData }] = await Promise.all([
+    getChildProgress(child.id),
+    supabase
+      .from("assigned_tasks")
+      .select("id, status, tasks(title_ar, description_ar, base_xp, proof)")
+      .eq("child_id", child.id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("child_badges")
+      .select("badges(label_ar)")
+      .eq("child_id", child.id),
+  ]);
+
+  const rows = (atData ?? []) as AssignedRow[];
+  const task = (r: AssignedRow) => (Array.isArray(r.tasks) ? r.tasks[0] : r.tasks);
+
+  const active = rows.filter((r) => ACTIVE.includes(r.status));
+  const waiting = rows.filter((r) => r.status === "submitted");
+  const done = rows.filter((r) => r.status === "approved");
+  const badges = (badgeData ?? []) as { badges: { label_ar: string } | { label_ar: string }[] }[];
+
+  return (
+    <>
+      <Header email={email} />
+      <main className="container-app space-y-5">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-extrabold text-ghars-700">{child.display_name}</h1>
+          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
+        </div>
+
+        {/* التقدم والمستوى */}
+        <section className="card">
+          <div className="mb-2 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-ghars-500">المستوى الحالي</p>
+              <p className="text-lg font-bold text-ghars-700">
+                {progress.level?.label_ar ?? "—"}
+              </p>
+            </div>
+            <div className="text-left">
+              <p className="text-sm text-ghars-500">مجموع XP</p>
+              <p className="text-lg font-bold text-ghars-700">{progress.totalXp}</p>
+            </div>
+          </div>
+          <div className="h-3 w-full overflow-hidden rounded-full bg-ghars-100">
+            <div
+              className="h-full rounded-full bg-ghars-500 transition-all"
+              style={{ width: `${progress.progressPct}%` }}
+            />
+          </div>
+          {progress.nextLevel ? (
+            <p className="mt-1.5 text-xs text-ghars-500">
+              نحو «{progress.nextLevel.label_ar}» — {progress.xpIntoLevel} من {progress.xpForNextLevel} XP
+            </p>
+          ) : (
+            <p className="mt-1.5 text-xs text-ghars-500">أعلى مستوى 🎉</p>
+          )}
+        </section>
+
+        {/* الشارات */}
+        {badges.length > 0 ? (
+          <section className="card">
+            <h2 className="mb-2 font-bold text-ghars-700">الشارات</h2>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((b, i) => {
+                const badge = Array.isArray(b.badges) ? b.badges[0] : b.badges;
+                return (
+                  <span key={i} className="rounded-full bg-ghars-100 px-3 py-1 text-xs font-medium text-ghars-700">
+                    🏅 {badge?.label_ar}
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {/* مهام للتنفيذ */}
+        <section className="space-y-3">
+          <h2 className="font-bold text-ghars-700">مهامي</h2>
+          {active.length === 0 ? (
+            <p className="text-sm text-ghars-500">لا توجد مهام حالية. اطلب من ولي الأمر إسناد مهمة.</p>
+          ) : (
+            <div className="grid gap-2">
+              {active.map((r) => {
+                const t = task(r);
+                if (!t) return null;
+                return (
+                  <CompleteTaskCard
+                    key={r.id}
+                    assignedTaskId={r.id}
+                    title={t.title_ar}
+                    description={t.description_ar}
+                    baseXp={t.base_xp}
+                    proof={t.proof}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* بانتظار الاعتماد */}
+        {waiting.length > 0 ? (
+          <section className="card">
+            <h2 className="mb-2 font-bold text-ghars-700">بانتظار اعتماد ولي الأمر</h2>
+            <ul className="space-y-1.5">
+              {waiting.map((r) => {
+                const t = task(r);
+                return (
+                  <li key={r.id} className="flex items-center justify-between text-sm">
+                    <span className="text-ghars-700">{t?.title_ar}</span>
+                    <span className="text-xs text-amber-600">قيد المراجعة</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+
+        {/* مكتملة */}
+        {done.length > 0 ? (
+          <section className="card">
+            <h2 className="mb-2 font-bold text-ghars-700">مكتملة ✓</h2>
+            <ul className="space-y-1.5">
+              {done.map((r) => {
+                const t = task(r);
+                return (
+                  <li key={r.id} className="flex items-center justify-between text-sm">
+                    <span className="text-ghars-700">{t?.title_ar}</span>
+                    <span className="text-xs text-ghars-500">{t?.base_xp} XP</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
+      </main>
+    </>
+  );
+}

@@ -36,27 +36,36 @@ export default async function DashboardPage() {
           ) : (
             <ul className="grid gap-2 sm:grid-cols-2">
               {children.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between rounded-xl border border-ghars-100 px-3 py-2.5"
-                >
-                  <div>
-                    <p className="font-semibold text-ghars-700">{c.display_name}</p>
-                    {c.age != null ? (
-                      <p className="text-xs text-ghars-500">{c.age} سنة</p>
-                    ) : null}
-                  </div>
+                <li key={c.id}>
+                  <Link
+                    href={`/children/${c.id}`}
+                    className="flex items-center justify-between rounded-xl border border-ghars-100 px-3 py-2.5 transition hover:border-ghars-500"
+                  >
+                    <div>
+                      <p className="font-semibold text-ghars-700">{c.display_name}</p>
+                      {c.age != null ? (
+                        <p className="text-xs text-ghars-500">{c.age} سنة</p>
+                      ) : null}
+                    </div>
+                    <span className="text-xs text-ghars-500">لوحة الابن ←</span>
+                  </Link>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-2">
+        <section className="grid gap-3 sm:grid-cols-3">
           <Link href="/values" className="card transition hover:border-ghars-500">
             <h3 className="font-bold text-ghars-700">اختيار قيمة</h3>
             <p className="mt-1 text-sm text-ghars-500">
-              ابدأ من إحدى القيم الأربع: الاحترام، التعاون، الاهتمام، الالتزام.
+              ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام.
+            </p>
+          </Link>
+          <Link href="/review" className="card transition hover:border-ghars-500">
+            <h3 className="font-bold text-ghars-700">المراجعة والاعتماد</h3>
+            <p className="mt-1 text-sm text-ghars-500">
+              اعتمد إنجازات الأبناء وامنح XP.
             </p>
           </Link>
           <div className="card opacity-60">
