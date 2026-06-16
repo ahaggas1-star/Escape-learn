@@ -47,6 +47,11 @@ export default async function AdminHome() {
             <p className="stat-value">{values ?? 0}</p>
             <p className="text-xs text-ghars-500">إدارة القيم والقيم الفرعية</p>
           </Link>
+          <Link href="/admin/gamification" className="card bg-gradient-to-br from-joy-50 to-joy-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+            <div className="mb-1 text-2xl">🏅</div>
+            <h2 className="font-display font-bold text-ghars-800">التلعيب</h2>
+            <p className="mt-1 text-sm text-ghars-500">الشارات والمستويات والإنجازات</p>
+          </Link>
           {role === "system_admin" ? (
             <Link href="/admin/users" className="card bg-gradient-to-br from-grape-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
               <div className="mb-1 text-2xl">👥</div>

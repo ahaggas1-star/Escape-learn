@@ -26,9 +26,12 @@ export async function signUp(_prev: unknown, formData: FormData) {
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) return { error: "تعذّر إنشاء الحساب. حاول ببريد آخر." };
 
-  // إذا كان تأكيد البريد مفعّلًا لن توجد جلسة بعد.
+  // الحسابات مؤكَّدة تلقائيًا — سجّل الدخول مباشرة إن لم توجد جلسة.
   if (!data.session) {
-    return { error: null, info: "تم إنشاء الحساب. تحقّق من بريدك لتأكيد الحساب ثم سجّل الدخول." };
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInErr) {
+      return { error: null, info: "تم إنشاء الحساب. يمكنك تسجيل الدخول الآن." };
+    }
   }
   redirect("/dashboard");
 }

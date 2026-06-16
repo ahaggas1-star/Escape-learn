@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -55,6 +56,7 @@ export default async function AdminGoalsPage() {
                       <p className="text-xs text-ghars-500">{cv?.label_ar} · {g.difficulty}</p>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Link href={`/admin/goals/${g.id}/edit`} className="rounded-full px-2.5 py-1 text-xs text-ghars-600 hover:bg-ghars-50">تعديل</Link>
                       <PublishToggle table="goal_templates" id={g.id} published={g.is_published} />
                       <DeleteTemplateButton table="goal_templates" id={g.id} />
                     </div>

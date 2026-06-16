@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -56,6 +57,7 @@ export default async function AdminTasksPage() {
                       <p className="text-xs text-ghars-500">{cv?.label_ar} · {t.base_xp} XP · {t.repeat_type}</p>
                     </div>
                     <div className="flex items-center gap-1">
+                      <Link href={`/admin/tasks/${t.id}/edit`} className="rounded-full px-2.5 py-1 text-xs text-ghars-600 hover:bg-ghars-50">تعديل</Link>
                       <PublishToggle table="task_templates" id={t.id} published={t.is_published} />
                       <DeleteTemplateButton table="task_templates" id={t.id} />
                     </div>
