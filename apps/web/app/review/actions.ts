@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { evaluateChild } from "@/lib/gamification-engine";
 
 type ReviewKind = "approve" | "reject" | "redo";
 
@@ -86,6 +87,8 @@ export async function reviewCompletion(_prev: unknown, formData: FormData) {
         source_id: comp.id,
       });
     if (events.length > 0) await supabase.from("xp_events").insert(events);
+    // تقييم الشارات/الإنجازات/الصناديق بعد الاعتماد ومنح XP.
+    await evaluateChild(comp.child_id);
   }
 
   revalidatePath("/review");

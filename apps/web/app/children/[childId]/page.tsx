@@ -5,6 +5,7 @@ import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getChildProgress } from "@/lib/gamification";
 import { CompleteTaskCard } from "./CompleteTaskCard";
+import { RewardBoxCard } from "./RewardBoxCard";
 
 export const dynamic = "force-dynamic";
 
@@ -30,18 +31,25 @@ export default async function ChildPage({
 
   const supabase = createClient();
 
-  const [progress, { data: atData }, { data: badgeData }] = await Promise.all([
-    getChildProgress(child.id),
-    supabase
-      .from("assigned_tasks")
-      .select("id, status, tasks(title_ar, description_ar, base_xp, proof)")
-      .eq("child_id", child.id)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("child_badges")
-      .select("badges(label_ar)")
-      .eq("child_id", child.id),
-  ]);
+  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }] =
+    await Promise.all([
+      getChildProgress(child.id),
+      supabase
+        .from("assigned_tasks")
+        .select("id, status, tasks(title_ar, description_ar, base_xp, proof)")
+        .eq("child_id", child.id)
+        .order("created_at", { ascending: true }),
+      supabase.from("child_badges").select("badges(label_ar)").eq("child_id", child.id),
+      supabase
+        .from("child_achievements")
+        .select("achievements(label_ar)")
+        .eq("child_id", child.id),
+      supabase
+        .from("reward_box_openings")
+        .select("id, status, reward_box_items(label_ar)")
+        .eq("child_id", child.id)
+        .order("opened_at", { ascending: false, nullsFirst: true }),
+    ]);
 
   const rows = (atData ?? []) as AssignedRow[];
   const task = (r: AssignedRow) => (Array.isArray(r.tasks) ? r.tasks[0] : r.tasks);
@@ -50,6 +58,17 @@ export default async function ChildPage({
   const waiting = rows.filter((r) => r.status === "submitted");
   const done = rows.filter((r) => r.status === "approved");
   const badges = (badgeData ?? []) as { badges: { label_ar: string } | { label_ar: string }[] }[];
+  const achievements = (achData ?? []) as {
+    achievements: { label_ar: string } | { label_ar: string }[];
+  }[];
+  type BoxRow = {
+    id: string;
+    status: string;
+    reward_box_items: { label_ar: string } | { label_ar: string }[] | null;
+  };
+  const boxes = (boxData ?? []) as BoxRow[];
+  const availableBoxes = boxes.filter((b) => b.status === "available");
+  const openedBoxes = boxes.filter((b) => b.status === "opened");
 
   return (
     <>
@@ -103,6 +122,54 @@ export default async function ChildPage({
                 );
               })}
             </div>
+          </section>
+        ) : null}
+
+        {/* صناديق المكافآت المتاحة */}
+        {availableBoxes.length > 0 ? (
+          <section className="space-y-3">
+            <h2 className="font-bold text-ghars-700">صناديق المكافآت</h2>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {availableBoxes.map((b) => (
+                <RewardBoxCard key={b.id} openingId={b.id} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* الإنجازات */}
+        {achievements.length > 0 ? (
+          <section className="card">
+            <h2 className="mb-2 font-bold text-ghars-700">الإنجازات</h2>
+            <div className="flex flex-wrap gap-2">
+              {achievements.map((a, i) => {
+                const ach = Array.isArray(a.achievements) ? a.achievements[0] : a.achievements;
+                return (
+                  <span key={i} className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                    ⭐ {ach?.label_ar}
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
+
+        {/* مكافآت مفتوحة */}
+        {openedBoxes.length > 0 ? (
+          <section className="card">
+            <h2 className="mb-2 font-bold text-ghars-700">مكافآت حصلت عليها</h2>
+            <ul className="space-y-1.5">
+              {openedBoxes.map((b) => {
+                const item = Array.isArray(b.reward_box_items)
+                  ? b.reward_box_items[0]
+                  : b.reward_box_items;
+                return (
+                  <li key={b.id} className="text-sm text-ghars-600">
+                    🎁 {item?.label_ar ?? "مكافأة"}
+                  </li>
+                );
+              })}
+            </ul>
           </section>
         ) : null}
 

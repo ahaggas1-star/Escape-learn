@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { evaluateChild } from "@/lib/gamification-engine";
 
 // الابن يُكمل مهمة. RLS يضمن أن المهمة تخص أسرة المستخدم الحالي.
 export async function completeTask(_prev: unknown, formData: FormData) {
@@ -58,8 +59,65 @@ export async function completeTask(_prev: unknown, formData: FormData) {
         source_id: at.id,
       });
     }
+    // تقييم الشارات/الإنجازات/الصناديق بعد منح XP.
+    await evaluateChild(at.child_id);
   }
 
   revalidatePath(`/children/${at.child_id}`);
+  return { error: null };
+}
+
+// فتح صندوق مكافأة متاح. الاختيار تدويري (لا عشوائية/مقامرة)، ويُمنح XP إن كان عنصر XP.
+export async function openReward(_prev: unknown, formData: FormData) {
+  const openingId = String(formData.get("opening_id") ?? "");
+  if (!openingId) return { error: "بيانات ناقصة." };
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: opening } = await supabase
+    .from("reward_box_openings")
+    .select("id, reward_box_id, child_id, status")
+    .eq("id", openingId)
+    .maybeSingle();
+  if (!opening || opening.status !== "available")
+    return { error: "الصندوق غير متاح للفتح." };
+
+  const { data: items } = await supabase
+    .from("reward_box_items")
+    .select("id, kind, label_ar, payload")
+    .eq("reward_box_id", opening.reward_box_id)
+    .order("sort_order", { ascending: true });
+  const list = items ?? [];
+  if (list.length === 0) return { error: "لا يوجد محتوى في الصندوق." };
+
+  // اختيار تدويري شفّاف حسب عدد الصناديق المفتوحة سابقًا.
+  const { count } = await supabase
+    .from("reward_box_openings")
+    .select("id", { count: "exact", head: true })
+    .eq("child_id", opening.child_id)
+    .eq("status", "opened");
+  const idx = (count ?? 0) % list.length;
+  const item = list[idx] as { id: string; kind: string; payload: { xp?: number } | null };
+
+  await supabase
+    .from("reward_box_openings")
+    .update({ item_id: item.id, status: "opened", opened_at: new Date().toISOString() })
+    .eq("id", opening.id);
+
+  if (item.kind === "xp" && item.payload?.xp) {
+    await supabase.from("xp_events").insert({
+      child_id: opening.child_id,
+      amount: item.payload.xp,
+      reason_key: "reward_box",
+      source_table: "reward_box_openings",
+      source_id: opening.id,
+    });
+  }
+
+  revalidatePath(`/children/${opening.child_id}`);
   return { error: null };
 }
