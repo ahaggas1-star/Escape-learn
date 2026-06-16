@@ -85,6 +85,12 @@ export default async function DashboardPage() {
             </Link>
           ) : null}
         </section>
+
+        <div className="text-center">
+          <Link href="/settings" className="text-xs font-semibold text-ghars-500 hover:text-ghars-700">
+            ⚙️ الإعدادات والخصوصية
+          </Link>
+        </div>
       </main>
     </>
   );

@@ -53,11 +53,18 @@ export default async function AdminHome() {
             <p className="mt-1 text-sm text-ghars-500">الشارات والمستويات والإنجازات</p>
           </Link>
           {role === "system_admin" ? (
-            <Link href="/admin/users" className="card bg-gradient-to-br from-grape-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
-              <div className="mb-1 text-2xl">👥</div>
-              <h2 className="font-display font-bold text-ghars-800">إدارة الأدوار</h2>
-              <p className="mt-1 text-sm text-ghars-500">تعيين أدوار المستخدمين</p>
-            </Link>
+            <>
+              <Link href="/admin/users" className="card bg-gradient-to-br from-grape-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+                <div className="mb-1 text-2xl">👥</div>
+                <h2 className="font-display font-bold text-ghars-800">إدارة الأدوار</h2>
+                <p className="mt-1 text-sm text-ghars-500">تعيين أدوار المستخدمين</p>
+              </Link>
+              <Link href="/admin/system" className="card bg-gradient-to-br from-sky-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+                <div className="mb-1 text-2xl">🛡️</div>
+                <h2 className="font-display font-bold text-ghars-800">لوحة النظام</h2>
+                <p className="mt-1 text-sm text-ghars-500">سجلات الموافقات والعمليات</p>
+              </Link>
+            </>
           ) : null}
         </div>
       </main>
