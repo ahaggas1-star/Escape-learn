@@ -12,6 +12,29 @@ export async function requireUser() {
   return user;
 }
 
+// يتطلّب أن يكون المستخدم من طاقم المحتوى/النظام، وإلا يعيد التوجيه.
+export async function requireStaff(): Promise<{
+  userId: string;
+  email: string | null;
+  role: string;
+}> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: row } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+  const role = row?.role ?? "guardian";
+  if (role !== "content_manager" && role !== "system_admin") redirect("/dashboard");
+
+  return { userId: user.id, email: user.email ?? null, role };
+}
+
 // سياق ولي الأمر: المستخدم + أسرته (أول أسرة يملكها) + أبناؤه.
 export async function getGuardianContext(): Promise<{
   userId: string;

@@ -2,14 +2,20 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const { email, family, children } = await getGuardianContext();
+  const { userId, email, family, children } = await getGuardianContext();
 
   // لا توجد أسرة بعد → ابدأ الإعداد.
   if (!family) redirect("/onboarding");
+
+  // هل المستخدم من طاقم المحتوى (لإظهار رابط لوحة الإدارة)؟
+  const supabase = createClient();
+  const { data: roleRow } = await supabase.from("users").select("role").eq("id", userId).maybeSingle();
+  const isStaff = roleRow?.role === "content_manager" || roleRow?.role === "system_admin";
 
   return (
     <>
@@ -76,6 +82,12 @@ export default async function DashboardPage() {
             <h3 className="font-bold text-ghars-700">ترتيب الأسر</h3>
             <p className="mt-1 text-sm text-ghars-500">تنافس أسري محفّز ومجهول الهوية.</p>
           </Link>
+          {isStaff ? (
+            <Link href="/admin" className="card border-joy-400 transition hover:border-joy-500">
+              <h3 className="font-bold text-ghars-700">لوحة إدارة المحتوى</h3>
+              <p className="mt-1 text-sm text-ghars-500">إدارة القيم والأهداف والمهام الجاهزة.</p>
+            </Link>
+          ) : null}
         </section>
       </main>
     </>
