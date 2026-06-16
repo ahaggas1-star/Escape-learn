@@ -68,10 +68,10 @@ export default async function DashboardPage() {
               اعتمد إنجازات الأبناء وامنح XP.
             </p>
           </Link>
-          <div className="card opacity-60">
+          <Link href="/reports" className="card transition hover:border-ghars-500">
             <h3 className="font-bold text-ghars-700">التقارير</h3>
-            <p className="mt-1 text-sm text-ghars-500">قريبًا — تقارير الابن والأسرة (المرحلة 6).</p>
-          </div>
+            <p className="mt-1 text-sm text-ghars-500">تقارير الابن والأسرة ومؤشرات عامة.</p>
+          </Link>
         </section>
       </main>
     </>
