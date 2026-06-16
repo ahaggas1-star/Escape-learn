@@ -1,0 +1,39 @@
+name: Deploy to Vercel
+
+# نشر تلقائي على Vercel من خادم GitHub (يصل لـVercel بخلاف بيئة التطوير المقيّدة).
+# مطلوب مرة واحدة: أضف سرّ المستودع VERCEL_TOKEN
+#   (أنشئه من https://vercel.com/account/tokens ثم
+#    Settings → Secrets and variables → Actions → New repository secret).
+# لا حاجة لمتغيرات بيئة أخرى (مفاتيح Supabase العامة مهيأة افتراضيًا في الكود).
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["claude/great-dirac-1v21ay", "main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Deploy (production)
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::أضف سرّ VERCEL_TOKEN في إعدادات المستودع أولًا."
+            exit 1
+          fi
+          URL=$(vercel deploy --prod --yes --token "$VERCEL_TOKEN")
+          echo "Deployment URL: $URL"
+          echo "## 🔗 رابط الموقع" >> "$GITHUB_STEP_SUMMARY"
+          echo "$URL" >> "$GITHUB_STEP_SUMMARY"
