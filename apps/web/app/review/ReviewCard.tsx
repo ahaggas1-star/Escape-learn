@@ -46,12 +46,14 @@ export function ReviewCard({
   taskTitle,
   baseXp,
   note,
+  photoUrl,
 }: {
   completionId: string;
   childName: string;
   taskTitle: string;
   baseXp: number;
   note: string | null;
+  photoUrl?: string | null;
 }) {
   const [state, formAction] = useFormState<State, FormData>(
     reviewCompletion,
@@ -71,6 +73,14 @@ export function ReviewCard({
           <p className="mt-1.5 rounded-lg bg-ghars-50 px-3 py-2 text-sm text-ghars-600">
             ملاحظة الابن: {note}
           </p>
+        ) : null}
+        {photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoUrl}
+            alt="صورة إثبات"
+            className="mt-2 max-h-56 w-full rounded-2xl border border-ghars-100 object-cover"
+          />
         ) : null}
       </div>
 

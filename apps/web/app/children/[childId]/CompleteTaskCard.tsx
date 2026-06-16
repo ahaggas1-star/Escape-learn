@@ -24,6 +24,7 @@ export function CompleteTaskCard({
     undefined
   );
   const showNote = proof === "note";
+  const showPhoto = proof === "photo";
 
   return (
     <form action={formAction} className="rounded-xl border border-ghars-100 p-4">
@@ -46,6 +47,18 @@ export function CompleteTaskCard({
           className="input mt-3"
           placeholder="اكتب ملاحظة أو انعكاسًا قصيرًا (اختياري)"
         />
+      ) : null}
+
+      {showPhoto ? (
+        <div className="mt-3">
+          <label className="label text-xs">أرفق صورة إثبات</label>
+          <input
+            type="file"
+            name="photo"
+            accept="image/*"
+            className="block w-full text-xs text-ghars-600 file:ml-2 file:rounded-xl file:border-0 file:bg-ghars-100 file:px-3 file:py-1.5 file:text-ghars-700"
+          />
+        </div>
       ) : null}
 
       {state?.error ? (

@@ -11,6 +11,7 @@ type TaskInfo = { title_ar: string; base_xp: number };
 type Row = {
   id: string;
   note_ar: string | null;
+  photo_path: string | null;
   submitted_at: string;
   children: { display_name: string } | { display_name: string }[] | null;
   assigned_tasks:
@@ -27,12 +28,25 @@ export default async function ReviewPage() {
   const { data } = await supabase
     .from("task_completions")
     .select(
-      "id, note_ar, submitted_at, children(display_name), assigned_tasks!inner(status, tasks(title_ar, base_xp))"
+      "id, note_ar, photo_path, submitted_at, children(display_name), assigned_tasks!inner(status, tasks(title_ar, base_xp))"
     )
     .eq("assigned_tasks.status", "submitted")
     .order("submitted_at", { ascending: true });
 
   const rows = (data ?? []) as unknown as Row[];
+
+  // روابط موقّعة لصور الإثبات (الصندوق خاص).
+  const photoUrls = new Map<string, string>();
+  await Promise.all(
+    rows
+      .filter((r) => r.photo_path)
+      .map(async (r) => {
+        const { data: signed } = await supabase.storage
+          .from("qiyam-proofs")
+          .createSignedUrl(r.photo_path as string, 3600);
+        if (signed?.signedUrl) photoUrls.set(r.id, signed.signedUrl);
+      })
+  );
 
   return (
     <>
@@ -65,6 +79,7 @@ export default async function ReviewPage() {
                   taskTitle={task?.title_ar ?? "مهمة"}
                   baseXp={task?.base_xp ?? 0}
                   note={r.note_ar}
+                  photoUrl={photoUrls.get(r.id) ?? null}
                 />
               );
             })}

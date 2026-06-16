@@ -44,7 +44,7 @@ h1, h2, h3, .font-display {
     @apply btn bg-ghars-50 text-ghars-700 hover:bg-ghars-100;
   }
   .btn-joy {
-    @apply btn bg-joy-400 text-joy-900 shadow-soft hover:bg-joy-500;
+    @apply btn bg-joy-400 text-ghars-900 shadow-soft hover:bg-joy-500;
   }
 
   .input {

@@ -29,12 +29,33 @@ export async function completeTask(_prev: unknown, formData: FormData) {
   const baseXp = task?.base_xp ?? 0;
   const proofKind = task?.proof ?? "self_confirm";
 
+  // رفع صورة الإثبات (إذا كان نوع الإثبات صورة وتم اختيار ملف).
+  let photoPath: string | null = null;
+  if (proofKind === "photo") {
+    const file = formData.get("photo");
+    if (file && file instanceof File && file.size > 0) {
+      if (file.size > 5 * 1024 * 1024) return { error: "حجم الصورة كبير (الحد 5MB)." };
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `${at.child_id}/${at.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("qiyam-proofs")
+        .upload(path, file, { contentType: file.type || "image/jpeg", upsert: false });
+      if (upErr) return { error: "تعذّر رفع الصورة." };
+      photoPath = path;
+      // تسجيل موافقة رفع الصور (الخصوصية).
+      await supabase
+        .from("consent_logs")
+        .insert({ user_id: user.id, kind: "photo_upload", granted: true });
+    }
+  }
+
   // سجل الإكمال مع الإثبات.
   const { error: compErr } = await supabase.from("task_completions").insert({
     assigned_task_id: at.id,
     child_id: at.child_id,
     proof_kind: proofKind,
     note_ar: note || null,
+    photo_path: photoPath,
   });
   if (compErr) return { error: "تعذّر تسجيل الإكمال." };
 

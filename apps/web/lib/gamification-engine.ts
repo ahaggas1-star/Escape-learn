@@ -94,7 +94,7 @@ function longestStreak(dates: string[]): number {
 export async function evaluateChild(childId: string): Promise<void> {
   const supabase = createClient();
 
-  const [{ data: child }, { data: approved }, { data: coreVals }, { data: subVals }, { data: badges }, { data: achievements }, { data: completedXp }] =
+  const [{ data: child }, { data: approved }, { data: coreVals }, { data: subVals }, { data: badges }, { data: achievements }, { data: completedXp }, { count: challengeXp }] =
     await Promise.all([
       supabase.from("children").select("family_id").eq("id", childId).maybeSingle(),
       supabase
@@ -111,6 +111,11 @@ export async function evaluateChild(childId: string): Promise<void> {
         .select("created_at")
         .eq("child_id", childId)
         .eq("reason_key", "task_completed"),
+      supabase
+        .from("xp_events")
+        .select("id", { count: "exact", head: true })
+        .eq("child_id", childId)
+        .eq("reason_key", "family_challenge"),
     ]);
 
   if (!child) return;
@@ -151,6 +156,7 @@ export async function evaluateChild(childId: string): Promise<void> {
   const earnedAchKeys: string[] = [];
   if (approvedTotal >= 1) earnedAchKeys.push("first_task");
   if (streak >= 5) earnedAchKeys.push("streak_5");
+  if ((challengeXp ?? 0) >= 1) earnedAchKeys.push("first_challenge");
   // أول هدف مكتمل: هدف للابن جميع مهامه معتمدة (وله مهمة واحدة على الأقل).
   if (await hasCompletedGoal(childId)) earnedAchKeys.push("first_goal");
   const earnedAchIds = earnedAchKeys

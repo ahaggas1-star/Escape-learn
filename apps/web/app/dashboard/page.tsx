@@ -68,6 +68,8 @@ export default async function DashboardPage() {
             { href: "/review", icon: "✅", bg: "from-sky-50 to-sky-100", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح XP." },
             { href: "/reports", icon: "📊", bg: "from-grape-50 to-grape-100", title: "التقارير", desc: "تقارير الابن والأسرة ومؤشرات عامة." },
             { href: "/leaderboard", icon: "🏆", bg: "from-joy-50 to-joy-100", title: "ترتيب الأسر", desc: "تنافس أسري محفّز ومجهول الهوية." },
+            { href: "/challenges", icon: "🚩", bg: "from-bloom-50 to-bloom-100", title: "التحديات العائلية", desc: "تحديات تجمع الأسرة حول قيمة." },
+            { href: "/rewards", icon: "🎁", bg: "from-joy-50 to-bloom-100", title: "مكافآت الأسرة", desc: "حدّد مكافآت الصندوق المعنوية والمادية." },
           ].map((a) => (
             <Link key={a.href} href={a.href} className={`card bg-gradient-to-br ${a.bg} transition hover:-translate-y-0.5 hover:shadow-soft`}>
               <div className="mb-1 text-2xl">{a.icon}</div>
