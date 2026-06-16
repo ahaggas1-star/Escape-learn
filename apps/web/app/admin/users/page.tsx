@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { Header } from "@/components/Header";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { RoleForm } from "./RoleForm";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +21,12 @@ export default async function AdminUsersPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">إدارة الأدوار</h1>
-            <p className="text-sm text-ghars-500">تعيين أدوار المستخدمين (مدير النظام فقط).</p>
-          </div>
-          <Link href="/admin" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="👥"
+          title="إدارة الأدوار"
+          subtitle="تعيين أدوار المستخدمين (مدير النظام فقط)."
+          backHref="/admin"
+        />
 
         <section className="card space-y-2">
           {users.length === 0 ? (

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
@@ -9,6 +8,7 @@ import { RewardBoxCard } from "./RewardBoxCard";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Chip } from "@/components/ui/Chip";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -77,10 +77,7 @@ export default async function ChildPage({
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-extrabold text-ghars-700">{child.display_name}</h1>
-          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader icon="🧒" title={child.display_name} backHref="/dashboard" />
 
         {/* التقدم والمستوى */}
         <section className="card bg-gradient-to-br from-white to-ghars-50">

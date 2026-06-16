@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { getChildReport } from "@/lib/reports";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -30,17 +31,12 @@ export default async function ChildReportPage({
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">
-              تقرير: {child.display_name}
-            </h1>
-            <p className="text-sm text-ghars-500">
-              المستوى: {r.progress.level?.label_ar ?? "—"} · {r.progress.totalXp} XP
-            </p>
-          </div>
-          <Link href="/reports" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="📄"
+          title={`تقرير: ${child.display_name}`}
+          subtitle={`المستوى: ${r.progress.level?.label_ar ?? "—"} · ${r.progress.totalXp} XP`}
+          backHref="/reports"
+        />
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           <Stat label="أهداف نشطة" value={r.goalsActive} />

@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AddValueForm, AddSubValueForm } from "./ValueForms";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Chip } from "@/components/ui/Chip";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +32,7 @@ export default async function AdminValuesPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-extrabold text-ghars-700">القيم</h1>
-          <Link href="/admin" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader icon="💚" title="القيم" backHref="/admin" />
 
         <section className="card">
           <h2 className="mb-3 font-bold text-ghars-700">القيم الحالية</h2>
@@ -44,9 +42,7 @@ export default async function AdminValuesPage() {
                 <p className="font-bold text-ghars-700">{v.label_ar}</p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {(v.sub_values ?? []).map((s) => (
-                    <span key={s.id} className="rounded-full bg-ghars-100 px-2.5 py-0.5 text-xs text-ghars-700">
-                      {s.label_ar}
-                    </span>
+                    <Chip key={s.id} tone="sky">{s.label_ar}</Chip>
                   ))}
                 </div>
               </div>

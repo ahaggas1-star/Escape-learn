@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { CoreValue } from "@/lib/types";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -20,13 +21,12 @@ export default async function ValuesPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">اختيار قيمة</h1>
-            <p className="text-sm text-ghars-500">ابدأ من قيمة، ثم حوّلها إلى أهداف ومهام.</p>
-          </div>
-          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="🌱"
+          title="اختيار قيمة"
+          subtitle="ابدأ من قيمة، ثم حوّلها إلى أهداف ومهام."
+          backHref="/dashboard"
+        />
 
         {values.length === 0 ? (
           <div className="card text-sm text-ghars-500">

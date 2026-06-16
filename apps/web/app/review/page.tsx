@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewCard } from "./ReviewCard";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -38,13 +38,12 @@ export default async function ReviewPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">المراجعة والاعتماد</h1>
-            <p className="text-sm text-ghars-500">اعتمد إنجازات الأبناء أو اطلب الإعادة.</p>
-          </div>
-          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="✅"
+          title="المراجعة والاعتماد"
+          subtitle="اعتمد إنجازات الأبناء أو اطلب الإعادة."
+          backHref="/dashboard"
+        />
 
         {rows.length === 0 ? (
           <div className="card text-sm text-ghars-500">

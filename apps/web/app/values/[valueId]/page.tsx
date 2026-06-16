@@ -6,6 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 import type { CoreValue, GoalTemplate, SubValue } from "@/lib/types";
 import { TemplateGoalCard } from "./TemplateGoalCard";
 import { CustomGoalForm } from "./CustomGoalForm";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Chip } from "@/components/ui/Chip";
+
+const CHIP_TONES = ["ghars", "joy", "sky", "bloom", "grape"] as const;
 
 export const dynamic = "force-dynamic";
 
@@ -47,25 +51,19 @@ export default async function ValueDetailPage({
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">{coreValue.label_ar}</h1>
-            {coreValue.description_ar ? (
-              <p className="text-sm text-ghars-500">{coreValue.description_ar}</p>
-            ) : null}
-          </div>
-          <Link href="/values" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="💚"
+          title={coreValue.label_ar}
+          subtitle={coreValue.description_ar ?? undefined}
+          backHref="/values"
+        />
 
         {subValues.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {subValues.map((s) => (
-              <span
-                key={s.id}
-                className="rounded-full bg-ghars-100 px-3 py-1 text-xs font-medium text-ghars-700"
-              >
+            {subValues.map((s, i) => (
+              <Chip key={s.id} tone={CHIP_TONES[i % CHIP_TONES.length]}>
                 {s.label_ar}
-              </span>
+              </Chip>
             ))}
           </div>
         ) : null}

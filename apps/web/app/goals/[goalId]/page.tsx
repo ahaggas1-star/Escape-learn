@@ -1,10 +1,11 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Goal, TaskTemplate } from "@/lib/types";
 import { AddTaskButton } from "./AddTaskButton";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Chip } from "@/components/ui/Chip";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,15 @@ const STATUS_LABEL: Record<string, string> = {
   approved: "معتمدة",
   rejected: "مرفوضة",
   redo_requested: "إعادة تنفيذ",
+};
+
+const STATUS_TONE: Record<string, "ghars" | "joy" | "sky" | "bloom" | "grape"> = {
+  assigned: "sky",
+  in_progress: "sky",
+  submitted: "joy",
+  approved: "ghars",
+  rejected: "bloom",
+  redo_requested: "grape",
 };
 
 type TaskRow = {
@@ -69,16 +79,15 @@ export default async function GoalPage({
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">{goal.title_ar}</h1>
-            <p className="text-sm text-ghars-500">
-              {child ? `للابن: ${child.display_name}` : "غير مرتبط بابن"}
-              {goal.source === "custom" ? " · هدف خاص" : " · هدف جاهز"}
-            </p>
-          </div>
-          <Link href="/dashboard" className="btn-ghost text-xs">لوحة التحكم</Link>
-        </div>
+        <PageHeader
+          icon="🎯"
+          title={goal.title_ar}
+          subtitle={`${child ? `للابن: ${child.display_name}` : "غير مرتبط بابن"}${
+            goal.source === "custom" ? " · هدف خاص" : " · هدف جاهز"
+          }`}
+          backHref="/dashboard"
+          backLabel="لوحة التحكم"
+        />
 
         {goal.measure_ar ? (
           <div className="card text-sm">
@@ -104,9 +113,9 @@ export default async function GoalPage({
                       <p className="font-semibold text-ghars-700">{t.title_ar}</p>
                       <p className="text-xs text-ghars-500">{t.base_xp}+ XP</p>
                     </div>
-                    <span className="rounded-full bg-ghars-100 px-3 py-1 text-xs font-medium text-ghars-700">
+                    <Chip tone={STATUS_TONE[status] ?? "ghars"}>
                       {STATUS_LABEL[status] ?? status}
-                    </span>
+                    </Chip>
                   </li>
                 );
               })}

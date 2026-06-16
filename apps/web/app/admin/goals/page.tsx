@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "../PublishToggle";
 import { DeleteTemplateButton } from "../DeleteTemplateButton";
 import { GoalTemplateForm } from "./GoalTemplateForm";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +36,7 @@ export default async function AdminGoalsPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-extrabold text-ghars-700">الأهداف الجاهزة</h1>
-          <Link href="/admin" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader icon="🎯" title="الأهداف الجاهزة" backHref="/admin" />
 
         <GoalTemplateForm values={values ?? []} subValues={subs ?? []} ageStages={stages ?? []} />
 

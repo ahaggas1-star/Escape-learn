@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/leaderboard";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +21,12 @@ export default async function LeaderboardPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">ترتيب الأسر</h1>
-            <p className="text-sm text-ghars-500">تنافس أسري محفّز — مجهول الهوية.</p>
-          </div>
-          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="🏆"
+          title="ترتيب الأسر"
+          subtitle="تنافس أسري محفّز — مجهول الهوية."
+          backHref="/dashboard"
+        />
 
         {/* شريط موضع أسرتكم */}
         {board.self ? (

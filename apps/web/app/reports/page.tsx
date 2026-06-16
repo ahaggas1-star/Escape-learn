@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { getFamilyReport, getPlatformMetrics } from "@/lib/reports";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -29,13 +30,12 @@ export default async function ReportsPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-extrabold text-ghars-700">التقارير</h1>
-            <p className="text-sm text-ghars-500">قياس التقدم والأثر داخل الأسرة.</p>
-          </div>
-          <Link href="/dashboard" className="btn-ghost text-xs">رجوع</Link>
-        </div>
+        <PageHeader
+          icon="📊"
+          title="التقارير"
+          subtitle="قياس التقدم والأثر داخل الأسرة."
+          backHref="/dashboard"
+        />
 
         {/* تقرير الأسرة */}
         <section className="card space-y-3">
