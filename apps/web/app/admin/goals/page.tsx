@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "../PublishToggle";
+import { DeleteTemplateButton } from "../DeleteTemplateButton";
 import { GoalTemplateForm } from "./GoalTemplateForm";
 
 export const dynamic = "force-dynamic";
@@ -56,7 +57,10 @@ export default async function AdminGoalsPage() {
                       <p className="font-semibold text-ghars-700">{g.title_ar}</p>
                       <p className="text-xs text-ghars-500">{cv?.label_ar} · {g.difficulty}</p>
                     </div>
-                    <PublishToggle table="goal_templates" id={g.id} published={g.is_published} />
+                    <div className="flex items-center gap-1">
+                      <PublishToggle table="goal_templates" id={g.id} published={g.is_published} />
+                      <DeleteTemplateButton table="goal_templates" id={g.id} />
+                    </div>
                   </li>
                 );
               })}

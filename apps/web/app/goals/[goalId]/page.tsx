@@ -43,18 +43,23 @@ export default async function GoalPage({
 
   const child = children.find((c) => c.id === goal.child_id) ?? null;
 
+  // قوالب المهام المقترحة: تُصفّى حسب مرحلة الابن العمرية (أو العامة بلا مرحلة).
+  let tplQuery = supabase
+    .from("task_templates")
+    .select("*")
+    .eq("core_value_id", goal.core_value_id)
+    .eq("is_published", true);
+  if (child?.age_stage_id) {
+    tplQuery = tplQuery.or(`age_stage_id.is.null,age_stage_id.eq.${child.age_stage_id}`);
+  }
+
   const [{ data: taskData }, { data: tplData }] = await Promise.all([
     supabase
       .from("tasks")
       .select("id, title_ar, base_xp, needs_guardian_approval, assigned_tasks(status)")
       .eq("goal_id", goal.id)
       .order("created_at", { ascending: true }),
-    supabase
-      .from("task_templates")
-      .select("*")
-      .eq("core_value_id", goal.core_value_id)
-      .eq("is_published", true)
-      .order("created_at", { ascending: true }),
+    tplQuery.order("created_at", { ascending: true }),
   ]);
 
   const tasks = (taskData ?? []) as TaskRow[];

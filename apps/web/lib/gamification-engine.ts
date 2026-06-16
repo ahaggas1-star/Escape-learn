@@ -182,6 +182,34 @@ export async function evaluateChild(childId: string): Promise<void> {
 
   // صندوق مكافأة متاح لكل إنجاز/شارة جديدة.
   await grantRewardBoxes(familyId, childId, newGrants);
+
+  // إكمال الأهداف التي اكتملت كل مهامها (تحديث الحالة).
+  await markCompletedGoals(childId);
+}
+
+// يحدّث حالة الأهداف النشطة التي اعتُمدت كل مهامها إلى "مكتمل".
+async function markCompletedGoals(childId: string): Promise<void> {
+  const supabase = createClient();
+  const { data: goals } = await supabase
+    .from("goals")
+    .select("id")
+    .eq("child_id", childId)
+    .eq("status", "active");
+  for (const g of goals ?? []) {
+    const { data: tasks } = await supabase
+      .from("tasks")
+      .select("id, assigned_tasks(status)")
+      .eq("goal_id", g.id);
+    const list = tasks ?? [];
+    if (list.length === 0) continue;
+    const allApproved = list.every((t: { assigned_tasks: { status: string }[] }) => {
+      const a = t.assigned_tasks ?? [];
+      return a.length > 0 && a.every((x) => x.status === "approved");
+    });
+    if (allApproved) {
+      await supabase.from("goals").update({ status: "completed" }).eq("id", g.id);
+    }
+  }
 }
 
 // هل للابن هدف واحد على الأقل جميع مهامه المسندة معتمدة؟

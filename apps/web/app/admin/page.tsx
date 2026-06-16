@@ -40,6 +40,12 @@ export default async function AdminHome() {
             <p className="mt-1 text-3xl font-extrabold text-ghars-700">{values ?? 0}</p>
             <p className="text-xs text-ghars-500">إدارة القيم والقيم الفرعية</p>
           </Link>
+          {role === "system_admin" ? (
+            <Link href="/admin/users" className="card transition hover:border-ghars-500">
+              <h2 className="font-bold text-ghars-700">إدارة الأدوار</h2>
+              <p className="mt-1 text-sm text-ghars-500">تعيين أدوار المستخدمين</p>
+            </Link>
+          ) : null}
         </div>
 
         <Link href="/dashboard" className="btn-ghost text-xs">العودة للوحة ولي الأمر</Link>

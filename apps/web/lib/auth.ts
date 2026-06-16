@@ -35,6 +35,13 @@ export async function requireStaff(): Promise<{
   return { userId: user.id, email: user.email ?? null, role };
 }
 
+// يتطلّب مدير نظام، وإلا يعيد التوجيه.
+export async function requireAdmin(): Promise<{ userId: string; email: string | null }> {
+  const { userId, email, role } = await requireStaff();
+  if (role !== "system_admin") redirect("/admin");
+  return { userId, email };
+}
+
 // سياق ولي الأمر: المستخدم + أسرته (أول أسرة يملكها) + أبناؤه.
 export async function getGuardianContext(): Promise<{
   userId: string;

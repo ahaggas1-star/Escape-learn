@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { requireStaff } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { PublishToggle } from "../PublishToggle";
+import { DeleteTemplateButton } from "../DeleteTemplateButton";
 import { TaskTemplateForm } from "./TaskTemplateForm";
 
 export const dynamic = "force-dynamic";
@@ -57,7 +58,10 @@ export default async function AdminTasksPage() {
                       <p className="font-semibold text-ghars-700">{t.title_ar}</p>
                       <p className="text-xs text-ghars-500">{cv?.label_ar} · {t.base_xp} XP · {t.repeat_type}</p>
                     </div>
-                    <PublishToggle table="task_templates" id={t.id} published={t.is_published} />
+                    <div className="flex items-center gap-1">
+                      <PublishToggle table="task_templates" id={t.id} published={t.is_published} />
+                      <DeleteTemplateButton table="task_templates" id={t.id} />
+                    </div>
                   </li>
                 );
               })}

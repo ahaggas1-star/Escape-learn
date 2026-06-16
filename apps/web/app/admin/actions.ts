@@ -117,6 +117,41 @@ export async function createCoreValue(_prev: unknown, fd: FormData) {
   return { error: null };
 }
 
+// حذف قالب (هدف أو مهمة).
+export async function deleteTemplate(_prev: unknown, fd: FormData) {
+  const table = str(fd, "table");
+  const id = str(fd, "id");
+  if (table !== "goal_templates" && table !== "task_templates") return { error: "غير صحيح." };
+  const { supabase } = await getStaff();
+  await supabase.from(table).delete().eq("id", id);
+  revalidatePath(table === "goal_templates" ? "/admin/goals" : "/admin/tasks");
+  return { error: null };
+}
+
+// تعيين دور مستخدم (مدير النظام فقط — RLS يفرض ذلك أيضًا).
+export async function setUserRole(_prev: unknown, fd: FormData) {
+  const userId = str(fd, "user_id");
+  const role = str(fd, "role");
+  if (!["guardian", "content_manager", "system_admin"].includes(role))
+    return { error: "دور غير صحيح." };
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { data: me } = await supabase.from("users").select("role").eq("id", user.id).maybeSingle();
+  if (me?.role !== "system_admin") redirect("/dashboard");
+  // لا تُسقط آخر مدير نظام لنفسه عرضًا — منع تخفيض الذات.
+  if (userId === user.id && role !== "system_admin")
+    return { error: "لا يمكنك تخفيض دورك بنفسك." };
+
+  const { error } = await supabase.from("users").update({ role }).eq("id", userId);
+  if (error) return { error: "تعذّر تحديث الدور." };
+  revalidatePath("/admin/users");
+  return { error: null };
+}
+
 export async function createSubValue(_prev: unknown, fd: FormData) {
   const core_value_id = str(fd, "core_value_id");
   const key = str(fd, "key");
