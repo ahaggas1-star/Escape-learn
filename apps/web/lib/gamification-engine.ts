@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { longestStreak } from "@/lib/streak";
 
 // =============================================================================
 // محرّك التلعيب الآمن
@@ -72,22 +73,6 @@ async function grantRewardBoxes(familyId: string, childId: string, count: number
     status: "available" as const,
   }));
   await supabase.from("reward_box_openings").insert(rows);
-}
-
-// أطول سلسلة أيام متتالية من النشاط (لإنجاز "5 أيام متتالية").
-function longestStreak(dates: string[]): number {
-  const days = Array.from(new Set(dates.map((d) => d.slice(0, 10)))).sort();
-  if (days.length === 0) return 0;
-  let best = 1;
-  let run = 1;
-  for (let i = 1; i < days.length; i++) {
-    const prev = new Date(days[i - 1] + "T00:00:00Z").getTime();
-    const cur = new Date(days[i] + "T00:00:00Z").getTime();
-    const diffDays = Math.round((cur - prev) / 86400000);
-    run = diffDays === 1 ? run + 1 : 1;
-    if (run > best) best = run;
-  }
-  return best;
 }
 
 // التقييم الكامل لابن: شارات + إنجازات + صناديق متاحة. آمن للاستدعاء المتكرر (idempotent).

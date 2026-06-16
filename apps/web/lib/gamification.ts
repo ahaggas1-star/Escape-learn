@@ -1,24 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
+import { computeLevelProgress, type Level, type LevelProgress } from "@/lib/progress";
 
-export interface Level {
-  id: string;
-  key: string;
-  label_ar: string;
-  min_xp: number;
-  sort_order: number;
-}
+export type { Level } from "@/lib/progress";
 
-export interface ChildProgress {
+export interface ChildProgress extends LevelProgress {
   totalXp: number;
-  level: Level | null;
-  nextLevel: Level | null;
-  // نسبة التقدم نحو المستوى التالي (0–100)
-  progressPct: number;
-  xpIntoLevel: number;
-  xpForNextLevel: number | null;
 }
 
-// يحسب XP الإجمالي من سجل الأحداث (xp_events) — وليس من رقم مخزّن.
+// يحسب XP الإجمالي من سجل الأحداث (xp_events) — وليس من رقم مخزّن — ثم المستوى/التقدّم.
 export async function getChildProgress(childId: string): Promise<ChildProgress> {
   const supabase = createClient();
 
@@ -33,26 +22,5 @@ export async function getChildProgress(childId: string): Promise<ChildProgress> 
   );
   const levels = (levelsData ?? []) as Level[];
 
-  let level: Level | null = null;
-  let nextLevel: Level | null = null;
-  for (let i = 0; i < levels.length; i++) {
-    if (totalXp >= levels[i].min_xp) {
-      level = levels[i];
-      nextLevel = levels[i + 1] ?? null;
-    }
-  }
-  // إن لم يبلغ أول مستوى (لا يحدث عادة لأن أول مستوى min_xp=0)
-  if (!level && levels.length > 0) {
-    nextLevel = levels[0];
-  }
-
-  const base = level?.min_xp ?? 0;
-  const xpIntoLevel = totalXp - base;
-  const xpForNextLevel = nextLevel ? nextLevel.min_xp - base : null;
-  const progressPct =
-    xpForNextLevel && xpForNextLevel > 0
-      ? Math.min(100, Math.round((xpIntoLevel / xpForNextLevel) * 100))
-      : 100;
-
-  return { totalXp, level, nextLevel, progressPct, xpIntoLevel, xpForNextLevel };
+  return { totalXp, ...computeLevelProgress(totalXp, levels) };
 }
