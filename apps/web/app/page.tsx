@@ -91,6 +91,7 @@ export default async function Home() {
         </p>
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <Link href="/login" className="btn-primary px-7 py-3 text-base">ابدأ الآن مجانًا 🌱</Link>
+          <Link href="/guide" className="btn-ghost px-7 py-3 text-base">📖 دليل ولي الأمر</Link>
           <a href="#how" className="btn-ghost px-7 py-3 text-base">شاهد كيف تعمل</a>
         </div>
         <p className="mt-3 text-xs text-ghars-400">بلا اشتراكات · عربي أولًا · آمن للأطفال</p>
@@ -264,7 +265,10 @@ export default async function Home() {
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-ghars-500 sm:flex-row">
           <Logo size={28} />
           <p>قِيَم — منصة القيم الأسرية</p>
-          <Link href="/login" className="hover:text-ghars-800">تسجيل الدخول</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/guide" className="hover:text-ghars-800">دليل ولي الأمر</Link>
+            <Link href="/login" className="hover:text-ghars-800">تسجيل الدخول</Link>
+          </div>
         </div>
       </footer>
     </main>
