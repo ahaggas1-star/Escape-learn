@@ -111,7 +111,7 @@ export default async function GoalPage({
                   >
                     <div>
                       <p className="font-semibold text-ghars-700">{t.title_ar}</p>
-                      <p className="text-xs text-ghars-500">{t.base_xp}+ XP</p>
+                      <p className="text-xs text-ghars-500">{t.base_xp}+ نقطة خبرة</p>
                     </div>
                     <Chip tone={STATUS_TONE[status] ?? "ghars"}>
                       {STATUS_LABEL[status] ?? status}

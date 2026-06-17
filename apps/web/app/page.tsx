@@ -121,7 +121,7 @@ export default async function Home() {
         <div className="grid gap-3 sm:grid-cols-3">
           {[
             { icon: "🧭", t: "نموذج واضح", d: "القيمة → الهدف → المهمة → التنفيذ → الاعتماد → القياس." },
-            { icon: "🎮", t: "تلعيب آمن", d: "XP، مستويات، شارات، صناديق مكافآت — بلا إدمان أو ضغط." },
+            { icon: "🎮", t: "تلعيب آمن", d: "نقاط الخبرة، المستويات، الشارات، صناديق المكافآت — بلا إدمان أو ضغط." },
             { icon: "👨‍👩‍👧", t: "تجربة أسرية", d: "ولي الأمر يقود، والأبناء ينفّذون ويتحفّزون معًا." },
           ].map((c) => (
             <div key={c.t} className="card">
@@ -174,7 +174,7 @@ export default async function Home() {
           <div className="card">
             <div className="text-3xl">🧒</div>
             <h3 className="mt-1 font-display font-bold text-ghars-800">الابن / الابنة</h3>
-            <p className="mt-0.5 text-sm text-ghars-600">ينفّذ المهام، يضيف الإثبات، ويرى تقدّمه: XP، مستويات، شارات، وصناديق مكافآت.</p>
+            <p className="mt-0.5 text-sm text-ghars-600">ينفّذ المهام، يضيف الإثبات، ويرى تقدّمه: نقاط الخبرة والمستويات والشارات وصناديق المكافآت.</p>
           </div>
         </div>
       </section>

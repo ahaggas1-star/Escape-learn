@@ -39,7 +39,7 @@ export default async function LeaderboardPage() {
               ) : null}
             </div>
             <p className="mt-1 text-xs opacity-90">
-              {board.self.total_xp} XP · {board.self.approved_tasks} مهمة معتمدة
+              {board.self.total_xp} نقطة خبرة · {board.self.approved_tasks} مهمة معتمدة
             </p>
           </section>
         ) : (
@@ -68,7 +68,7 @@ export default async function LeaderboardPage() {
                     </span>
                   </div>
                   <span className="text-xs text-ghars-500">
-                    {r.total_xp} XP · {r.approved_tasks} مهمة
+                    {r.total_xp} نقطة خبرة · {r.approved_tasks} مهمة
                   </span>
                 </li>
               );
@@ -81,7 +81,7 @@ export default async function LeaderboardPage() {
                 <span className="text-sm font-semibold text-ghars-700">أسرتكم</span>
               </div>
               <span className="text-xs text-ghars-500">
-                {board.self.total_xp} XP · {board.self.approved_tasks} مهمة
+                {board.self.total_xp} نقطة خبرة · {board.self.approved_tasks} مهمة
               </span>
             </div>
           ) : null}

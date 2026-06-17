@@ -34,7 +34,7 @@ export default async function ChildReportPage({
         <PageHeader
           icon="📄"
           title={`تقرير: ${child.display_name}`}
-          subtitle={`المستوى: ${r.progress.level?.label_ar ?? "—"} · ${r.progress.totalXp} XP`}
+          subtitle={`المستوى: ${r.progress.level?.label_ar ?? "—"} · ${r.progress.totalXp} نقطة خبرة`}
           backHref="/reports"
         />
 
@@ -46,7 +46,7 @@ export default async function ChildReportPage({
           <Stat label="الشارات" value={r.badges} />
           <Stat label="الإنجازات" value={r.achievements} />
           <Stat label="إجمالي المهام" value={r.tasksTotal} />
-          <Stat label="XP" value={r.progress.totalXp} />
+          <Stat label="نقاط الخبرة" value={r.progress.totalXp} />
         </div>
 
         {r.topValue ? (

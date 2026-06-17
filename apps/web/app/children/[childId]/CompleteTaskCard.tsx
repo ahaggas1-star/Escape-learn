@@ -35,7 +35,7 @@ export function CompleteTaskCard({
           {description ? (
             <p className="mt-0.5 text-xs text-ghars-500">{description}</p>
           ) : null}
-          <p className="mt-1 text-xs text-ghars-600">{baseXp}+ XP</p>
+          <p className="mt-1 text-xs text-ghars-600">{baseXp}+ نقطة خبرة</p>
         </div>
         <SubmitButton label="أنجزتها ✓" className="btn-primary" pendingLabel="…" />
       </div>

@@ -30,7 +30,7 @@ export function ChildTaskCard({
         <div>
           <p className="font-display font-bold text-ghars-700">{title}</p>
           {description ? <p className="mt-0.5 text-xs text-ghars-500">{description}</p> : null}
-          <p className="mt-1 text-xs font-semibold text-joy-600">+{baseXp} XP</p>
+          <p className="mt-1 text-xs font-semibold text-joy-600">+{baseXp} نقطة خبرة</p>
         </div>
         <SubmitButton label="أنجزتها ✓" className="btn-primary" pendingLabel="…" />
       </div>

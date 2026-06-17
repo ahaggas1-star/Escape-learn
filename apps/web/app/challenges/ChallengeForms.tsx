@@ -30,7 +30,7 @@ export function CreateChallengeForm({ values }: { values: Opt[] }) {
           </select>
         </div>
         <div>
-          <label className="label">مكافأة XP</label>
+          <label className="label">مكافأة (نقاط خبرة)</label>
           <input name="reward_xp" type="number" min={0} defaultValue={50} className="input" dir="ltr" />
         </div>
         <div className="grid grid-cols-2 gap-2">

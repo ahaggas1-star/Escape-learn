@@ -14,7 +14,7 @@ const KIND_LABEL: Record<string, string> = {
   activity_choice: "نشاط",
   appreciation: "تقدير",
   message: "رسالة",
-  xp: "XP",
+  xp: "نقاط خبرة",
 };
 
 type Item = { id: string; kind: string; label_ar: string };

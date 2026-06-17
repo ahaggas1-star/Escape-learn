@@ -65,7 +65,7 @@ export default async function DashboardPage() {
         <section className="grid gap-3 sm:grid-cols-2">
           {[
             { href: "/values", icon: "🌱", bg: "from-ghars-50 to-ghars-100", title: "اختيار قيمة", desc: "ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام." },
-            { href: "/review", icon: "✅", bg: "from-sky-50 to-sky-100", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح XP." },
+            { href: "/review", icon: "✅", bg: "from-sky-50 to-sky-100", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح نقاط الخبرة." },
             { href: "/reports", icon: "📊", bg: "from-grape-50 to-grape-100", title: "التقارير", desc: "تقارير الابن والأسرة ومؤشرات عامة." },
             { href: "/leaderboard", icon: "🏆", bg: "from-joy-50 to-joy-100", title: "ترتيب الأسر", desc: "تنافس أسري محفّز ومجهول الهوية." },
             { href: "/challenges", icon: "🚩", bg: "from-bloom-50 to-bloom-100", title: "التحديات العائلية", desc: "تحديات تجمع الأسرة حول قيمة." },
@@ -86,7 +86,10 @@ export default async function DashboardPage() {
           ) : null}
         </section>
 
-        <div className="text-center">
+        <div className="flex items-center justify-center gap-4">
+          <Link href="/guide" className="text-xs font-semibold text-ghars-500 hover:text-ghars-700">
+            📖 دليل ولي الأمر
+          </Link>
           <Link href="/settings" className="text-xs font-semibold text-ghars-500 hover:text-ghars-700">
             ⚙️ الإعدادات والخصوصية
           </Link>

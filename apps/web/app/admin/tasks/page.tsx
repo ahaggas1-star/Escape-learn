@@ -54,7 +54,7 @@ export default async function AdminTasksPage() {
                   <li key={t.id} className="flex items-center justify-between rounded-xl border border-ghars-100 px-3 py-2.5">
                     <div>
                       <p className="font-semibold text-ghars-700">{t.title_ar}</p>
-                      <p className="text-xs text-ghars-500">{cv?.label_ar} · {t.base_xp} XP · {t.repeat_type}</p>
+                      <p className="text-xs text-ghars-500">{cv?.label_ar} · {t.base_xp} نقطة خبرة · {t.repeat_type}</p>
                     </div>
                     <div className="flex items-center gap-1">
                       <Link href={`/admin/tasks/${t.id}/edit`} className="rounded-full px-2.5 py-1 text-xs text-ghars-600 hover:bg-ghars-50">تعديل</Link>

@@ -67,7 +67,7 @@ export function ReviewCard({
       <div>
         <p className="font-semibold text-ghars-700">{taskTitle}</p>
         <p className="text-xs text-ghars-500">
-          {childName} · عند الاعتماد: {baseXp}+ XP
+          {childName} · عند الاعتماد: {baseXp}+ نقطة خبرة
         </p>
         {note ? (
           <p className="mt-1.5 rounded-lg bg-ghars-50 px-3 py-2 text-sm text-ghars-600">
@@ -86,7 +86,7 @@ export function ReviewCard({
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         <div className="col-span-2 sm:col-span-1">
-          <label className="label text-xs">XP إضافي (اختياري)</label>
+          <label className="label text-xs">نقاط خبرة إضافية (اختياري)</label>
           <input
             className="input"
             name="bonus_xp"

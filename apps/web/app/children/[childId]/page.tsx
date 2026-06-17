@@ -93,13 +93,13 @@ export default async function ChildPage({
             <LevelBadge levelKey={progress.level?.key} label={progress.level?.label_ar} size="lg" />
             <div className="text-left">
               <p className="stat-value text-joy-500">{progress.totalXp}</p>
-              <p className="stat-label">مجموع XP</p>
+              <p className="stat-label">مجموع نقاط الخبرة</p>
             </div>
           </div>
           <ProgressBar value={progress.progressPct} />
           {progress.nextLevel ? (
             <p className="mt-1.5 text-xs text-ghars-500">
-              نحو «{progress.nextLevel.label_ar}» — {progress.xpIntoLevel} من {progress.xpForNextLevel} XP
+              نحو «{progress.nextLevel.label_ar}» — {progress.xpIntoLevel} من {progress.xpForNextLevel} نقطة خبرة
             </p>
           ) : (
             <p className="mt-1.5 text-xs text-ghars-500">أعلى مستوى 🎉</p>
@@ -216,7 +216,7 @@ export default async function ChildPage({
                 return (
                   <li key={r.id} className="flex items-center justify-between text-sm">
                     <span className="text-ghars-700">{t?.title_ar}</span>
-                    <span className="text-xs text-ghars-500">{t?.base_xp} XP</span>
+                    <span className="text-xs text-ghars-500">{t?.base_xp} نقطة خبرة</span>
                   </li>
                 );
               })}

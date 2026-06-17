@@ -62,7 +62,7 @@ export default async function ChallengesPage() {
                       <h3 className="font-display font-bold text-ghars-700">{c.title_ar}</h3>
                       {c.description_ar ? <p className="text-sm text-ghars-500">{c.description_ar}</p> : null}
                     </div>
-                    <Chip tone="joy">+{c.reward_xp} XP</Chip>
+                    <Chip tone="joy">+{c.reward_xp} نقطة خبرة</Chip>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {cv ? <Chip tone="ghars">{cv.label_ar}</Chip> : null}

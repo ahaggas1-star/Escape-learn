@@ -30,7 +30,7 @@ export function AddTaskButton({
             <p className="text-xs text-ghars-500">{template.description_ar}</p>
           ) : null}
           <p className="mt-1 text-xs text-ghars-600">
-            {template.base_xp}+ XP · {template.needs_guardian_approval ? "يحتاج اعتماد" : "بدون اعتماد"}
+            {template.base_xp}+ نقطة خبرة · {template.needs_guardian_approval ? "يحتاج اعتماد" : "بدون اعتماد"}
           </p>
         </div>
         <SubmitButton label="إسناد" className="btn-ghost text-xs" pendingLabel="…" />

@@ -117,7 +117,7 @@ export function TaskTemplateForm({
           </select>
         </div>
         <div>
-          <label className="label">XP الأساسي</label>
+          <label className="label">نقاط الخبرة الأساسية</label>
           <input name="base_xp" type="number" min={0} defaultValue={initial?.base_xp ?? 10} className="input" dir="ltr" />
         </div>
         <label className="flex items-end gap-2 pb-2 text-sm text-ghars-700">

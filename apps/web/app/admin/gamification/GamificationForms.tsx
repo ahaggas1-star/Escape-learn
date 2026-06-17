@@ -37,7 +37,7 @@ export function LevelForm() {
       <div className="grid gap-2 sm:grid-cols-3">
         <input name="label_ar" className="input" placeholder="اسم المستوى" required />
         <input name="key" className="input" placeholder="key" dir="ltr" required />
-        <input name="min_xp" type="number" min={0} className="input" placeholder="حد XP" dir="ltr" required />
+        <input name="min_xp" type="number" min={0} className="input" placeholder="حد نقاط الخبرة" dir="ltr" required />
       </div>
       <Err s={s} />
       <SubmitButton label="إضافة مستوى" className="btn-ghost text-xs" />
