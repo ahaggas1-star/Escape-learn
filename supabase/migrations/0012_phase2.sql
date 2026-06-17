@@ -3,10 +3,10 @@
 -- Migration 0012_phase2
 -- =============================================================================
 
--- رمز مشاركة لكل طفل (لبطاقة الإنجاز العامة)
-alter table children add column if not exists share_token text;
+-- رمز مشاركة لكل طفل (لبطاقة الإنجاز العامة) — افتراضي تلقائي للأطفال الجدد
+alter table children add column if not exists share_token text default encode(extensions.gen_random_bytes(9),'hex');
 create unique index if not exists children_share_token_key on children(share_token) where share_token is not null;
-update children set share_token = encode(gen_random_bytes(9),'hex') where share_token is null;
+update children set share_token = encode(extensions.gen_random_bytes(9),'hex') where share_token is null;
 
 -- ترتيب الأطفال عبر العوائل (بالهوية التي يختارها ولي الأمر لكل طفل)
 create or replace function children_leaderboard(p_limit int default 20)
