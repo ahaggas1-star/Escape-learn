@@ -30,50 +30,6 @@ type ApprovedTask = {
     | null;
 };
 
-// يضمن وجود صندوق مكافآت افتراضي للأسرة مع عناصره، ويعيد معرّفه.
-async function ensureFamilyRewardBox(familyId: string): Promise<string | null> {
-  const supabase = createClient();
-  const { data: existing } = await supabase
-    .from("reward_boxes")
-    .select("id")
-    .eq("family_id", familyId)
-    .limit(1)
-    .maybeSingle();
-  if (existing) return existing.id;
-
-  const { data: box } = await supabase
-    .from("reward_boxes")
-    .insert({
-      family_id: familyId,
-      title_ar: "صندوق الإنجاز",
-      unlock_condition_ar: "يُفتح بعد تحقيق إنجاز حقيقي (شارة أو إنجاز جديد).",
-    })
-    .select("id")
-    .single();
-  if (!box) return null;
-
-  await supabase.from("reward_box_items").insert([
-    { reward_box_id: box.id, kind: "message", label_ar: "رسالة تشجيع: أحسنت! استمر في الغرس 🌱", sort_order: 1 },
-    { reward_box_id: box.id, kind: "xp", label_ar: "‎+10 XP", payload: { xp: 10 }, sort_order: 2 },
-    { reward_box_id: box.id, kind: "appreciation", label_ar: "بطاقة تقدير من العائلة", sort_order: 3 },
-  ]);
-
-  return box.id;
-}
-
-// يمنح عددًا من صناديق المكافآت "المتاحة" للابن (واحد لكل إنجاز/شارة جديدة).
-async function grantRewardBoxes(familyId: string, childId: string, count: number) {
-  if (count <= 0) return;
-  const boxId = await ensureFamilyRewardBox(familyId);
-  if (!boxId) return;
-  const supabase = createClient();
-  const rows = Array.from({ length: count }, () => ({
-    reward_box_id: boxId,
-    child_id: childId,
-    status: "available" as const,
-  }));
-  await supabase.from("reward_box_openings").insert(rows);
-}
 
 // التقييم الكامل لابن: شارات + إنجازات + صناديق متاحة. آمن للاستدعاء المتكرر (idempotent).
 export async function evaluateChild(childId: string): Promise<void> {
@@ -148,31 +104,26 @@ export async function evaluateChild(childId: string): Promise<void> {
     .map((k) => achKeyToId.get(k))
     .filter((v): v is string => Boolean(v));
 
-  // منح الشارات (idempotent) — الجديد فقط يُعاد.
-  let newGrants = 0;
+  // منح الشارات والإنجازات (idempotent).
   if (earnedBadgeIds.length > 0) {
-    const { data: inserted } = await supabase
+    await supabase
       .from("child_badges")
       .upsert(
         earnedBadgeIds.map((badge_id) => ({ child_id: childId, badge_id })),
         { onConflict: "child_id,badge_id", ignoreDuplicates: true }
-      )
-      .select("id");
-    newGrants += inserted?.length ?? 0;
+      );
   }
   if (earnedAchIds.length > 0) {
-    const { data: inserted } = await supabase
+    await supabase
       .from("child_achievements")
       .upsert(
         earnedAchIds.map((achievement_id) => ({ child_id: childId, achievement_id })),
         { onConflict: "child_id,achievement_id", ignoreDuplicates: true }
-      )
-      .select("id");
-    newGrants += inserted?.length ?? 0;
+      );
   }
 
-  // صندوق مكافأة متاح لكل إنجاز/شارة جديدة.
-  await grantRewardBoxes(familyId, childId, newGrants);
+  // صناديق المكافآت الآن متجر يُفتح بالعملات (لا تُمنح تلقائيًا).
+  void familyId;
 
   // إكمال الأهداف التي اكتملت كل مهامها (تحديث الحالة).
   await markCompletedGoals(childId);

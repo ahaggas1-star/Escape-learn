@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
 import { getChildProgress } from "@/lib/gamification";
 import { CompleteTaskCard } from "./CompleteTaskCard";
-import { RewardBoxCard } from "./RewardBoxCard";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Chip } from "@/components/ui/Chip";
@@ -36,7 +36,7 @@ export default async function ChildPage({
 
   const supabase = createClient();
 
-  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }] =
+  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: coinsData }] =
     await Promise.all([
       getChildProgress(child.id),
       supabase
@@ -49,11 +49,7 @@ export default async function ChildPage({
         .from("child_achievements")
         .select("achievements(label_ar)")
         .eq("child_id", child.id),
-      supabase
-        .from("reward_box_openings")
-        .select("id, status, reward_box_items(label_ar)")
-        .eq("child_id", child.id)
-        .order("opened_at", { ascending: false, nullsFirst: true }),
+      supabase.rpc("child_coins", { p_child_id: child.id }),
     ]);
 
   const rows = (atData ?? []) as AssignedRow[];
@@ -66,14 +62,7 @@ export default async function ChildPage({
   const achievements = (achData ?? []) as {
     achievements: { label_ar: string } | { label_ar: string }[];
   }[];
-  type BoxRow = {
-    id: string;
-    status: string;
-    reward_box_items: { label_ar: string } | { label_ar: string }[] | null;
-  };
-  const boxes = (boxData ?? []) as BoxRow[];
-  const availableBoxes = boxes.filter((b) => b.status === "available");
-  const openedBoxes = boxes.filter((b) => b.status === "opened");
+  const coins = (coinsData as number) ?? 0;
 
   return (
     <>
@@ -99,9 +88,15 @@ export default async function ChildPage({
         <section className="card bg-gradient-to-br from-white to-ghars-50">
           <div className="mb-3 flex items-center justify-between">
             <LevelBadge levelKey={progress.level?.key} label={progress.level?.label_ar} size="lg" />
-            <div className="text-left">
-              <p className="stat-value text-joy-500">{progress.totalXp}</p>
-              <p className="stat-label">مجموع نقاط الخبرة</p>
+            <div className="flex gap-3 text-center">
+              <div>
+                <p className="stat-value text-joy-500">{progress.totalXp}</p>
+                <p className="stat-label">نقطة خبرة</p>
+              </div>
+              <div>
+                <p className="stat-value text-bloom-500">{coins} 🪙</p>
+                <p className="stat-label">عملات</p>
+              </div>
             </div>
           </div>
           <ProgressBar value={progress.progressPct} />
@@ -127,17 +122,11 @@ export default async function ChildPage({
           </section>
         ) : null}
 
-        {/* صناديق المكافآت المتاحة */}
-        {availableBoxes.length > 0 ? (
-          <section className="space-y-3">
-            <h2 className="font-bold text-ghars-700">صناديق المكافآت</h2>
-            <div className="grid gap-2 sm:grid-cols-3">
-              {availableBoxes.map((b) => (
-                <RewardBoxCard key={b.id} openingId={b.id} childId={child.id} />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        {/* إدارة صناديق المكافآت */}
+        <Link href="/rewards" className="card flex items-center justify-between bg-gradient-to-l from-joy-50 to-bloom-50 transition hover:shadow-soft">
+          <span className="font-display font-bold text-ghars-700">🎁 صناديق المكافآت — أنشئ صناديقك وحدّد تكلفتها</span>
+          <span className="text-xs text-ghars-500">إدارة ←</span>
+        </Link>
 
         {/* الإنجازات */}
         {achievements.length > 0 ? (
@@ -149,25 +138,6 @@ export default async function ChildPage({
                 return <Chip key={i} tone="joy">⭐ {ach?.label_ar}</Chip>;
               })}
             </div>
-          </section>
-        ) : null}
-
-        {/* مكافآت مفتوحة */}
-        {openedBoxes.length > 0 ? (
-          <section className="card">
-            <h2 className="mb-2 font-bold text-ghars-700">مكافآت حصلت عليها</h2>
-            <ul className="space-y-1.5">
-              {openedBoxes.map((b) => {
-                const item = Array.isArray(b.reward_box_items)
-                  ? b.reward_box_items[0]
-                  : b.reward_box_items;
-                return (
-                  <li key={b.id} className="text-sm text-ghars-600">
-                    🎁 {item?.label_ar ?? "مكافأة"}
-                  </li>
-                );
-              })}
-            </ul>
           </section>
         ) : null}
 

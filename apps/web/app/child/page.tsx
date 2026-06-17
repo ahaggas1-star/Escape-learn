@@ -9,7 +9,7 @@ import { Chip } from "@/components/ui/Chip";
 import { ShareButton } from "@/components/ShareButton";
 import { ChildHeader } from "./ChildHeader";
 import { ChildTaskCard } from "./ChildTaskCard";
-import { ChildRewardCard } from "./ChildRewardCard";
+import { BoxShopCard } from "./BoxShopCard";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +29,7 @@ export default async function ChildHome() {
   const child = await requireChild();
   const supabase = createClient();
 
-  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }, { data: board }, collectives] =
+  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }, { data: board }, collectives, { data: coinsData }] =
     await Promise.all([
       getChildProgress(child.id),
       supabase
@@ -40,12 +40,14 @@ export default async function ChildHome() {
       supabase.from("child_badges").select("badges(label_ar)").eq("child_id", child.id),
       supabase.from("child_achievements").select("achievements(label_ar)").eq("child_id", child.id),
       supabase
-        .from("reward_box_openings")
-        .select("id, status, reward_box_items(label_ar)")
-        .eq("child_id", child.id)
-        .order("opened_at", { ascending: false, nullsFirst: true }),
+        .from("reward_boxes")
+        .select("id, title_ar, box_type, cost_coins, reward_box_items(count)")
+        .or(`family_id.eq.${child.family_id},family_id.is.null`)
+        .eq("is_active", true)
+        .order("cost_coins", { ascending: true }),
       supabase.rpc("family_members_ranked"),
       getFamilyCollectives(),
+      supabase.rpc("child_coins", { p_child_id: child.id }),
     ]);
 
   const rows = (atData ?? []) as AssignedRow[];
@@ -55,9 +57,9 @@ export default async function ChildHome() {
   const done = rows.filter((r) => r.status === "approved");
   const badges = (badgeData ?? []) as { badges: { label_ar: string } | { label_ar: string }[] }[];
   const achievements = (achData ?? []) as { achievements: { label_ar: string } | { label_ar: string }[] }[];
-  type BoxRow = { id: string; status: string };
-  const boxes = (boxData ?? []) as BoxRow[];
-  const availableBoxes = boxes.filter((b) => b.status === "available");
+  type ShopBox = { id: string; title_ar: string; box_type: string; cost_coins: number; reward_box_items: { count: number }[] };
+  const shopBoxes = (boxData ?? []) as ShopBox[];
+  const coins = (coinsData as number) ?? 0;
   const members = (board ?? []) as Member[];
   const medal = (r: number) => (r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : `#${r}`);
 
@@ -69,9 +71,15 @@ export default async function ChildHome() {
         <section className="card bg-gradient-to-br from-white to-ghars-50">
           <div className="mb-3 flex items-center justify-between">
             <LevelBadge levelKey={progress.level?.key} label={progress.level?.label_ar} size="lg" />
-            <div className="text-left">
-              <p className="stat-value text-joy-500">{progress.totalXp}</p>
-              <p className="stat-label">نقاطي</p>
+            <div className="flex gap-3 text-center">
+              <div>
+                <p className="stat-value text-joy-500">{progress.totalXp}</p>
+                <p className="stat-label">نقطة خبرة</p>
+              </div>
+              <div>
+                <p className="stat-value text-bloom-500">{coins} 🪙</p>
+                <p className="stat-label">عملات</p>
+              </div>
             </div>
           </div>
           <ProgressBar value={progress.progressPct} />
@@ -88,10 +96,19 @@ export default async function ChildHome() {
           </div>
         </section>
 
-        {/* صناديق المكافآت */}
-        {availableBoxes.length > 0 ? (
-          <section className="grid gap-2 sm:grid-cols-3">
-            {availableBoxes.map((b) => <ChildRewardCard key={b.id} openingId={b.id} />)}
+        {/* متجر الصناديق (يُفتح بالعملات) */}
+        {shopBoxes.length > 0 ? (
+          <section className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display font-bold text-ghars-700">متجر الصناديق 🛍️</h2>
+              <span className="rounded-full bg-joy-100 px-3 py-1 text-sm font-bold text-joy-600">رصيدي: {coins} 🪙</span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {shopBoxes.map((b) => (
+                <BoxShopCard key={b.id} boxId={b.id} title={b.title_ar} boxType={b.box_type}
+                  cost={b.cost_coins} canAfford={coins >= b.cost_coins} />
+              ))}
+            </div>
           </section>
         ) : null}
 

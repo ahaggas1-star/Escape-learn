@@ -63,13 +63,19 @@ export async function childCompleteTask(_prev: unknown, formData: FormData) {
   return { error: null };
 }
 
-// الطفل يفتح صندوق مكافأة.
-export async function childOpenReward(_prev: unknown, formData: FormData) {
-  const openingId = String(formData.get("opening_id") ?? "");
-  if (!openingId) return { error: "بيانات ناقصة." };
+// الطفل يفتح صندوقًا من المتجر بصرف العملات.
+export async function openBox(_prev: unknown, formData: FormData) {
+  const boxId = String(formData.get("box_id") ?? "");
+  if (!boxId) return { error: "بيانات ناقصة." };
   const supabase = createClient();
-  const { error } = await supabase.rpc("open_reward_box", { p_opening_id: openingId });
-  if (error) return { error: "تعذّر فتح الصندوق." };
+  const { data, error } = await supabase.rpc("open_box", { p_box_id: boxId });
+  if (error) {
+    const m = error.message?.includes("insufficient")
+      ? "لا تملك عملات كافية."
+      : "تعذّر فتح الصندوق.";
+    return { error: m };
+  }
+  const item = data as { kind: string; label: string } | null;
   revalidatePath("/child");
-  return { error: null };
+  return { error: null, reward: item?.label ?? "مكافأة" };
 }
