@@ -29,52 +29,52 @@ export default async function AdminHome() {
         />
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <Link href="/admin/goals" className="card bg-gradient-to-br from-ghars-50 to-ghars-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/goals" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">🎯</div>
-            <h2 className="font-display font-bold text-ghars-800">الأهداف الجاهزة</h2>
+            <h2 className="font-display font-semibold text-ghars-900">الأهداف الجاهزة</h2>
             <p className="stat-value">{goals ?? 0}</p>
-            <p className="text-xs text-ghars-500">إنشاء/نشر أهداف جاهزة</p>
+            <p className="text-xs text-slate-500">إنشاء/نشر أهداف جاهزة</p>
           </Link>
-          <Link href="/admin/tasks" className="card bg-gradient-to-br from-sky-50 to-sky-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/tasks" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">📝</div>
-            <h2 className="font-display font-bold text-ghars-800">المهام الجاهزة</h2>
+            <h2 className="font-display font-semibold text-ghars-900">المهام الجاهزة</h2>
             <p className="stat-value">{tasks ?? 0}</p>
-            <p className="text-xs text-ghars-500">إنشاء/نشر مهام جاهزة</p>
+            <p className="text-xs text-slate-500">إنشاء/نشر مهام جاهزة</p>
           </Link>
-          <Link href="/admin/values" className="card bg-gradient-to-br from-bloom-50 to-bloom-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/values" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">💚</div>
-            <h2 className="font-display font-bold text-ghars-800">القيم</h2>
+            <h2 className="font-display font-semibold text-ghars-900">القيم</h2>
             <p className="stat-value">{values ?? 0}</p>
-            <p className="text-xs text-ghars-500">إدارة القيم والقيم الفرعية</p>
+            <p className="text-xs text-slate-500">إدارة القيم والقيم الفرعية</p>
           </Link>
-          <Link href="/admin/gamification" className="card bg-gradient-to-br from-joy-50 to-joy-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/gamification" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">🏅</div>
-            <h2 className="font-display font-bold text-ghars-800">التلعيب</h2>
-            <p className="mt-1 text-sm text-ghars-500">الشارات والمستويات والإنجازات</p>
+            <h2 className="font-display font-semibold text-ghars-900">التلعيب</h2>
+            <p className="mt-1 text-sm text-slate-500">الشارات والمستويات والإنجازات</p>
           </Link>
           {role === "system_admin" ? (
             <>
-              <Link href="/admin/users" className="card bg-gradient-to-br from-grape-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/admin/users" className="card transition hover:border-ghars-300 hover:shadow-soft">
                 <div className="mb-1 text-2xl">👥</div>
-                <h2 className="font-display font-bold text-ghars-800">إدارة الأدوار</h2>
-                <p className="mt-1 text-sm text-ghars-500">تعيين أدوار المستخدمين</p>
+                <h2 className="font-display font-semibold text-ghars-900">إدارة الأدوار</h2>
+                <p className="mt-1 text-sm text-slate-500">تعيين أدوار المستخدمين</p>
               </Link>
-              <Link href="/admin/system" className="card bg-gradient-to-br from-sky-50 to-grape-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+              <Link href="/admin/system" className="card transition hover:border-ghars-300 hover:shadow-soft">
                 <div className="mb-1 text-2xl">🛡️</div>
-                <h2 className="font-display font-bold text-ghars-800">لوحة النظام</h2>
-                <p className="mt-1 text-sm text-ghars-500">سجلات الموافقات والعمليات</p>
+                <h2 className="font-display font-semibold text-ghars-900">لوحة النظام</h2>
+                <p className="mt-1 text-sm text-slate-500">سجلات الموافقات والعمليات</p>
               </Link>
             </>
           ) : null}
-          <Link href="/admin/collectives" className="card bg-gradient-to-br from-grape-50 to-sky-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/collectives" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">🏛️</div>
-            <h2 className="font-display font-bold text-ghars-800">التحديات الجماعية</h2>
-            <p className="mt-1 text-sm text-ghars-500">إنجازات رسمية لكل الأسر</p>
+            <h2 className="font-display font-semibold text-ghars-900">التحديات الجماعية</h2>
+            <p className="mt-1 text-sm text-slate-500">إنجازات رسمية لكل الأسر</p>
           </Link>
-          <Link href="/admin/guide" className="card bg-gradient-to-br from-joy-50 to-sky-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+          <Link href="/admin/guide" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">📚</div>
-            <h2 className="font-display font-bold text-ghars-800">دليل الإدارة</h2>
-            <p className="mt-1 text-sm text-ghars-500">شرح تفصيلي لكيفية عمل المنصة</p>
+            <h2 className="font-display font-semibold text-ghars-900">دليل الإدارة</h2>
+            <p className="mt-1 text-sm text-slate-500">شرح تفصيلي لكيفية عمل المنصة</p>
           </Link>
         </div>
       </main>

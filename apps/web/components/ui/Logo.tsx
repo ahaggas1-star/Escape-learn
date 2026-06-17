@@ -5,7 +5,7 @@ export function Logo({ size = 36, showText = true }: { size?: number; showText?:
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/icon.svg" alt="قِيَم" width={size} height={size} className="rounded-xl" />
       {showText ? (
-        <span className="font-display text-xl font-extrabold text-ghars-700">قِيَم</span>
+        <span className="font-display text-lg font-bold text-ghars-800">قِيَم</span>
       ) : null}
     </span>
   );

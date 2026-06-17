@@ -4,7 +4,6 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { getPlatformMetrics } from "@/lib/reports";
 import { Logo } from "@/components/ui/Logo";
-import { Mascot } from "@/components/ui/Mascot";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +37,7 @@ const FAQ = [
 function SectionTitle({ children, sub }: { children: React.ReactNode; sub?: string }) {
   return (
     <div className="mb-6 text-center">
-      <h2 className="font-display text-2xl font-extrabold text-ghars-800 sm:text-3xl">{children}</h2>
+      <h2 className="font-display text-2xl font-bold text-ghars-800 sm:text-3xl">{children}</h2>
       {sub ? <p className="mx-auto mt-2 max-w-xl text-sm text-ghars-500">{sub}</p> : null}
     </div>
   );
@@ -80,9 +79,9 @@ export default async function Home() {
 
       {/* البطل */}
       <section className="relative mx-auto max-w-3xl px-4 pb-12 pt-12 text-center">
-        <span className="chip mb-4 bg-ghars-100 text-ghars-700">🌟 منصة القيم الأسرية</span>
-        <div className="mb-4 flex justify-center"><Mascot size={96} /></div>
-        <h1 className="font-display text-4xl font-extrabold leading-tight text-ghars-800 sm:text-5xl">
+        <span className="chip mb-4 bg-ghars-100 text-ghars-700">منصة القيم الأسرية</span>
+        <div className="mb-4 flex justify-center"><Logo size={56} showText={false} /></div>
+        <h1 className="font-display text-4xl font-bold leading-tight text-ghars-800 sm:text-5xl">
           نغرس القيم في أبنائنا…<br />بخطوات عملية يومية
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-base text-ghars-600">
@@ -153,7 +152,7 @@ export default async function Home() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {STEPS.map((s) => (
             <div key={s.n} className="card text-center">
-              <div className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-ghars-100 font-display font-extrabold text-ghars-700">{s.n}</div>
+              <div className="mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-ghars-100 font-display font-bold text-ghars-700">{s.n}</div>
               <div className="text-2xl">{s.icon}</div>
               <h3 className="mt-1 font-display font-bold text-ghars-800">{s.t}</h3>
               <p className="mt-0.5 text-xs text-ghars-600">{s.d}</p>
@@ -187,7 +186,7 @@ export default async function Home() {
           <div className="flex flex-wrap items-center justify-center gap-2">
             {LEVELS.map((l, i) => (
               <span key={l.n} className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-ghars-100 to-joy-100 px-3 py-1 text-sm font-semibold text-ghars-700">
+                <span className="inline-flex items-center gap-1 rounded-full bg-ghars-50 px-3 py-1 text-sm font-semibold text-ghars-700">
                   <span>{l.e}</span> {l.n}
                 </span>
                 {i < LEVELS.length - 1 ? <span className="text-ghars-300">←</span> : null}
@@ -226,7 +225,7 @@ export default async function Home() {
       <section className="mx-auto max-w-md px-4 py-12">
         <SectionTitle>التسعير</SectionTitle>
         <div className="card text-center">
-          <p className="font-display text-4xl font-extrabold text-ghars-700">مجانًا</p>
+          <p className="font-display text-4xl font-bold text-ghars-700">مجانًا</p>
           <p className="mt-1 text-sm text-ghars-500">بلا اشتراكات في النسخة الحالية</p>
           <ul className="mx-auto mt-4 max-w-xs space-y-1.5 text-right text-sm text-ghars-600">
             <li>✅ القيم والأهداف والمهام الجاهزة</li>
@@ -252,8 +251,8 @@ export default async function Home() {
 
       {/* دعوة ختامية */}
       <section className="mx-auto max-w-3xl px-4 pb-10 pt-4 text-center">
-        <div className="rounded-3xl bg-gradient-to-l from-ghars-500 to-ghars-600 p-8 text-white shadow-soft">
-          <h2 className="font-display text-2xl font-extrabold">ابدأ رحلة الغرس مع أسرتك اليوم</h2>
+        <div className="rounded-3xl bg-ghars-700 p-8 text-white shadow-soft">
+          <h2 className="font-display text-2xl font-bold">ابدأ رحلة الغرس مع أسرتك اليوم</h2>
           <p className="mt-2 text-sm opacity-90">أنشئ حسابك، أضف أبناءك، واختر أول قيمة.</p>
           <Link href="/login" className="btn-joy mt-5 inline-flex px-7 py-3 text-base">إنشاء حساب 🌟</Link>
         </div>

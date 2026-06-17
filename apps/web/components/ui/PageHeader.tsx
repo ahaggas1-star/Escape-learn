@@ -18,7 +18,7 @@ export function PageHeader({
     <div className="flex items-start justify-between gap-3">
       <div className="flex items-center gap-3">
         {icon ? (
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-ghars-100 to-joy-100 text-xl shadow-card">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-ghars-50 text-xl shadow-card">
             {icon}
           </div>
         ) : null}

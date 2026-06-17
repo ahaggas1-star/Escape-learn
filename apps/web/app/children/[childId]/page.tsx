@@ -123,7 +123,7 @@ export default async function ChildPage({
         ) : null}
 
         {/* إدارة صناديق المكافآت */}
-        <Link href="/rewards" className="card flex items-center justify-between bg-gradient-to-l from-joy-50 to-bloom-50 transition hover:shadow-soft">
+        <Link href="/rewards" className="card flex items-center justify-between bg-ghars-50 transition hover:shadow-soft">
           <span className="font-display font-bold text-ghars-700">🎁 صناديق المكافآت — أنشئ صناديقك وحدّد تكلفتها</span>
           <span className="text-xs text-ghars-500">إدارة ←</span>
         </Link>

@@ -21,13 +21,13 @@ export default async function DashboardPage() {
     <>
       <Header email={email} />
       <main className="container-app space-y-5">
-        <div className="rounded-3xl bg-gradient-to-l from-ghars-500 to-ghars-600 p-5 text-white shadow-soft">
-          <p className="text-sm opacity-90">أهلًا بك 👋</p>
-          <h1 className="font-display text-2xl font-extrabold">
+        <div className="rounded-2xl bg-ghars-700 p-5 text-white shadow-soft">
+          <p className="text-sm text-white/70">أهلًا بك</p>
+          <h1 className="font-display text-2xl font-bold">
             {family.name ? `أسرة ${family.name}` : "أسرتي"}
           </h1>
-          <p className="mt-1 text-sm opacity-90">
-            اختر قيمة، حوّلها إلى أهداف ومهام، وتابِع تقدّم أبنائك 🌱
+          <p className="mt-1 text-sm text-white/80">
+            اختر قيمة، حوّلها إلى أهداف ومهام، وتابِع تقدّم أبنائك.
           </p>
         </div>
 
@@ -64,35 +64,39 @@ export default async function DashboardPage() {
 
         <section className="grid gap-3 sm:grid-cols-2">
           {[
-            { href: "/values", icon: "🌱", bg: "from-ghars-50 to-ghars-100", title: "اختيار قيمة", desc: "ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام." },
-            { href: "/review", icon: "✅", bg: "from-sky-50 to-sky-100", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح نقاط الخبرة." },
-            { href: "/reports", icon: "📊", bg: "from-grape-50 to-grape-100", title: "التقارير", desc: "تقارير الابن والأسرة ومؤشرات عامة." },
-            { href: "/leaderboard", icon: "🏆", bg: "from-joy-50 to-joy-100", title: "ترتيب الأسر", desc: "تنافس أسري محفّز ومجهول الهوية." },
-            { href: "/challenges", icon: "🚩", bg: "from-bloom-50 to-bloom-100", title: "التحديات العائلية", desc: "تحديات تجمع الأسرة حول قيمة." },
-            { href: "/collectives", icon: "🎯", bg: "from-grape-50 to-sky-100", title: "الإنجازات الجماعية", desc: "أهداف تكملها الأسرة معًا بشريط تقدّم." },
-            { href: "/rewards", icon: "🎁", bg: "from-joy-50 to-bloom-100", title: "مكافآت الأسرة", desc: "حدّد مكافآت الصندوق المعنوية والمادية." },
+            { href: "/values", icon: "🌱", tint: "bg-ghars-50 text-ghars-700", title: "اختيار قيمة", desc: "ابدأ من إحدى القيم الأربع وحوّلها إلى أهداف ومهام." },
+            { href: "/review", icon: "✅", tint: "bg-sky-50 text-sky-600", title: "المراجعة والاعتماد", desc: "اعتمد إنجازات الأبناء وامنح نقاط الخبرة." },
+            { href: "/reports", icon: "📊", tint: "bg-grape-50 text-grape-600", title: "التقارير", desc: "تقارير الابن والأسرة ومؤشرات عامة." },
+            { href: "/leaderboard", icon: "🏆", tint: "bg-joy-50 text-joy-600", title: "ترتيب الأسر", desc: "تنافس أسري محفّز ومجهول الهوية." },
+            { href: "/challenges", icon: "🚩", tint: "bg-bloom-50 text-bloom-600", title: "التحديات العائلية", desc: "تحديات تجمع الأسرة حول قيمة." },
+            { href: "/collectives", icon: "🎯", tint: "bg-sky-50 text-sky-600", title: "الإنجازات الجماعية", desc: "أهداف تكملها الأسرة معًا بشريط تقدّم." },
+            { href: "/rewards", icon: "🎁", tint: "bg-joy-50 text-joy-600", title: "مكافآت الأسرة", desc: "حدّد مكافآت الصناديق وتكلفتها بالعملات." },
           ].map((a) => (
-            <Link key={a.href} href={a.href} className={`card bg-gradient-to-br ${a.bg} transition hover:-translate-y-0.5 hover:shadow-soft`}>
-              <div className="mb-1 text-2xl">{a.icon}</div>
-              <h3 className="font-display font-bold text-ghars-800">{a.title}</h3>
-              <p className="mt-0.5 text-sm text-ghars-600">{a.desc}</p>
+            <Link key={a.href} href={a.href} className="card flex items-start gap-3 transition hover:border-ghars-300 hover:shadow-soft">
+              <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl ${a.tint}`}>{a.icon}</span>
+              <div>
+                <h3 className="font-display font-semibold text-ghars-900">{a.title}</h3>
+                <p className="mt-0.5 text-sm text-slate-500">{a.desc}</p>
+              </div>
             </Link>
           ))}
           {isStaff ? (
-            <Link href="/admin" className="card bg-gradient-to-br from-bloom-50 to-bloom-100 transition hover:-translate-y-0.5 hover:shadow-soft">
-              <div className="mb-1 text-2xl">🛠️</div>
-              <h3 className="font-display font-bold text-ghars-800">لوحة إدارة المحتوى</h3>
-              <p className="mt-0.5 text-sm text-ghars-600">إدارة القيم والأهداف والمهام الجاهزة.</p>
+            <Link href="/admin" className="card flex items-start gap-3 transition hover:border-ghars-300 hover:shadow-soft">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ghars-50 text-xl text-ghars-700">🛠️</span>
+              <div>
+                <h3 className="font-display font-semibold text-ghars-900">لوحة إدارة المحتوى</h3>
+                <p className="mt-0.5 text-sm text-slate-500">إدارة القيم والأهداف والمهام الجاهزة.</p>
+              </div>
             </Link>
           ) : null}
         </section>
 
         <div className="flex items-center justify-center gap-4">
-          <Link href="/guide" className="text-xs font-semibold text-ghars-500 hover:text-ghars-700">
-            📖 دليل ولي الأمر
+          <Link href="/guide" className="text-xs font-semibold text-slate-500 hover:text-ghars-700">
+            دليل ولي الأمر
           </Link>
-          <Link href="/settings" className="text-xs font-semibold text-ghars-500 hover:text-ghars-700">
-            ⚙️ الإعدادات والخصوصية
+          <Link href="/settings" className="text-xs font-semibold text-slate-500 hover:text-ghars-700">
+            الإعدادات والخصوصية
           </Link>
         </div>
       </main>

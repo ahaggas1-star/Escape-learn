@@ -29,14 +29,14 @@ export default async function LeaderboardPage() {
           backHref="/dashboard"
         />
 
-        <Link href="/leaderboard/children" className="card flex items-center justify-between bg-gradient-to-l from-joy-50 to-bloom-50 transition hover:shadow-soft">
+        <Link href="/leaderboard/children" className="card flex items-center justify-between bg-ghars-50 transition hover:shadow-soft">
           <span className="font-display font-bold text-ghars-700">🏆 أبطال قِيَم — ترتيب الأبطال عبر العوائل</span>
           <span className="text-xs text-ghars-500">عرض ←</span>
         </Link>
 
         {/* شريط موضع أسرتكم */}
         {board.self ? (
-          <section className="rounded-3xl bg-gradient-to-l from-ghars-500 to-joy-400 p-5 text-white shadow-soft">
+          <section className="rounded-3xl bg-ghars-700 p-5 text-white shadow-soft">
             <p className="text-sm opacity-90">🏆 موضع أسرتكم</p>
             <div className="mt-1 flex items-end justify-between">
               <p className="font-display text-3xl font-extrabold">المركز {board.self.rank} من {board.total}</p>

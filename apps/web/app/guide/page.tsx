@@ -61,7 +61,7 @@ export default async function GuardianGuide() {
       <main className="container-app space-y-7">
         <PageHeader icon="📖" title="دليل ولي الأمر" subtitle="كل ما تحصل عليه أنت وابنك من مميزات وتفاعل." backHref="/dashboard" />
 
-        <div className="rounded-3xl bg-gradient-to-l from-ghars-500 to-ghars-600 p-5 text-white shadow-soft">
+        <div className="rounded-3xl bg-ghars-700 p-5 text-white shadow-soft">
           <p className="text-sm opacity-90">فكرة المنصة باختصار</p>
           <p className="mt-1 font-display text-lg font-bold">
             تحوّل القيم التربوية إلى أهداف ومهام يومية قابلة للمتابعة، وتحفّز ابنك عبر تلعيب آمن — القيمة قبل النقاط.
