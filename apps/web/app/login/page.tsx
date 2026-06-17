@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AuthForm } from "./AuthForm";
 import { isSupabaseConfigured } from "@/lib/env";
 import { SetupNotice } from "@/components/SetupNotice";
@@ -18,7 +19,11 @@ export default function LoginPage() {
         </p>
       </div>
       {isSupabaseConfigured ? <AuthForm /> : <SetupNotice />}
-      <p className="mt-4 text-center text-xs text-ghars-400">
+      <p className="mt-4 text-center text-xs text-ghars-500">
+        طفل؟{" "}
+        <Link href="/child/login" className="font-semibold text-ghars-600">دخول الطفل من هنا</Link>
+      </p>
+      <p className="mt-2 text-center text-xs text-ghars-400">
         منصة أسرية آمنة — القيمة قبل النقاط
       </p>
     </main>

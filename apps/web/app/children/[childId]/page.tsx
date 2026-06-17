@@ -9,6 +9,7 @@ import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Chip } from "@/components/ui/Chip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ChildLoginSettings } from "./ChildLoginSettings";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +80,13 @@ export default async function ChildPage({
       <main className="container-app space-y-5">
         <PageHeader icon="🧒" title={child.display_name} backHref="/dashboard" />
 
+        <ChildLoginSettings
+          childId={child.id}
+          username={child.username ?? null}
+          nickname={child.nickname ?? null}
+          publicMode={child.public_name_mode ?? "nickname"}
+        />
+
         {/* التقدم والمستوى */}
         <section className="card bg-gradient-to-br from-white to-ghars-50">
           <div className="mb-3 flex items-center justify-between">
@@ -117,7 +125,7 @@ export default async function ChildPage({
             <h2 className="font-bold text-ghars-700">صناديق المكافآت</h2>
             <div className="grid gap-2 sm:grid-cols-3">
               {availableBoxes.map((b) => (
-                <RewardBoxCard key={b.id} openingId={b.id} />
+                <RewardBoxCard key={b.id} openingId={b.id} childId={child.id} />
               ))}
             </div>
           </section>

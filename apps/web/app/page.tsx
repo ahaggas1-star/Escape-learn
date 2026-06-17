@@ -50,7 +50,14 @@ export default async function Home() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (user) redirect("/dashboard");
+    if (user) {
+      const { data: child } = await supabase
+        .from("children")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+      redirect(child ? "/child" : "/dashboard");
+    }
   }
 
   const metrics = isSupabaseConfigured ? await getPlatformMetrics() : null;

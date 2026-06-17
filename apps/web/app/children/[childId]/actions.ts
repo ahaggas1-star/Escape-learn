@@ -88,57 +88,61 @@ export async function completeTask(_prev: unknown, formData: FormData) {
   return { error: null };
 }
 
-// فتح صندوق مكافأة متاح. الاختيار تدويري (لا عشوائية/مقامرة)، ويُمنح XP إن كان عنصر XP.
+// فتح صندوق مكافأة عبر الدالة المحمية (اختيار تدويري، يمنح XP إن لزم).
 export async function openReward(_prev: unknown, formData: FormData) {
   const openingId = String(formData.get("opening_id") ?? "");
+  const childId = String(formData.get("child_id") ?? "");
   if (!openingId) return { error: "بيانات ناقصة." };
 
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { error } = await supabase.rpc("open_reward_box", { p_opening_id: openingId });
+  if (error) return { error: "تعذّر فتح الصندوق." };
 
-  const { data: opening } = await supabase
-    .from("reward_box_openings")
-    .select("id, reward_box_id, child_id, status")
-    .eq("id", openingId)
-    .maybeSingle();
-  if (!opening || opening.status !== "available")
-    return { error: "الصندوق غير متاح للفتح." };
-
-  const { data: items } = await supabase
-    .from("reward_box_items")
-    .select("id, kind, label_ar, payload")
-    .eq("reward_box_id", opening.reward_box_id)
-    .order("sort_order", { ascending: true });
-  const list = items ?? [];
-  if (list.length === 0) return { error: "لا يوجد محتوى في الصندوق." };
-
-  // اختيار تدويري شفّاف حسب عدد الصناديق المفتوحة سابقًا.
-  const { count } = await supabase
-    .from("reward_box_openings")
-    .select("id", { count: "exact", head: true })
-    .eq("child_id", opening.child_id)
-    .eq("status", "opened");
-  const idx = (count ?? 0) % list.length;
-  const item = list[idx] as { id: string; kind: string; payload: { xp?: number } | null };
-
-  await supabase
-    .from("reward_box_openings")
-    .update({ item_id: item.id, status: "opened", opened_at: new Date().toISOString() })
-    .eq("id", opening.id);
-
-  if (item.kind === "xp" && item.payload?.xp) {
-    await supabase.from("xp_events").insert({
-      child_id: opening.child_id,
-      amount: item.payload.xp,
-      reason_key: "reward_box",
-      source_table: "reward_box_openings",
-      source_id: opening.id,
-    });
-  }
-
-  revalidatePath(`/children/${opening.child_id}`);
+  if (childId) revalidatePath(`/children/${childId}`);
   return { error: null };
+}
+
+// إنشاء/تعديل بيانات دخول الطفل (اسم مستخدم + كلمة مرور).
+export async function setChildLogin(_prev: unknown, formData: FormData) {
+  const childId = String(formData.get("child_id") ?? "");
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  if (!childId) return { error: "بيانات ناقصة." };
+  if (!/^[a-z0-9_]{3,30}$/.test(username))
+    return { error: "اسم المستخدم: أحرف إنجليزية صغيرة وأرقام و_ (3–30)." };
+  if (password.length < 4) return { error: "كلمة المرور 4 أحرف على الأقل." };
+
+  const supabase = createClient();
+  const { error } = await supabase.rpc("set_child_login", {
+    p_child_id: childId,
+    p_username: username,
+    p_password: password,
+  });
+  if (error) {
+    const msg = error.message?.includes("username_taken")
+      ? "اسم المستخدم مستخدم مسبقًا."
+      : "تعذّر حفظ بيانات الدخول.";
+    return { error: msg };
+  }
+  revalidatePath(`/children/${childId}`);
+  return { error: null, info: "تم حفظ بيانات الدخول." };
+}
+
+// تحديث هوية الطفل العامة (اللقب وما يظهر للعامة).
+export async function updateChildPublic(_prev: unknown, formData: FormData) {
+  const childId = String(formData.get("child_id") ?? "");
+  const nickname = String(formData.get("nickname") ?? "").trim();
+  const mode = String(formData.get("public_name_mode") ?? "nickname");
+  if (!childId) return { error: "بيانات ناقصة." };
+  if (!["nickname", "first_name", "full_name"].includes(mode))
+    return { error: "خيار غير صحيح." };
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("children")
+    .update({ nickname: nickname || null, public_name_mode: mode })
+    .eq("id", childId);
+  if (error) return { error: "تعذّر الحفظ." };
+  revalidatePath(`/children/${childId}`);
+  return { error: null, info: "تم الحفظ." };
 }

@@ -42,6 +42,37 @@ export async function requireAdmin(): Promise<{ userId: string; email: string | 
   return { userId, email };
 }
 
+export interface ChildSelf {
+  id: string;
+  family_id: string;
+  display_name: string;
+  nickname: string | null;
+  public_name_mode: string;
+  age: number | null;
+}
+
+// الطفل الحالي (إن كان المستخدم طفلًا)، وإلا null.
+export async function getChildSelf(): Promise<ChildSelf | null> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase
+    .from("children")
+    .select("id, family_id, display_name, nickname, public_name_mode, age")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  return (data as ChildSelf) ?? null;
+}
+
+// يتطلّب طفلًا مسجّلًا، وإلا يعيد التوجيه لدخول الطفل.
+export async function requireChild(): Promise<ChildSelf> {
+  const child = await getChildSelf();
+  if (!child) redirect("/child/login");
+  return child;
+}
+
 // سياق ولي الأمر: المستخدم + أسرته (أول أسرة يملكها) + أبناؤه.
 export async function getGuardianContext(): Promise<{
   userId: string;
@@ -54,6 +85,14 @@ export async function getGuardianContext(): Promise<{
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  // الأطفال يُوجَّهون للوحتهم بدل صفحات ولي الأمر.
+  const { data: asChild } = await supabase
+    .from("children")
+    .select("id")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+  if (asChild) redirect("/child");
 
   const { data: family } = await supabase
     .from("families")

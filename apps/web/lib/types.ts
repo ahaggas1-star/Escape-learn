@@ -68,6 +68,10 @@ export interface Child {
   age_stage_id: string | null;
   gender: string | null;
   created_at: string;
+  username?: string | null;
+  nickname?: string | null;
+  public_name_mode?: string;
+  auth_user_id?: string | null;
 }
 
 export interface GoalTemplate {
