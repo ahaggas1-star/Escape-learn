@@ -1,8 +1,9 @@
-import { Header } from "@/components/Header";
-import { getGuardianContext } from "@/lib/auth";
+import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
+
 
 const JOURNEY = [
   { n: "1", icon: "📝", t: "أنشئ حسابك", d: "سجّل بالبريد وكلمة المرور — بلا تأكيد بريد، تدخل مباشرة." },
@@ -52,14 +53,17 @@ function Section({ title, sub, children }: { title: string; sub?: string; childr
   );
 }
 
-export default async function GuardianGuide() {
-  const { email } = await getGuardianContext();
-
+export default function GuardianGuide() {
   return (
     <>
-      <Header email={email} />
+      <header className="sticky top-0 z-10 border-b border-line bg-white/90 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3">
+          <Link href="/"><Logo /></Link>
+          <Link href="/login" className="btn-primary text-sm">تسجيل الدخول</Link>
+        </div>
+      </header>
       <main className="container-app space-y-7">
-        <PageHeader icon="📖" title="دليل ولي الأمر" subtitle="كل ما تحصل عليه أنت وابنك من مميزات وتفاعل." backHref="/dashboard" />
+        <PageHeader icon="📖" title="دليل ولي الأمر" subtitle="كل ما تحصل عليه أنت وابنك من مميزات وتفاعل." backHref="/" backLabel="الرئيسية" />
 
         <div className="rounded-3xl bg-ghars-700 p-5 text-white shadow-soft">
           <p className="text-sm opacity-90">فكرة المنصة باختصار</p>

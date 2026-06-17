@@ -15,24 +15,31 @@ export async function signIn(_prev: unknown, formData: FormData) {
   redirect("/dashboard");
 }
 
-// إنشاء حساب ولي أمر جديد.
+// إنشاء حساب ولي أمر جديد (عبر دالة آمنة تُنشئ حسابًا مؤكَّدًا فورًا).
 export async function signUp(_prev: unknown, formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
-  if (!email || password.length < 6)
-    return { error: "أدخل بريدًا صحيحًا وكلمة مرور لا تقل عن 6 أحرف." };
+  if (!email) return { error: "أدخل البريد الإلكتروني." };
+  if (password.length < 6) return { error: "كلمة المرور 6 أحرف على الأقل." };
 
   const supabase = createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) return { error: "تعذّر إنشاء الحساب. حاول ببريد آخر." };
-
-  // الحسابات مؤكَّدة تلقائيًا — سجّل الدخول مباشرة إن لم توجد جلسة.
-  if (!data.session) {
-    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInErr) {
-      return { error: null, info: "تم إنشاء الحساب. يمكنك تسجيل الدخول الآن." };
-    }
+  const { error } = await supabase.rpc("signup_guardian", {
+    p_email: email,
+    p_password: password,
+  });
+  if (error) {
+    const m = error.message ?? "";
+    if (m.includes("email_taken"))
+      return { error: "هذا البريد مسجّل مسبقًا — سجّل الدخول بدلًا من ذلك." };
+    if (m.includes("invalid_email")) return { error: "صيغة البريد غير صحيحة." };
+    if (m.includes("weak_password")) return { error: "كلمة المرور 6 أحرف على الأقل." };
+    return { error: "تعذّر إنشاء الحساب. حاول مرة أخرى." };
   }
+
+  // الحساب مؤكَّد — سجّل الدخول مباشرة.
+  const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInErr)
+    return { error: null, info: "تم إنشاء الحساب بنجاح. يمكنك تسجيل الدخول الآن." };
   redirect("/dashboard");
 }
 
