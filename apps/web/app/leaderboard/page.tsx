@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
@@ -27,6 +28,11 @@ export default async function LeaderboardPage() {
           subtitle="تنافس أسري محفّز — مجهول الهوية."
           backHref="/dashboard"
         />
+
+        <Link href="/leaderboard/children" className="card flex items-center justify-between bg-gradient-to-l from-joy-50 to-bloom-50 transition hover:shadow-soft">
+          <span className="font-display font-bold text-ghars-700">🏆 أبطال قِيَم — ترتيب الأبطال عبر العوائل</span>
+          <span className="text-xs text-ghars-500">عرض ←</span>
+        </Link>
 
         {/* شريط موضع أسرتكم */}
         {board.self ? (

@@ -49,6 +49,7 @@ export interface ChildSelf {
   nickname: string | null;
   public_name_mode: string;
   age: number | null;
+  share_token: string | null;
 }
 
 // الطفل الحالي (إن كان المستخدم طفلًا)، وإلا null.
@@ -60,7 +61,7 @@ export async function getChildSelf(): Promise<ChildSelf | null> {
   if (!user) return null;
   const { data } = await supabase
     .from("children")
-    .select("id, family_id, display_name, nickname, public_name_mode, age")
+    .select("id, family_id, display_name, nickname, public_name_mode, age, share_token")
     .eq("auth_user_id", user.id)
     .maybeSingle();
   return (data as ChildSelf) ?? null;

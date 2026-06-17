@@ -9,6 +9,7 @@ import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Chip } from "@/components/ui/Chip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ShareButton } from "@/components/ShareButton";
 import { ChildLoginSettings } from "./ChildLoginSettings";
 
 export const dynamic = "force-dynamic";
@@ -86,6 +87,13 @@ export default async function ChildPage({
           nickname={child.nickname ?? null}
           publicMode={child.public_name_mode ?? "nickname"}
         />
+
+        {child.share_token ? (
+          <div className="card flex items-center justify-between gap-2">
+            <span className="text-sm text-ghars-600">🔗 بطاقة إنجاز {child.display_name} العامة</span>
+            <ShareButton path={`/p/${child.share_token}`} title={`إنجازات ${child.display_name}`} />
+          </div>
+        ) : null}
 
         {/* التقدم والمستوى */}
         <section className="card bg-gradient-to-br from-white to-ghars-50">

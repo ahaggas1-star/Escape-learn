@@ -66,6 +66,11 @@ export default async function AdminHome() {
               </Link>
             </>
           ) : null}
+          <Link href="/admin/collectives" className="card bg-gradient-to-br from-grape-50 to-sky-100 transition hover:-translate-y-0.5 hover:shadow-soft">
+            <div className="mb-1 text-2xl">🏛️</div>
+            <h2 className="font-display font-bold text-ghars-800">التحديات الجماعية</h2>
+            <p className="mt-1 text-sm text-ghars-500">إنجازات رسمية لكل الأسر</p>
+          </Link>
           <Link href="/admin/guide" className="card bg-gradient-to-br from-joy-50 to-sky-100 transition hover:-translate-y-0.5 hover:shadow-soft">
             <div className="mb-1 text-2xl">📚</div>
             <h2 className="font-display font-bold text-ghars-800">دليل الإدارة</h2>

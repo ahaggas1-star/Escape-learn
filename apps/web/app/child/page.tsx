@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { requireChild } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getChildProgress } from "@/lib/gamification";
+import { getFamilyCollectives, cheer } from "@/lib/collectives";
 import { LevelBadge } from "@/components/ui/LevelBadge";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Chip } from "@/components/ui/Chip";
+import { ShareButton } from "@/components/ShareButton";
 import { ChildHeader } from "./ChildHeader";
 import { ChildTaskCard } from "./ChildTaskCard";
 import { ChildRewardCard } from "./ChildRewardCard";
@@ -26,7 +29,7 @@ export default async function ChildHome() {
   const child = await requireChild();
   const supabase = createClient();
 
-  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }, { data: board }] =
+  const [progress, { data: atData }, { data: badgeData }, { data: achData }, { data: boxData }, { data: board }, collectives] =
     await Promise.all([
       getChildProgress(child.id),
       supabase
@@ -42,6 +45,7 @@ export default async function ChildHome() {
         .eq("child_id", child.id)
         .order("opened_at", { ascending: false, nullsFirst: true }),
       supabase.rpc("family_members_ranked"),
+      getFamilyCollectives(),
     ]);
 
   const rows = (atData ?? []) as AssignedRow[];
@@ -78,6 +82,10 @@ export default async function ChildHome() {
           ) : (
             <p className="mt-1.5 text-xs text-ghars-500">وصلت أعلى مستوى 🎉</p>
           )}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {child.share_token ? <ShareButton path={`/p/${child.share_token}`} /> : null}
+            <Link href="/leaderboard/children" className="btn-ghost text-xs">🏆 أبطال قِيَم</Link>
+          </div>
         </section>
 
         {/* صناديق المكافآت */}
@@ -155,6 +163,28 @@ export default async function ChildHome() {
                 );
               })}
             </ul>
+          </section>
+        ) : null}
+
+        {/* الإنجازات الجماعية */}
+        {collectives.length > 0 ? (
+          <section className="space-y-3">
+            <h2 className="font-display font-bold text-ghars-700">إنجازات جماعية 🤝</h2>
+            <div className="grid gap-2">
+              {collectives.map((c) => {
+                const pct = c.target > 0 ? Math.min(100, Math.round((c.current / c.target) * 100)) : 0;
+                return (
+                  <div key={c.id} className="card">
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="font-display font-bold text-ghars-700">{c.icon} {c.title_ar}</span>
+                      <Chip tone={c.scope === "official" ? "grape" : "sky"}>{c.scope === "official" ? "رسمي" : "عائلي"}</Chip>
+                    </div>
+                    <ProgressBar value={pct} />
+                    <p className="mt-1 text-xs font-semibold text-ghars-600">{c.current}/{c.target} · {cheer(pct)}</p>
+                  </div>
+                );
+              })}
+            </div>
           </section>
         ) : null}
 

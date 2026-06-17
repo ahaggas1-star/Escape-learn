@@ -72,6 +72,7 @@ export interface Child {
   nickname?: string | null;
   public_name_mode?: string;
   auth_user_id?: string | null;
+  share_token?: string | null;
 }
 
 export interface GoalTemplate {

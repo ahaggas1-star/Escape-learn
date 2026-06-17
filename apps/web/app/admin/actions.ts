@@ -265,6 +265,41 @@ export async function createAchievement(_prev: unknown, fd: FormData) {
   return { error: null };
 }
 
+// ---- إنجازات جماعية رسمية (إدارة) ----
+export async function createOfficialCollective(_prev: unknown, fd: FormData) {
+  const title = str(fd, "title_ar");
+  if (title.length < 3) return { error: "اكتب عنوانًا واضحًا." };
+  const target = Math.max(1, Number(str(fd, "target")) || 10);
+  const perCap = Math.max(1, Number(str(fd, "per_child_cap")) || 6);
+  const reward = Math.max(0, Number(str(fd, "reward_xp")) || 80);
+
+  const { supabase, userId } = await getStaff();
+  const { error } = await supabase.from("collective_achievements").insert({
+    scope: "official",
+    title_ar: title,
+    description_ar: str(fd, "description_ar") || null,
+    icon: str(fd, "icon") || "🏛️",
+    core_value_id: str(fd, "core_value_id") || null,
+    target,
+    per_child_cap: perCap,
+    reward_xp: reward,
+    is_published: fd.get("is_published") === "on",
+    counts_in_ranking: true,
+    created_by: userId,
+  });
+  if (error) return { error: "تعذّر إنشاء التحدي الرسمي." };
+  revalidatePath("/admin/collectives");
+  return { error: null };
+}
+
+export async function deleteCollective(_prev: unknown, fd: FormData) {
+  const id = str(fd, "id");
+  const { supabase } = await getStaff();
+  await supabase.from("collective_achievements").delete().eq("id", id).eq("scope", "official");
+  revalidatePath("/admin/collectives");
+  return { error: null };
+}
+
 export async function deleteGamItem(_prev: unknown, fd: FormData) {
   const table = str(fd, "table");
   const id = str(fd, "id");
