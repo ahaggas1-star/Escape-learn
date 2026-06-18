@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "منصة أسرية تحوّل القيم التربوية إلى أهداف ومهام عملية مع تلعيب آمن.",
     start_url: "/",
     display: "standalone",
-    background_color: "#f6fef9",
-    theme_color: "#16a34a",
+    background_color: "#f8f7fb",
+    theme_color: "#4d3d60",
     dir: "rtl",
     lang: "ar",
     icons: [
