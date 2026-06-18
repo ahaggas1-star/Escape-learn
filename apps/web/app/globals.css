@@ -14,6 +14,21 @@ body {
   font-family: "IBM Plex Sans Arabic", "Tajawal", system-ui, Tahoma, Arial, sans-serif;
   background-color: #f8f7fb;
   color: #334155; /* slate-700 محايد للنصوص */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* إحساس تطبيق أصلي عند التثبيت على الشاشة الرئيسية */
+@media (display-mode: standalone) {
+  body {
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input, textarea, select {
+    -webkit-user-select: text;
+    user-select: text;
+  }
 }
 
 h1, h2, h3, .font-display {
@@ -23,7 +38,7 @@ h1, h2, h3, .font-display {
 
 @layer components {
   .container-app {
-    @apply mx-auto w-full max-w-3xl px-4 py-6;
+    @apply mx-auto w-full max-w-3xl px-4 py-6 pb-28 lg:pb-8;
   }
 
   /* بطاقة نظيفة: بيضاء بحدّ رقيق وظلّ خفيف جدًا */
