@@ -3,6 +3,7 @@ import { AuthForm } from "./AuthForm";
 import { isSupabaseConfigured } from "@/lib/env";
 import { SetupNotice } from "@/components/SetupNotice";
 import { Logo } from "@/components/ui/Logo";
+import { SomouAttribution } from "@/components/ui/SomouAttribution";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +22,9 @@ export default function LoginPage() {
         طفل؟{" "}
         <Link href="/child/login" className="font-semibold text-ghars-600">دخول الطفل من هنا</Link>
       </p>
+      <div className="mt-8 flex justify-center border-t border-line pt-6">
+        <SomouAttribution variant="stacked" />
+      </div>
     </main>
   );
 }

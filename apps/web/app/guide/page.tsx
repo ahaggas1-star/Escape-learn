@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { SomouAttribution } from "@/components/ui/SomouAttribution";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,10 @@ export default function GuardianGuide() {
       <header className="sticky top-0 z-10 border-b border-line bg-white/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-4 py-3">
           <Link href="/"><Logo /></Link>
-          <Link href="/login" className="btn-primary text-sm">تسجيل الدخول</Link>
+          <div className="flex items-center gap-3">
+            <SomouAttribution variant="inline" className="hidden sm:inline-flex" />
+            <Link href="/login" className="btn-primary text-sm">تسجيل الدخول</Link>
+          </div>
         </div>
       </header>
       <main className="container-app space-y-7">
@@ -141,6 +145,10 @@ export default function GuardianGuide() {
             والصور لا تُستخدم إلا بموافقتك. التلعيب مرتبط بإنجاز حقيقي فقط — بلا عشوائية أو دفع أو مقارنة جارحة.
           </div>
         </Section>
+
+        <div className="flex justify-center border-t border-line pt-6">
+          <SomouAttribution variant="stacked" />
+        </div>
       </main>
     </>
   );

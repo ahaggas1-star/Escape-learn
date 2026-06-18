@@ -4,6 +4,7 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 import { getPlatformMetrics } from "@/lib/reports";
 import { Logo } from "@/components/ui/Logo";
+import { SomouAttribution } from "@/components/ui/SomouAttribution";
 
 export const dynamic = "force-dynamic";
 
@@ -95,6 +96,9 @@ export default async function Home() {
           <a href="#how" className="btn-ghost px-7 py-3 text-base">شاهد كيف تعمل</a>
         </div>
         <p className="mt-3 text-xs text-ghars-400">بلا اشتراكات · عربي أولًا · آمن للأطفال</p>
+        <div className="mt-5 flex justify-center">
+          <SomouAttribution variant="inline" />
+        </div>
       </section>
 
       {/* مؤشرات حيّة */}
@@ -261,13 +265,16 @@ export default async function Home() {
       </section>
 
       {/* التذييل */}
-      <footer className="border-t border-white/60 bg-white/60">
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-ghars-500 sm:flex-row">
-          <Logo size={28} />
-          <p>قِيَم — منصة القيم الأسرية</p>
-          <div className="flex items-center gap-4">
-            <Link href="/guide" className="hover:text-ghars-800">دليل ولي الأمر</Link>
-            <Link href="/login" className="hover:text-ghars-800">تسجيل الدخول</Link>
+      <footer className="border-t border-line bg-white/70">
+        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-5 px-4 py-8 text-sm text-ghars-500">
+          <SomouAttribution variant="stacked" />
+          <div className="flex w-full flex-col items-center justify-between gap-3 border-t border-line pt-5 sm:flex-row">
+            <Logo size={28} />
+            <p>قِيَم — منصة القيم الأسرية</p>
+            <div className="flex items-center gap-4">
+              <Link href="/guide" className="hover:text-ghars-800">دليل ولي الأمر</Link>
+              <Link href="/login" className="hover:text-ghars-800">تسجيل الدخول</Link>
+            </div>
           </div>
         </div>
       </footer>

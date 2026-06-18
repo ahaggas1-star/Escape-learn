@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { QuickStart, type Step } from "./QuickStart";
+import { SomouAttribution } from "@/components/ui/SomouAttribution";
 
 export const dynamic = "force-dynamic";
 
@@ -119,6 +120,10 @@ export default async function DashboardPage() {
           <Link href="/settings" className="text-xs font-semibold text-slate-500 hover:text-ghars-700">
             الإعدادات والخصوصية
           </Link>
+        </div>
+
+        <div className="flex justify-center border-t border-line pt-5">
+          <SomouAttribution variant="stacked" />
         </div>
       </main>
     </>
