@@ -1,20 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- هوية «سمو»: شجرة أرجوانية بنقاط ملوّنة مرحة -->
+  <!-- أيقونة «قِيَم» بهوية سمو: شجرة الأشخاص بنقاط ملوّنة على خلفية أرجوانية -->
+  <defs>
+    <linearGradient id="i-orange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4a14a"/><stop offset="1" stop-color="#e85c2a"/></linearGradient>
+    <linearGradient id="i-teal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2bb6ad"/><stop offset="1" stop-color="#0e7d86"/></linearGradient>
+    <linearGradient id="i-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc24a"/><stop offset="1" stop-color="#3a9b4e"/></linearGradient>
+    <linearGradient id="i-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9fd4"/><stop offset="1" stop-color="#245f93"/></linearGradient>
+    <linearGradient id="i-pink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ec5ba6"/><stop offset="1" stop-color="#c0277a"/></linearGradient>
+    <linearGradient id="i-purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b06fc4"/><stop offset="1" stop-color="#7f4d96"/></linearGradient>
+  </defs>
   <rect width="512" height="512" rx="112" fill="#4d3d60"/>
-  <!-- الجذع والأذرع المرفوعة (إحساس شجرة سمو) -->
-  <g stroke="#efe9f4" stroke-width="26" stroke-linecap="round" fill="none">
-    <path d="M256 436 V298"/>
-    <path d="M256 300 V228"/>
-    <path d="M256 300 C 216 286, 186 254, 174 210"/>
-    <path d="M256 300 C 296 286, 326 254, 338 210"/>
+  <g fill="none" stroke="#efe9f4" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 444 V312"/>
+    <path d="M256 314 V250"/>
+    <path d="M256 256 C 248 234, 238 224, 224 216"/>
+    <path d="M256 256 C 264 234, 274 224, 288 216"/>
+    <path d="M256 318 C 216 312, 192 292, 180 262 C 173 246, 171 230, 174 214"/>
+    <path d="M174 222 C 169 206, 160 198, 148 192"/>
+    <path d="M174 222 C 180 208, 190 200, 204 196"/>
+    <path d="M256 318 C 296 312, 320 292, 332 262 C 339 246, 341 230, 338 214"/>
+    <path d="M338 222 C 343 206, 352 198, 364 192"/>
+    <path d="M338 222 C 332 208, 322 200, 308 196"/>
   </g>
-  <!-- نقاط الشجرة (برتقالي · فيروزي · أخضر · وردي · أرجواني) -->
-  <circle cx="256" cy="150" r="23" fill="#ec4899"/>
-  <circle cx="256" cy="92"  r="13" fill="#22d3ee"/>
-  <circle cx="194" cy="118" r="15" fill="#f97316"/>
-  <circle cx="318" cy="122" r="16" fill="#06b6d4"/>
-  <circle cx="158" cy="184" r="13" fill="#22c55e"/>
-  <circle cx="354" cy="184" r="13" fill="#8b5cf6"/>
-  <circle cx="228" cy="172" r="10" fill="#f97316"/>
-  <circle cx="290" cy="176" r="10" fill="#16a34a"/>
+  <circle cx="256" cy="168" r="21" fill="url(#i-pink)"/>
+  <circle cx="256" cy="112" r="12" fill="url(#i-teal)"/>
+  <circle cx="200" cy="132" r="14" fill="url(#i-orange)"/>
+  <circle cx="312" cy="134" r="15" fill="url(#i-blue)"/>
+  <circle cx="166" cy="190" r="12" fill="url(#i-green)"/>
+  <circle cx="346" cy="190" r="12" fill="url(#i-purple)"/>
+  <circle cx="232" cy="130" r="8"  fill="url(#i-blue)"/>
+  <circle cx="284" cy="132" r="8"  fill="url(#i-green)"/>
+  <circle cx="168" cy="244" r="10" fill="url(#i-orange)"/>
+  <circle cx="344" cy="244" r="9"  fill="url(#i-teal)"/>
 </svg>

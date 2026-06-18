@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="شجرة سمو">
+  <defs>
+    <linearGradient id="s-orange" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4a14a"/><stop offset="1" stop-color="#e85c2a"/></linearGradient>
+    <linearGradient id="s-teal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2bb6ad"/><stop offset="1" stop-color="#0e7d86"/></linearGradient>
+    <linearGradient id="s-green" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc24a"/><stop offset="1" stop-color="#3a9b4e"/></linearGradient>
+    <linearGradient id="s-blue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f8fc4"/><stop offset="1" stop-color="#245f93"/></linearGradient>
+    <linearGradient id="s-pink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e1469b"/><stop offset="1" stop-color="#b51e6c"/></linearGradient>
+    <linearGradient id="s-purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a5cae"/><stop offset="1" stop-color="#6f3d86"/></linearGradient>
+  </defs>
+
+  <!-- شجرة الأشخاص (ثلاثة أشخاص يرفعون أذرعهم) -->
+  <g fill="none" stroke="#5b4a6b" stroke-width="30" stroke-linecap="round" stroke-linejoin="round">
+    <!-- الجذع -->
+    <path d="M256 446 V306"/>
+    <!-- الشخص الأوسط -->
+    <path d="M256 308 V238"/>
+    <path d="M256 246 C 248 222, 236 210, 220 200"/>
+    <path d="M256 246 C 264 222, 276 210, 292 200"/>
+    <!-- الشخص الأيسر -->
+    <path d="M256 312 C 212 306, 186 284, 172 250 C 165 232, 163 214, 166 196"/>
+    <path d="M166 206 C 160 188, 150 178, 136 170"/>
+    <path d="M166 206 C 173 190, 184 182, 200 176"/>
+    <!-- الشخص الأيمن -->
+    <path d="M256 312 C 300 306, 326 284, 340 250 C 347 232, 349 214, 346 196"/>
+    <path d="M346 206 C 352 188, 362 178, 376 170"/>
+    <path d="M346 206 C 339 190, 328 182, 312 176"/>
+  </g>
+
+  <!-- نقاط الشجرة المتدرّجة -->
+  <circle cx="256" cy="150" r="24" fill="url(#s-pink)"/>
+  <circle cx="256" cy="88"  r="13" fill="url(#s-teal)"/>
+  <circle cx="204" cy="96"  r="11" fill="url(#s-green)"/>
+  <circle cx="300" cy="98"  r="12" fill="url(#s-blue)"/>
+  <circle cx="186" cy="120" r="16" fill="url(#s-orange)"/>
+  <circle cx="328" cy="120" r="17" fill="url(#s-orange)"/>
+  <circle cx="232" cy="116" r="9"  fill="url(#s-blue)"/>
+  <circle cx="282" cy="118" r="9"  fill="url(#s-green)"/>
+  <circle cx="156" cy="176" r="14" fill="url(#s-purple)"/>
+  <circle cx="356" cy="176" r="14" fill="url(#s-pink)"/>
+  <circle cx="150" cy="232" r="12" fill="url(#s-teal)"/>
+  <circle cx="362" cy="232" r="12" fill="url(#s-blue)"/>
+  <circle cx="178" cy="268" r="10" fill="url(#s-orange)"/>
+  <circle cx="334" cy="268" r="9"  fill="url(#s-purple)"/>
+  <circle cx="208" cy="180" r="8"  fill="url(#s-teal)"/>
+  <circle cx="306" cy="184" r="8"  fill="url(#s-green)"/>
+</svg>
