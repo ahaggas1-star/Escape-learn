@@ -3,6 +3,12 @@ import { getShowcaseData } from "@/lib/showcase-data";
 import { CountUp } from "./CountUp";
 import { Leaderboard } from "./Leaderboard";
 import { ShareAchievement } from "./ShareAchievement";
+import { OnLoadCelebration } from "./OnLoadCelebration";
+import { SoundToggle } from "./SoundToggle";
+import { LuckBoxes } from "./LuckBoxes";
+import { CollectivesShowcase } from "./CollectivesShowcase";
+import { GrowthChart } from "./GrowthChart";
+import { AchievementsMarquee } from "./AchievementsMarquee";
 
 export const dynamic = "force-static";
 
@@ -36,9 +42,11 @@ function SectionTitle({ kicker, title }: { kicker: string; title: string }) {
 export default function ShowcasePage() {
   const d = getShowcaseData();
   const sp = d.spotlight;
+  const dailyTop = d.champions.daily[0];
 
   return (
     <main dir="rtl" className="min-h-screen bg-gradient-to-b from-[#2a2036] via-[#3f3350] to-[#241b30] text-white">
+      <OnLoadCelebration name={dailyTop.name} family={dailyTop.family} avatar={dailyTop.avatar} />
       {/* وهج علوي */}
       <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(60%_60%_at_50%_0%,rgba(139,92,246,0.35),transparent)]" />
 
@@ -49,9 +57,12 @@ export default function ShowcasePage() {
           <img src="/somou-mark.svg" alt="" width={34} height={34} />
           <span className="font-display text-lg font-bold">قِيَم</span>
         </span>
-        <Link href="/dashboard" className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold backdrop-blur transition hover:bg-white/20">
-          دخول المنصة ←
-        </Link>
+        <div className="flex items-center gap-2">
+          <SoundToggle />
+          <Link href="/dashboard" className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold backdrop-blur transition hover:bg-white/20">
+            دخول المنصة ←
+          </Link>
+        </div>
       </header>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl space-y-20 px-5 pb-24">
@@ -99,6 +110,9 @@ export default function ShowcasePage() {
           </div>
         </section>
 
+        {/* ===== شريط إنجازات متحرّك ===== */}
+        <AchievementsMarquee />
+
         {/* ===== ترتيب الأبطال ===== */}
         <section>
           <SectionTitle kicker="LEADERBOARD" title="🏆 سلّم أبطال قِيَم" />
@@ -137,35 +151,13 @@ export default function ShowcasePage() {
           <p className="mt-3 text-center text-xs text-white/50">يستعرض الأبطال إنجازاتهم بهويّة يختارها وليّ الأمر فقط — تحفيز اجتماعي آمن.</p>
         </section>
 
-        {/* ===== الإنجازات الجماعية (الإدارة) ===== */}
+        {/* ===== الإنجازات الجماعية (الإدارة) — قابلة لفتح الجائزة ===== */}
         <section>
           <SectionTitle kicker="OFFICIAL" title="🎯 إنجازات جماعية من الإدارة" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {d.collectives.map((c) => {
-              const pct = Math.round((c.current / c.target) * 100);
-              return (
-                <Glass key={c.title} className="p-5">
-                  <div className="flex items-start justify-between">
-                    <span className="text-3xl">{c.icon}</span>
-                    {c.status === "done" ? (
-                      <span className="rounded-full bg-leaf-400/20 px-2.5 py-1 text-[11px] font-bold text-leaf-200 ring-1 ring-leaf-300/30">مكتمل ✓</span>
-                    ) : (
-                      <span className="rounded-full bg-joy-400/20 px-2.5 py-1 text-[11px] font-bold text-joy-200 ring-1 ring-joy-300/30">جارٍ</span>
-                    )}
-                  </div>
-                  <h3 className="mt-2 font-display text-lg font-bold">{c.title}</h3>
-                  <p className="text-xs text-white/55">{c.desc}</p>
-                  <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
-                    <div className={`h-full rounded-full ${c.status === "done" ? "bg-leaf-400" : "bg-gradient-to-l from-joy-400 to-bloom-400"}`} style={{ width: `${pct}%` }} />
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-xs text-white/60">
-                    <span>{c.current.toLocaleString("en-US")} / {c.target.toLocaleString("en-US")}</span>
-                    <span>{pct}% · {c.families} أسرة</span>
-                  </div>
-                </Glass>
-              );
-            })}
-          </div>
+          <p className="mx-auto mb-6 -mt-3 max-w-lg text-center text-sm text-white/55">
+            منها ما اكتمل وينتظر فتح جائزته بترقّب، ومنها ما زال جاريًا. افتح جائزة لترى المفاجأة!
+          </p>
+          <CollectivesShowcase collectives={d.collectives} />
         </section>
 
         {/* ===== شبكة: نشاط حيّ + تحدّيات + ترتيب الأسر ===== */}
@@ -226,23 +218,19 @@ export default function ShowcasePage() {
           </div>
         </section>
 
-        {/* ===== أنواع الصناديق ===== */}
+        {/* ===== صناديق الحظ التفاعلية ===== */}
         <section>
-          <SectionTitle kicker="REWARDS" title="🎁 صناديق المكافآت" />
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { t: "عادية", e: "🎁", d: "مكافأة يومية بسيطة", c: "from-ghars-400/30 to-ghars-500/10", n: "مجاني" },
-              { t: "مميزة", e: "🎀", d: "لإنجاز أكبر", c: "from-sky-400/30 to-sky-500/10", n: "١٥ عملة" },
-              { t: "رهيبة", e: "💎", d: "لمناسبة استثنائية", c: "from-bloom-400/30 to-grape-500/10", n: "٣٠ عملة" },
-            ].map((b) => (
-              <Glass key={b.t} className={`bg-gradient-to-br ${b.c} p-6 text-center transition hover:-translate-y-1`}>
-                <div className="text-5xl">{b.e}</div>
-                <h3 className="mt-2 font-display text-xl font-extrabold">الصندوق {b.t}</h3>
-                <p className="text-sm text-white/60">{b.d}</p>
-                <span className="mt-3 inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-bold">{b.n}</span>
-              </Glass>
-            ))}
-          </div>
+          <SectionTitle kicker="LUCKY BOXES" title="🎁 صناديق الحظ — جرّب بنفسك!" />
+          <p className="mx-auto mb-6 -mt-3 max-w-lg text-center text-sm text-white/55">
+            اضغط أي صندوق لتفتحه وتشاهد المؤثرات والمكافأة. (شغّل الصوت من الأعلى 🔊)
+          </p>
+          <LuckBoxes />
+        </section>
+
+        {/* ===== رسم النمو ===== */}
+        <section>
+          <SectionTitle kicker="GROWTH" title="📈 المنصة في نموّ مستمر" />
+          <GrowthChart />
         </section>
 
         {/* ===== دعوة ===== */}
