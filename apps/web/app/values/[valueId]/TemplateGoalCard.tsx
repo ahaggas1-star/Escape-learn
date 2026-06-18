@@ -45,6 +45,11 @@ export function TemplateGoalCard({
         <SubmitButton label="اعتماد كهدف" className="btn-primary" pendingLabel="…" />
       </div>
 
+      <label className="mt-2 flex items-center gap-2 text-xs text-ghars-600">
+        <input type="checkbox" name="add_tasks" value="on" defaultChecked />
+        أضف المهام المقترحة وأسندها فورًا (هدف جاهز للعمل)
+      </label>
+
       {state?.error ? (
         <p className="mt-2 text-xs text-red-600">{state.error}</p>
       ) : null}

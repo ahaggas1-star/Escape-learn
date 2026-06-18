@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewCard } from "./ReviewCard";
+import { ApproveAllButton } from "./ApproveAllButton";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 export const dynamic = "force-dynamic";
@@ -65,6 +66,11 @@ export default async function ReviewPage() {
           </div>
         ) : (
           <div className="grid gap-3">
+            {rows.length > 1 ? (
+              <div className="card bg-ghars-50/50">
+                <ApproveAllButton count={rows.length} />
+              </div>
+            ) : null}
             {rows.map((r) => {
               const child = Array.isArray(r.children) ? r.children[0] : r.children;
               const at = Array.isArray(r.assigned_tasks)
