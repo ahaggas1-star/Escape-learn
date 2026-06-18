@@ -74,6 +74,7 @@ export default async function Home() {
             <a href="#safe" className="hover:text-ghars-800">التلعيب الآمن</a>
             <a href="#faq" className="hover:text-ghars-800">أسئلة</a>
             <a href="/guide" className="hover:text-ghars-800">الدليل</a>
+            <a href="/showcase" className="hover:text-ghars-800">العرض</a>
           </nav>
           <Link href="/login" className="btn-primary text-sm">تسجيل الدخول</Link>
         </div>

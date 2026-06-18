@@ -28,6 +28,18 @@ export default async function AdminHome() {
           backLabel="لوحة ولي الأمر"
         />
 
+        <Link
+          href="/showcase"
+          className="flex items-center justify-between gap-3 rounded-3xl bg-gradient-to-l from-ghars-700 to-grape-700 p-5 text-white shadow-soft transition hover:opacity-95"
+        >
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-white/60">عرض تقديمي</p>
+            <h2 className="font-display text-lg font-extrabold">✨ الصفحة التفاعلية للعرض</h2>
+            <p className="text-sm text-white/80">لمحة حيّة مبهرة (أبطال · ترتيب · إنجازات جماعية) — مثالية لعرضها على المسؤولين.</p>
+          </div>
+          <span className="shrink-0 rounded-full bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur">افتح ←</span>
+        </Link>
+
         <div className="grid gap-3 sm:grid-cols-3">
           <Link href="/admin/goals" className="card transition hover:border-ghars-300 hover:shadow-soft">
             <div className="mb-1 text-2xl">🎯</div>
