@@ -4,12 +4,17 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-// يضمن وجود سطر للمستخدم في جدول users (دور ولي الأمر).
+// يضمن وجود سطر للمستخدم في جدول users (دور ولي الأمر) — دون المساس بدور موجود
+// (حتى لا يُخفَّض مدير النظام/المحتوى إلى ولي أمر عند إنشاء أسرة).
 async function ensureUserRow(userId: string, email: string | null) {
   const supabase = createClient();
-  await supabase
+  const { data: existing } = await supabase
     .from("users")
-    .upsert({ id: userId, role: "guardian", email }, { onConflict: "id" });
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+  if (existing) return;
+  await supabase.from("users").insert({ id: userId, role: "guardian", email });
 }
 
 // إنشاء الأسرة + ولي الأمر كعضو مالك، ثم إضافة أول ابن.
