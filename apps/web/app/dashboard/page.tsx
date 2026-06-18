@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Header } from "@/components/Header";
 import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { QuickStart, type Step } from "./QuickStart";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,24 @@ export default async function DashboardPage() {
   const { data: roleRow } = await supabase.from("users").select("role").eq("id", userId).maybeSingle();
   const isStaff = roleRow?.role === "content_manager" || roleRow?.role === "system_admin";
 
+  // تقدّم رحلة البداية الموجّهة.
+  const childIds = children.map((c) => c.id);
+  const [loginRes, goalsRes, tasksRes, boxesRes] = await Promise.all([
+    supabase.from("children").select("id", { count: "exact", head: true }).eq("family_id", family.id).not("username", "is", null),
+    supabase.from("goals").select("id", { count: "exact", head: true }).eq("family_id", family.id),
+    childIds.length
+      ? supabase.from("assigned_tasks").select("id", { count: "exact", head: true }).in("child_id", childIds)
+      : Promise.resolve({ count: 0 } as { count: number | null }),
+    supabase.from("reward_boxes").select("id", { count: "exact", head: true }).eq("family_id", family.id),
+  ]);
+  const steps: Step[] = [
+    { key: "child", icon: "👦", title: "أضف أول ابن", desc: "ابدأ بإضافة طفل لربط أهدافه ومهامه به.", href: "/children/new", cta: "أضف ابن", done: children.length > 0 },
+    { key: "login", icon: "🔑", title: "جهّز دخول الطفل", desc: "أنشئ له اسم مستخدم وكلمة مرور ليدخل بنفسه ويرى مهامه.", href: childIds[0] ? `/children/${childIds[0]}` : "/dashboard", cta: "جهّز الدخول", done: (loginRes.count ?? 0) > 0 },
+    { key: "goal", icon: "🌱", title: "اختر قيمة وحوّلها هدفًا", desc: "من القيم الأربع، اختر هدفًا قابلًا للقياس.", href: "/values", cta: "اختر قيمة", done: (goalsRes.count ?? 0) > 0 },
+    { key: "task", icon: "📋", title: "أسند أول مهمة", desc: "مهمة يومية بسيطة مع طريقة إثبات.", href: "/values", cta: "أسند مهمة", done: (tasksRes.count ?? 0) > 0 },
+    { key: "reward", icon: "🎁", title: "أنشئ صندوق مكافآت", desc: "ضع رسائلك ومكافآتك يفتحها الطفل بعملاته.", href: "/rewards", cta: "أنشئ صندوقًا", done: (boxesRes.count ?? 0) > 0 },
+  ];
+
   return (
     <>
       <Header email={email} />
@@ -30,6 +49,8 @@ export default async function DashboardPage() {
             اختر قيمة، حوّلها إلى أهداف ومهام، وتابِع تقدّم أبنائك.
           </p>
         </div>
+
+        <QuickStart steps={steps} familyName={family.name ? `أسرة ${family.name}` : "أسرتك"} />
 
         <section className="card">
           <div className="mb-3 flex items-center justify-between">

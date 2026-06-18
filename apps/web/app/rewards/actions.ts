@@ -23,8 +23,9 @@ async function getOwnedFamilyId() {
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 
 const TYPES = ["normal", "special", "awesome"];
+const ALLOWED_KINDS = ["message", "appreciation", "privilege", "material", "activity_choice", "xp"];
 
-// إنشاء صندوق جديد (نوع + تكلفة بالعملات).
+// إنشاء صندوق كامل في خطوة واحدة: النوع + التكلفة + عناصره ورسائله.
 export async function createBox(_prev: unknown, fd: FormData) {
   const title = str(fd, "title_ar");
   const type = str(fd, "box_type");
@@ -32,18 +33,49 @@ export async function createBox(_prev: unknown, fd: FormData) {
   if (!TYPES.includes(type)) return { error: "نوع غير صحيح." };
   const cost = Math.max(0, Number(str(fd, "cost_coins")) || 0);
 
+  // العناصر القادمة من النموذج (JSON).
+  type DraftItem = { kind?: string; label?: string; xp?: number };
+  let items: DraftItem[] = [];
+  try {
+    const parsed = JSON.parse(str(fd, "items") || "[]");
+    if (Array.isArray(parsed)) items = parsed;
+  } catch {
+    items = [];
+  }
+
   const { supabase, userId, familyId } = await getOwnedFamilyId();
-  const { error } = await supabase.from("reward_boxes").insert({
-    family_id: familyId,
-    box_type: type,
-    cost_coins: cost,
-    title_ar: title,
-    unlock_condition_ar: cost > 0 ? `يُفتح بـ ${cost} عملة` : "مجاني",
-    created_by: userId,
-  });
-  if (error) return { error: "تعذّر إنشاء الصندوق." };
+  const { data: box, error } = await supabase
+    .from("reward_boxes")
+    .insert({
+      family_id: familyId,
+      box_type: type,
+      cost_coins: cost,
+      title_ar: title,
+      unlock_condition_ar: cost > 0 ? `يُفتح بـ ${cost} عملة` : "مجاني",
+      created_by: userId,
+    })
+    .select("id")
+    .single();
+  if (error || !box) return { error: "تعذّر إنشاء الصندوق." };
+
+  const rows = items
+    .filter((it) => typeof it.label === "string" && it.label.trim().length >= 2)
+    .map((it, i) => {
+      const kind = ALLOWED_KINDS.includes(String(it.kind)) ? String(it.kind) : "message";
+      return {
+        reward_box_id: box.id as string,
+        kind,
+        label_ar: String(it.label).trim(),
+        payload: kind === "xp" ? { xp: Math.max(1, Number(it.xp) || 10) } : null,
+        sort_order: i + 1,
+      };
+    });
+  if (rows.length > 0) {
+    await supabase.from("reward_box_items").insert(rows);
+  }
+
   revalidatePath("/rewards");
-  return { error: null };
+  redirect("/rewards");
 }
 
 export async function updateBox(_prev: unknown, fd: FormData) {
