@@ -151,3 +151,83 @@ export async function addTaskFromTemplate(_prev: unknown, formData: FormData) {
   revalidatePath(`/goals/${goalId}`);
   return { error: null };
 }
+
+// إضافة كل المهام المقترحة دفعة واحدة وإسنادها لابن الهدف (تقليل الخطوات).
+export async function addAllTasksFromTemplates(_prev: unknown, formData: FormData) {
+  const goalId = String(formData.get("goal_id") ?? "");
+  if (!goalId) return { error: "بيانات ناقصة." };
+
+  const { supabase, userId } = await getOwnedFamilyId();
+
+  const { data: goal } = await supabase
+    .from("goals")
+    .select("id, child_id, core_value_id")
+    .eq("id", goalId)
+    .maybeSingle();
+  if (!goal) return { error: "الهدف غير موجود." };
+
+  // مرحلة الابن العمرية لتصفية القوالب (كما في صفحة الهدف).
+  let ageStageId: string | null = null;
+  if (goal.child_id) {
+    const { data: ch } = await supabase
+      .from("children")
+      .select("age_stage_id")
+      .eq("id", goal.child_id)
+      .maybeSingle();
+    ageStageId = ch?.age_stage_id ?? null;
+  }
+
+  let tplQuery = supabase
+    .from("task_templates")
+    .select("*")
+    .eq("core_value_id", goal.core_value_id)
+    .eq("is_published", true);
+  if (ageStageId) tplQuery = tplQuery.or(`age_stage_id.is.null,age_stage_id.eq.${ageStageId}`);
+  const { data: templates } = await tplQuery;
+
+  // تجنّب التكرار: استبعاد القوالب المُضافة لهذا الهدف سابقًا.
+  const { data: existing } = await supabase
+    .from("tasks")
+    .select("template_id")
+    .eq("goal_id", goal.id)
+    .not("template_id", "is", null);
+  const used = new Set((existing ?? []).map((r) => r.template_id as string));
+
+  const fresh = (templates ?? []).filter((t) => !used.has(t.id));
+  if (fresh.length === 0) return { error: null, info: "كل المهام المقترحة مُضافة بالفعل." };
+
+  for (const tpl of fresh) {
+    const { data: task } = await supabase
+      .from("tasks")
+      .insert({
+        goal_id: goal.id,
+        template_id: tpl.id,
+        core_value_id: tpl.core_value_id,
+        sub_value_id: tpl.sub_value_id,
+        title_ar: tpl.title_ar,
+        description_ar: tpl.description_ar,
+        difficulty: tpl.difficulty,
+        repeat_type: tpl.repeat_type,
+        proof: tpl.proof,
+        needs_guardian_approval: tpl.needs_guardian_approval,
+        base_xp: tpl.base_xp,
+        child_instructions_ar: tpl.child_instructions_ar,
+        guardian_guidelines_ar: tpl.guardian_guidelines_ar,
+        success_criteria_ar: tpl.success_criteria_ar,
+        created_by: userId,
+      })
+      .select("id")
+      .single();
+    if (task && goal.child_id) {
+      await supabase.from("assigned_tasks").insert({
+        task_id: task.id,
+        child_id: goal.child_id,
+        assigned_by: userId,
+        status: "assigned",
+      });
+    }
+  }
+
+  revalidatePath(`/goals/${goalId}`);
+  return { error: null, info: `أُضيفت ${fresh.length} مهمة وأُسندت للابن.` };
+}

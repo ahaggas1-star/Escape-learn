@@ -27,9 +27,12 @@ const ACTIVE = ["assigned", "in_progress", "redo_requested"];
 
 export default async function ChildPage({
   params,
+  searchParams,
 }: {
   params: { childId: string };
+  searchParams?: { notice?: string };
 }) {
+  const notice = searchParams?.notice;
   const { email, family, children } = await getGuardianContext();
   const child = children.find((c) => c.id === params.childId);
   if (!family || !child) notFound();
@@ -69,6 +72,10 @@ export default async function ChildPage({
       <Header email={email} />
       <main className="container-app space-y-5">
         <PageHeader icon="🧒" title={child.display_name} backHref="/dashboard" />
+
+        {notice ? (
+          <p className="rounded-xl bg-joy-50 px-3 py-2 text-sm text-ghars-700">{notice}</p>
+        ) : null}
 
         <ChildLoginSettings
           childId={child.id}

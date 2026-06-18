@@ -67,15 +67,24 @@ export async function createFamilyWithChild(_prev: unknown, formData: FormData) 
   redirect("/dashboard");
 }
 
-// إضافة ابن إلى أسرة موجودة.
+// إضافة ابن إلى أسرة موجودة — مع تجهيز دخوله اختياريًا في نفس الخطوة.
 export async function addChild(_prev: unknown, formData: FormData) {
   const childName = String(formData.get("child_name") ?? "").trim();
   const ageRaw = String(formData.get("child_age") ?? "").trim();
   const age = ageRaw ? Number(ageRaw) : null;
+  // بيانات دخول اختيارية (إن رغب ولي الأمر بتجهيزها فورًا).
+  const username = String(formData.get("username") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const wantsLogin = username.length > 0 || password.length > 0;
 
   if (!childName) return { error: "أدخل اسم الابن." };
   if (age != null && (Number.isNaN(age) || age < 1 || age > 25))
     return { error: "أدخل عمرًا صحيحًا." };
+  if (wantsLogin) {
+    if (!/^[a-z0-9_]{3,30}$/.test(username))
+      return { error: "اسم المستخدم: أحرف إنجليزية صغيرة وأرقام و_ (3–30)." };
+    if (password.length < 4) return { error: "كلمة المرور 4 أحرف على الأقل." };
+  }
 
   const supabase = createClient();
   const {
@@ -103,13 +112,33 @@ export async function addChild(_prev: unknown, formData: FormData) {
     ageStageId = stage?.id ?? null;
   }
 
-  const { error } = await supabase.from("children").insert({
-    family_id: family.id,
-    display_name: childName,
-    age,
-    age_stage_id: ageStageId,
-  });
-  if (error) return { error: "تعذّرت إضافة الابن." };
+  const { data: child, error } = await supabase
+    .from("children")
+    .insert({
+      family_id: family.id,
+      display_name: childName,
+      age,
+      age_stage_id: ageStageId,
+    })
+    .select("id")
+    .single();
+  if (error || !child) return { error: "تعذّرت إضافة الابن." };
+
+  // تجهيز الدخول في نفس الخطوة إن طُلب.
+  if (wantsLogin) {
+    const { error: loginErr } = await supabase.rpc("set_child_login", {
+      p_child_id: child.id,
+      p_username: username,
+      p_password: password,
+    });
+    if (loginErr) {
+      const msg = loginErr.message?.includes("username_taken")
+        ? "أُضيف الابن، لكن اسم المستخدم مستخدم مسبقًا — جهّز الدخول من صفحته."
+        : "أُضيف الابن، لكن تعذّر حفظ الدخول — جهّزه من صفحته.";
+      revalidatePath("/dashboard");
+      redirect(`/children/${child.id}?notice=${encodeURIComponent(msg)}`);
+    }
+  }
 
   revalidatePath("/dashboard");
   redirect("/dashboard");

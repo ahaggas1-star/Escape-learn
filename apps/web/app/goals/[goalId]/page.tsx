@@ -4,6 +4,7 @@ import { getGuardianContext } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Goal, TaskTemplate } from "@/lib/types";
 import { AddTaskButton } from "./AddTaskButton";
+import { AddAllTasksButton } from "./AddAllTasksButton";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Chip } from "@/components/ui/Chip";
 
@@ -124,15 +125,21 @@ export default async function GoalPage({
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-bold text-ghars-700">إضافة مهام مقترحة</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="font-bold text-ghars-700">إضافة مهام مقترحة</h2>
+            {templates.length > 0 ? <AddAllTasksButton goalId={goal.id} count={templates.length} /> : null}
+          </div>
           {templates.length === 0 ? (
             <p className="text-sm text-ghars-500">لا توجد مهام جاهزة لهذه القيمة بعد.</p>
           ) : (
-            <div className="grid gap-2">
-              {templates.map((t) => (
-                <AddTaskButton key={t.id} template={t} goalId={goal.id} />
-              ))}
-            </div>
+            <>
+              <p className="text-xs text-ghars-400">أضِفها جميعًا بضغطة واحدة، أو اختر منها يدويًا أدناه.</p>
+              <div className="grid gap-2">
+                {templates.map((t) => (
+                  <AddTaskButton key={t.id} template={t} goalId={goal.id} />
+                ))}
+              </div>
+            </>
           )}
         </section>
       </main>
