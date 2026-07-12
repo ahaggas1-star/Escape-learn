@@ -93,8 +93,8 @@ export default async function Home() {
         </p>
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <Link href="/login" className="btn-primary px-7 py-3 text-base">ابدأ الآن مجانًا 🌱</Link>
+          <Link href="/showcase" className="btn-ghost border-grape-300 px-7 py-3 text-base text-grape-700 hover:bg-grape-50">✨ شاهد العرض التفاعلي</Link>
           <Link href="/guide" className="btn-ghost px-7 py-3 text-base">📖 دليل ولي الأمر</Link>
-          <a href="#how" className="btn-ghost px-7 py-3 text-base">شاهد كيف تعمل</a>
         </div>
         <p className="mt-3 text-xs text-ghars-400">بلا اشتراكات · عربي أولًا · آمن للأطفال</p>
         <div className="mt-5 flex justify-center">
@@ -273,6 +273,7 @@ export default async function Home() {
             <Logo size={28} />
             <p>قِيَم — منصة القيم الأسرية</p>
             <div className="flex items-center gap-4">
+              <Link href="/showcase" className="hover:text-ghars-800">العرض التفاعلي</Link>
               <Link href="/guide" className="hover:text-ghars-800">دليل ولي الأمر</Link>
               <Link href="/login" className="hover:text-ghars-800">تسجيل الدخول</Link>
             </div>
