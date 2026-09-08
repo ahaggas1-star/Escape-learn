@@ -166,6 +166,10 @@ function badgeEarned(id){
     case 'wordsmith': return state.wordsBuilt >= 10;
     case 'explorer':  return !!(g.quiz && g.count && g.memory && g.word);
     case 'level5':    return level() >= 5;
+    case 'scholar':   return lessonsCount() >= 12;
+    case 'century':   return state.answered >= 100;
+    case 'weekly':    return streak() >= 7;
+    case 'master':    return SUBJECTS.some(s => { const p = subjectProgress(s.id); return p.all > 0 && p.done === p.all; });
     default:          return false;
   }
 }

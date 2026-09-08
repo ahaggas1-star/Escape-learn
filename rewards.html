@@ -72,6 +72,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
 (function(){
   const A = window.App, $ = id => document.getElementById(id);
   A.mountSubbar('الجوائز', 'نقاطك وأوسمتك', 'index.html');
+  A.checkBadges();                       // يفتح أي وسام استُحقّ ولم يُسجَّل بعد
   const st = A.S.get(), lg = A.league();
 
   /* المستوى */
@@ -81,7 +82,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
   const pct = Math.round(A.levelXp() / A.XP_PER_LEVEL * 100);
   $('lvlBar').style.width = pct + '%';
   $('lvlPct').textContent = A.num(pct) + '٪';
-  $('lvlSub').textContent = A.num(st.xp) + ' نقطة · باقٍ ' +
+  $('lvlSub').textContent = A.num(st.xp) + ' نقطة ، باقٍ ' +
     A.num(A.XP_PER_LEVEL - A.levelXp()) + ' نقطة للمستوى ' + A.num(A.level()+1);
 
   /* الهديّة اليومية */

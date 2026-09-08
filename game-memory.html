@@ -65,7 +65,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
 
   function paintSets(){
     $('pickSet').innerHTML = MEMORY_SETS.map((s,k)=>`
-      <button class="tile ${A.tone(['pink','mint','sky','sun'][k])}" data-k="${k}" style="min-height:92px;${setIdx===k?'outline:3px solid var(--primary);outline-offset:2px':''}">
+      <button class="tile ${A.tone(['pink','mint','sky','sun','violet','coral'][k % 6])}" data-k="${k}" style="min-height:92px;${setIdx===k?'outline:3px solid var(--primary);outline-offset:2px':''}">
         <h3 style="font-size:16px">${s.name}</h3>
         <p class="tiny mt1" style="opacity:.8">${s.items.slice(0,4).join(' ')}</p>
       </button>`).join('');

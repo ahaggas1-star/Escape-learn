@@ -71,7 +71,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
   const myIdx = rows.findIndex(r => r.me);
   $('myRank').textContent = 'ترتيبك ' + A.num(myIdx + 1);
 
-  /* منصّة التتويج (٢ · ١ · ٣) */
+  /* منصّة التتويج (٢ ، ١ ، ٣) */
   const top = rows.slice(0,3);
   const order = [top[1], top[0], top[2]].filter(Boolean);
   const heights = { 0:74, 1:100, 2:60 };

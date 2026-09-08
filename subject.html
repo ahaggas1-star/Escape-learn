@@ -106,7 +106,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
       <div class="grow">
         <p class="tiny muted bold">الدرس ${A.num(i+1)}</p>
         <p class="bold">${l.title}</p>
-        <p class="tiny muted">${A.num(l.mins)} دقائق · ${A.num(l.teach.length + 4)} خطوات</p>
+        <p class="tiny muted">${A.num(l.mins)} دقائق ، ${A.num(l.teach.length + 4)} خطوات</p>
       </div>
       <span class="chip ${done?'chip-mint':isNext?'chip-primary':''}">${done?'تمّ':isNext?'التالي':'ابدأ'}</span>
     </a>`;

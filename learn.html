@@ -130,7 +130,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
         </div>
         <h3 class="mt2">${s.name}</h3>
         <p class="tiny mt1" style="opacity:.85">${s.desc}</p>
-        <p class="tiny mt2 xbold">${A.num(p.done)} / ${A.num(p.all)} دروس · ${A.num(p.pct)}٪</p>
+        <p class="tiny mt2 xbold">${A.num(p.done)} / ${A.num(p.all)} دروس ، ${A.num(p.pct)}٪</p>
         <div class="bar thin mt1" style="background:rgba(255,255,255,.5)"><i style="width:${p.pct}%;background:currentColor"></i></div>
         <span class="emo">${s.emoji}</span>
       </a>`;
@@ -152,7 +152,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
       <div class="sq-lg ${A.tone(g.tone)}">${g.emoji}</div>
       <div class="grow">
         <p class="bold">${g.name}</p>
-        <p class="tiny muted">${g.desc} · لُعبت ${A.num(g.plays)} مرة اليوم</p>
+        <p class="tiny muted">${g.desc} ، لُعبت ${A.num(g.plays)} مرة اليوم</p>
       </div>
       <span class="chip ${tried?'chip-mint':'chip-primary'}">${tried?'جرّبتها':'العب'}</span>
     </a>`;

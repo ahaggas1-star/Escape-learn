@@ -117,7 +117,7 @@ if(t==='dark')document.documentElement.classList.add('dark')})();</script>
     const st = A.S.get();
     $('avatarEmoji').textContent = st.avatar;
     $('name').textContent = st.name;
-    $('sub').textContent = A.league().emoji + ' دوري ' + A.league().name + ' · ' +
+    $('sub').textContent = A.league().emoji + ' دوري ' + A.league().name + ' ، ' +
       A.num(A.lessonsCount()) + ' دروس مكتملة';
     $('cStreak').textContent = '🔥 ' + A.num(A.streak()) + ' يوم';
     $('cXp').textContent = '⭐ ' + A.num(st.xp) + ' نقطة';
