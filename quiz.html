@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اختبار سريع · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame" style="padding-bottom:24px">
+
+  <!-- ===== شاشة البداية ===== -->
+  <section id="intro" class="page safe-top">
+    <div class="row">
+      <button class="back-btn" id="backBtn" aria-label="رجوع">→</button>
+      <h1 class="disp t-lg grow">اختبار سريع</h1>
+      <button class="icon-btn" data-theme-toggle aria-label="الوضع الليلي">🌙</button>
+    </div>
+
+    <div class="hero hero-primary mt3 fade-up" style="text-align:center">
+      <span class="wm" aria-hidden="true">❓</span>
+      <div class="float" style="font-size:64px">🧠</div>
+      <p class="disp t-2xl mt2">جاهز للتحدّي؟</p>
+      <p class="small" style="opacity:.92">١٠ أسئلة · ٣ قلوب · حتى ١٠٠ نقطة خبرة</p>
+    </div>
+
+    <p class="sec-label mt3">اختر المادة</p>
+    <div class="grid2 mt1" id="pickSubject"></div>
+
+    <div class="card row mt3">
+      <div class="sq t-sun">🏅</div>
+      <div class="grow"><p class="bold small">أفضل نتيجة لك</p><p class="tiny muted" id="bestLabel">لم تلعب بعد</p></div>
+    </div>
+
+    <button class="btn btn-primary btn-block mt3" id="startBtn">ابدأ الاختبار ▶</button>
+  </section>
+
+  <!-- ===== شاشة اللعب ===== -->
+  <section id="play" class="hidden">
+    <header class="safe-top page" style="padding-bottom:10px">
+      <div class="row">
+        <button class="back-btn" id="quitBtn" aria-label="إنهاء">✕</button>
+        <div class="grow"><div class="bar"><i id="qBar"></i></div></div>
+        <span class="chip chip-coral" id="lives">❤️❤️❤️</span>
+      </div>
+      <div class="row mt1">
+        <span class="tiny muted bold grow" id="qCount">السؤال ١ من ١٠</span>
+        <span class="chip chip-sun" id="timer">⏱ ٢٠</span>
+        <span class="chip chip-mint" id="score">٠ نقطة</span>
+      </div>
+    </header>
+
+    <section class="page">
+      <div class="card-lg" id="qCard">
+        <p class="sec-label" id="qSubject"></p>
+        <h2 class="disp t-xl mt1" id="qText" style="line-height:1.85"></h2>
+      </div>
+      <div class="col mt2" style="gap:10px" id="opts"></div>
+      <div id="fb" class="mt2"></div>
+      <div class="page" style="padding:0"></div>
+    </section>
+
+    <section class="page mt2" style="padding-bottom:20px">
+      <button class="btn btn-ghost btn-block" id="nextBtn" disabled>اختر إجابة</button>
+    </section>
+  </section>
+
+  <!-- ===== شاشة النتيجة ===== -->
+  <section id="result" class="hidden page safe-top" style="padding-bottom:24px"></section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App;
+  const TOTAL = 10, TIME = 20;
+
+  let subjectId = A.param('s') || 'all';
+  let qs = [], i = 0, score = 0, right = 0, lives = 3, answered = false, chain = 0, best = 0;
+  let tick = null, left = TIME;
+
+  const $ = id => document.getElementById(id);
+
+  /* ---------- شاشة البداية ---------- */
+  $('backBtn').onclick = ()=>{ A.sfx.tap(); history.length>1 ? history.back() : location.href='learn.html'; };
+
+  function paintPicker(){
+    const all = [{id:'all', name:'كل المواد', emoji:'🎲', tone:'violet'}, ...SUBJECTS];
+    $('pickSubject').innerHTML = all.map(s=>`
+      <button class="tile ${A.tone(s.tone)} ${subjectId===s.id?'sel':''}" data-s="${s.id}"
+        style="min-height:86px;${subjectId===s.id?'outline:3px solid var(--primary);outline-offset:2px':''}">
+        <h3 style="font-size:15px">${s.name}</h3>
+        <span class="emo" style="font-size:44px;bottom:-8px">${s.emoji}</span>
+      </button>`).join('');
+  }
+  paintPicker();
+  $('pickSubject').onclick = e=>{
+    const b = e.target.closest('[data-s]'); if(!b) return;
+    subjectId = b.dataset.s; A.sfx.tap(); paintPicker();
+  };
+
+  best = A.S.get().bestQuiz;
+  $('bestLabel').textContent = best ? A.num(best)+' من ١٠ إجابات صحيحة' : 'لم تلعب بعد — كن الأول!';
+
+  $('startBtn').onclick = start;
+
+  /* ---------- اللعب ---------- */
+  function start(){
+    qs = A.drawQuestions(subjectId === 'all' ? null : subjectId, TOTAL);
+    i = 0; score = 0; right = 0; lives = 3; chain = 0;
+    $('intro').classList.add('hidden');
+    $('play').classList.remove('hidden');
+    A.tryGame('quiz'); A.sfx.tap();
+    render();
+  }
+
+  $('quitBtn').onclick = ()=>{
+    if(confirm('هل تريد إنهاء الاختبار؟')){ stopTimer(); finish(true); }
+  };
+
+  function startTimer(){
+    left = TIME;
+    paintTimer();
+    stopTimer();
+    tick = setInterval(()=>{
+      left--; paintTimer();
+      if(left <= 0){ stopTimer(); timeUp(); }
+    }, 1000);
+  }
+  const stopTimer = ()=>{ if(tick){ clearInterval(tick); tick = null; } };
+  function paintTimer(){
+    const t = $('timer');
+    t.textContent = '⏱ ' + A.num(left);
+    t.className = 'chip ' + (left <= 5 ? 'chip-coral' : 'chip-sun');
+  }
+
+  function render(){
+    answered = false;
+    const q = qs[i];
+    $('qBar').style.width = (i / TOTAL * 100) + '%';
+    $('qCount').textContent = 'السؤال ' + A.num(i+1) + ' من ' + A.num(TOTAL);
+    $('score').textContent = A.num(score) + ' نقطة';
+    $('lives').textContent = '❤️'.repeat(lives) + '🤍'.repeat(3-lives);
+    $('qSubject').textContent = subjectId === 'all' ? 'سؤال عشوائي' : SUBJ[subjectId].name;
+    $('qText').textContent = q.q;
+    $('fb').innerHTML = '';
+    $('opts').innerHTML = q.options.map((o,k)=>`
+      <button class="answer" data-k="${k}">
+        <span class="key">${'أبجد'[k]}</span>
+        <span class="grow">${A.escapeHtml(o.text)}</span>
+        <span class="mark"></span>
+      </button>`).join('');
+    $('nextBtn').disabled = true;
+    $('nextBtn').className = 'btn btn-ghost btn-block';
+    $('nextBtn').textContent = 'اختر إجابة';
+    startTimer();
+  }
+
+  $('opts').onclick = e=>{
+    const btn = e.target.closest('.answer');
+    if(btn && !answered) answer(+btn.dataset.k);
+  };
+
+  function timeUp(){ if(!answered) answer(-1, true); }
+
+  function answer(k, byTime){
+    answered = true; stopTimer();
+    const q = qs[i], ok = k === q.answer;
+
+    A.qsa('.answer').forEach((b,idx)=>{
+      b.disabled = true;
+      if(idx === q.answer){ b.classList.add('correct'); b.querySelector('.mark').textContent = '✓'; }
+      else if(idx === k){ b.classList.add('wrong'); b.querySelector('.mark').textContent = '✕'; }
+      else b.classList.add('dim');
+    });
+
+    let gained = 0;
+    if(ok){
+      right++; chain++;
+      gained = 10 + (left >= 12 ? 4 : left >= 6 ? 2 : 0) + (chain >= 3 ? 4 : 0);
+      score += gained;
+      if(subjectId !== 'all') A.markCorrect(subjectId);
+      A.sfx.right();
+      if(chain === 3) A.toast('٣ إجابات متتالية! 🔥', '🔥');
+    } else {
+      chain = 0; lives--; A.markWrong(); A.sfx.wrong();
+      $('lives').textContent = '❤️'.repeat(Math.max(lives,0)) + '🤍'.repeat(3-Math.max(lives,0));
+      $('lives').classList.add('bump');
+      setTimeout(()=> $('lives').classList.remove('bump'), 500);
+    }
+    $('score').textContent = A.num(score) + ' نقطة';
+
+    $('fb').innerHTML = `
+      <div class="card row fade-up" style="background:color-mix(in srgb,var(--${ok?'mint':'coral'}) 16%,var(--surface))">
+        <span style="font-size:26px">${ok?'🎉':byTime?'⏰':'💪'}</span>
+        <div class="grow">
+          <p class="bold small">${ok ? 'ممتاز! +'+A.num(gained)+' نقطة' : byTime ? 'انتهى الوقت!' : 'إجابة خاطئة'}</p>
+          <p class="tiny muted">${A.escapeHtml(q.hint || ('الإجابة الصحيحة: ' + q.options[q.answer].text))}</p>
+        </div>
+      </div>`;
+
+    const last = (i === TOTAL-1) || lives <= 0;
+    $('nextBtn').disabled = false;
+    $('nextBtn').className = 'btn btn-primary btn-block';
+    $('nextBtn').textContent = last ? 'اعرض النتيجة 🏁' : 'السؤال التالي ←';
+  }
+
+  $('nextBtn').onclick = ()=>{
+    A.sfx.tap();
+    if(i === TOTAL-1 || lives <= 0) return finish(false);
+    i++; render();
+  };
+
+  /* ---------- النتيجة ---------- */
+  function finish(quit){
+    stopTimer();
+    $('play').classList.add('hidden');
+    $('result').classList.remove('hidden');
+
+    const perfect = right === TOTAL;
+    const st = A.S.get();
+    if(right > st.bestQuiz) A.S.set({ bestQuiz: right });
+    if(!quit){ A.logActivity(); A.addXp(score, true); }
+
+    const mood = perfect ? {e:'🏆', t:'علامة كاملة!', c:'mint'}
+               : right >= 7 ? {e:'🎉', t:'أداء رائع!', c:'mint'}
+               : right >= 4 ? {e:'👏', t:'جيد… واصل!', c:'sun'}
+               :              {e:'💪', t:'حاول مرة أخرى', c:'coral'};
+
+    if(right >= 4){ A.confetti(); A.sfx.win(); }
+    A.checkBadges();
+
+    $('result').innerHTML = `
+      <div class="hero hero-${mood.c==='mint'?'mint':mood.c==='sun'?'sun':'coral'} fade-up" style="text-align:center">
+        <span class="wm" aria-hidden="true">${mood.e}</span>
+        <div class="bump" style="font-size:72px">${mood.e}</div>
+        <p class="disp t-2xl mt2">${mood.t}</p>
+        <p class="small" style="opacity:.93">أجبت بشكل صحيح على ${A.num(right)} من ${A.num(TOTAL)}</p>
+      </div>
+
+      <div class="grid3 mt3">
+        <div class="stat" style="cursor:default"><b>⭐ النقاط</b><span>+${A.num(score)}</span></div>
+        <div class="stat" style="cursor:default"><b>✅ صحيح</b><span>${A.num(right)}</span></div>
+        <div class="stat" style="cursor:default"><b>❤️ متبقٍ</b><span>${A.num(Math.max(lives,0))}</span></div>
+      </div>
+
+      <div class="card mt2">
+        <div class="row"><p class="bold small grow">دقّتك</p><p class="bold small">${A.num(Math.round(right/TOTAL*100))}٪</p></div>
+        <div class="bar mint mt1"><i style="width:${right/TOTAL*100}%"></i></div>
+        <p class="tiny muted mt2">${perfect ? 'مذهل! لم تخطئ ولا سؤالًا 🌟'
+          : right >= 7 ? 'أنت قريب جدًا من العلامة الكاملة.'
+          : 'راجع الدروس ثم عُد — ستتحسّن بسرعة!'}</p>
+      </div>
+
+      <button class="btn btn-primary btn-block mt3" id="againBtn">العب مرة أخرى 🔁</button>
+      <div class="grid2 mt2">
+        <a class="btn btn-ghost" href="learn.html">مواد أخرى</a>
+        <a class="btn btn-ghost" href="index.html">الرئيسية</a>
+      </div>`;
+
+    document.getElementById('againBtn').onclick = ()=>{
+      $('result').classList.add('hidden');
+      $('intro').classList.remove('hidden');
+      best = A.S.get().bestQuiz;
+      $('bestLabel').textContent = A.num(best)+' من ١٠ إجابات صحيحة';
+      A.sfx.tap();
+    };
+  }
+
+  window.addEventListener('pagehide', stopTimer);
+})();
+</script>
+</body>
+</html>

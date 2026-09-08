@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ملفّي · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame">
+  <div id="subbar"></div>
+
+  <!-- بطاقة الطفل -->
+  <section class="page">
+    <div class="card-lg fade-up" style="text-align:center">
+      <button class="avatar" id="avatarBtn" style="width:84px;height:84px;font-size:44px;border-radius:28px;margin:0 auto"
+              aria-label="تغيير الصورة الرمزية">
+        <span id="avatarEmoji">🐻</span>
+      </button>
+      <h2 class="disp t-xl mt2" id="name">لُجين</h2>
+      <p class="tiny muted" id="sub"></p>
+      <div class="row mt3" style="gap:8px;justify-content:center;flex-wrap:wrap">
+        <span class="chip chip-sun" id="cStreak">🔥 ٠ يوم</span>
+        <span class="chip chip-primary" id="cXp">⭐ ٠ نقطة</span>
+        <span class="chip chip-mint" id="cLvl">🚀 المستوى ١</span>
+      </div>
+      <button class="btn btn-ghost btn-block mt3" id="editBtn">تعديل الاسم والصورة ✏️</button>
+    </div>
+  </section>
+
+  <!-- تقدّم المواد -->
+  <section class="page mt3">
+    <h2 class="disp t-lg" style="margin-bottom:10px">تقدّمك في المواد</h2>
+    <div class="card list" id="progressList"></div>
+  </section>
+
+  <!-- نشاط الأسبوع -->
+  <section class="page mt3">
+    <h2 class="disp t-lg" style="margin-bottom:10px">نشاط الأسبوع</h2>
+    <div class="card">
+      <div class="grid3" style="grid-template-columns:repeat(7,1fr);gap:5px" id="weekDots"></div>
+      <p class="tiny muted mt2" id="weekNote"></p>
+    </div>
+  </section>
+
+  <!-- الإعدادات -->
+  <section class="page mt3" style="padding-bottom:16px">
+    <h2 class="disp t-lg" style="margin-bottom:10px">الإعدادات</h2>
+    <div class="card list">
+      <div class="list-row">
+        <div class="sq t-sky">🔢</div>
+        <div class="grow"><p class="bold small">الأرقام العربية (١٢٣)</p><p class="tiny muted">بدّل بين ١٢٣ و 123</p></div>
+        <button class="switch" id="swDigits" role="switch" aria-checked="true" aria-label="الأرقام العربية"></button>
+      </div>
+      <div class="list-row">
+        <div class="sq t-sun">🔊</div>
+        <div class="grow"><p class="bold small">الأصوات</p><p class="tiny muted">نغمات الإجابات والفوز</p></div>
+        <button class="switch" id="swSound" role="switch" aria-checked="true" aria-label="الأصوات"></button>
+      </div>
+      <div class="list-row">
+        <div class="sq t-violet">🌙</div>
+        <div class="grow"><p class="bold small">الوضع الليلي</p><p class="tiny muted">مريح للعين ليلًا</p></div>
+        <button class="switch" id="swDark" role="switch" aria-checked="false" aria-label="الوضع الليلي"></button>
+      </div>
+      <button class="list-row" id="resetBtn">
+        <div class="sq t-coral">♻️</div>
+        <div class="grow"><p class="bold small">إعادة ضبط التقدّم</p><p class="tiny muted">امسح كل شيء وابدأ من جديد</p></div>
+        <span aria-hidden="true">←</span>
+      </button>
+    </div>
+
+    <div class="card row mt3" style="background:color-mix(in srgb,var(--lemon) 26%,var(--surface))">
+      <span style="font-size:22px">🔒</span>
+      <p class="tiny grow">كل بياناتك محفوظة داخل متصفّحك فقط — لا تُرسل إلى أي خادم.</p>
+    </div>
+  </section>
+
+  <div id="tabbar"></div>
+</main>
+
+<!-- نافذة التعديل -->
+<div class="sheet-bg" id="editSheet" role="dialog" aria-modal="true" aria-label="تعديل الملف">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="row" style="margin-bottom:12px">
+      <h2 class="disp t-lg grow">تعديل الملف</h2>
+      <button class="icon-btn" data-close aria-label="إغلاق">✕</button>
+    </div>
+    <p class="sec-label">الاسم</p>
+    <input class="input mt1" id="nameInput" maxlength="16" placeholder="اكتب اسمك">
+    <p class="sec-label mt3">اختر صورتك</p>
+    <div class="row mt1" style="flex-wrap:wrap;gap:8px" id="avatarPick"></div>
+    <button class="btn btn-primary btn-block mt3" id="saveBtn">حفظ ✓</button>
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('ملفّي', 'حسابك وإعداداتك', 'index.html');
+
+  const AVATARS = ['🐻','🦊','🐼','🐯','🦁','🐧','🐰','🦄','🐨','🐸','🐙','🦖'];
+  let pickedAvatar = A.S.get().avatar;
+
+  function paint(){
+    const st = A.S.get();
+    $('avatarEmoji').textContent = st.avatar;
+    $('name').textContent = st.name;
+    $('sub').textContent = A.league().emoji + ' دوري ' + A.league().name + ' · ' +
+      A.num(A.lessonsCount()) + ' دروس مكتملة';
+    $('cStreak').textContent = '🔥 ' + A.num(A.streak()) + ' يوم';
+    $('cXp').textContent = '⭐ ' + A.num(st.xp) + ' نقطة';
+    $('cLvl').textContent = '🚀 المستوى ' + A.num(A.level());
+
+    $('progressList').innerHTML = SUBJECTS.map(s=>{
+      const p = A.subjectProgress(s.id);
+      return `<a class="list-row" href="subject.html?s=${s.id}">
+        <div class="sq ${A.tone(s.tone)}">${s.emoji}</div>
+        <div class="grow">
+          <p class="bold small">${s.name}</p>
+          <div class="bar thin mt1"><i style="width:${p.pct}%"></i></div>
+        </div>
+        <span class="chip ${p.pct===100?'chip-mint':''}">${A.num(p.done)}/${A.num(p.all)}</span>
+      </a>`;
+    }).join('');
+
+    const wk = A.week();
+    $('weekDots').innerHTML = wk.map(d=>
+      `<span class="streak-dot${d.on?' on':''}${d.today?' today':''}" title="${d.date}">${d.label}</span>`).join('');
+    $('weekNote').textContent = 'نشِط في ' + A.num(wk.filter(d=>d.on).length) + ' من ٧ أيام هذا الأسبوع.';
+
+    setSwitch('swDigits', st.arabicDigits);
+    setSwitch('swSound', st.sound);
+    setSwitch('swDark', document.documentElement.classList.contains('dark'));
+  }
+  const setSwitch = (id, on) => $(id).setAttribute('aria-checked', on ? 'true' : 'false');
+
+  /* الإعدادات */
+  $('swDigits').onclick = ()=>{
+    const v = !A.S.get().arabicDigits;
+    A.S.set({ arabicDigits: v }); A.sfx.tap(); paint(); A.localizeDigits();
+    A.toast(v ? 'الأرقام العربية ١٢٣' : 'الأرقام اللاتينية 123', '🔢');
+  };
+  $('swSound').onclick = ()=>{
+    const v = !A.S.get().sound;
+    A.S.set({ sound: v }); paint();
+    if(v) A.sfx.right();
+    A.toast(v ? 'الأصوات مفعّلة' : 'الأصوات مغلقة', v ? '🔊' : '🔇');
+  };
+  $('swDark').onclick = ()=>{ A.toggleTheme(); paint(); };
+
+  $('resetBtn').onclick = ()=>{
+    if(confirm('سيتم مسح كل التقدّم والنقاط والأوسمة. هل أنت متأكد؟')){
+      A.S.reset(); A.toast('تمّت إعادة الضبط', '♻️');
+      setTimeout(()=> location.reload(), 700);
+    }
+  };
+
+  /* تعديل الملف */
+  function openEdit(){
+    const st = A.S.get();
+    pickedAvatar = st.avatar;
+    $('nameInput').value = st.name;
+    paintAvatars();
+    A.openSheet('editSheet');
+  }
+  function paintAvatars(){
+    $('avatarPick').innerHTML = AVATARS.map(a=>`
+      <button class="letter" data-a="${a}" style="font-size:26px;${pickedAvatar===a?'outline:3px solid var(--primary);outline-offset:2px':''}">${a}</button>`).join('');
+  }
+  $('avatarPick').onclick = e=>{
+    const b = e.target.closest('[data-a]'); if(!b) return;
+    pickedAvatar = b.dataset.a; A.sfx.tap(); paintAvatars();
+  };
+  $('editBtn').onclick = openEdit;
+  $('avatarBtn').onclick = openEdit;
+  $('saveBtn').onclick = ()=>{
+    const n = $('nameInput').value.trim() || 'صديقي';
+    A.S.set({ name: n, avatar: pickedAvatar });
+    A.closeSheet('editSheet'); A.sfx.win();
+    A.toast('تم الحفظ يا ' + n + '!', pickedAvatar);
+    paint();
+  };
+
+  paint();
+  A.mountTabbar('profile.html');
+})();
+</script>
+</body>
+</html>

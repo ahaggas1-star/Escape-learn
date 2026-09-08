@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المادة · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame">
+  <div id="subbar"></div>
+
+  <!-- بطاقة المادة -->
+  <section class="page">
+    <div class="hero fade-up" id="heroCard">
+      <span class="wm" id="heroEmoji" aria-hidden="true">📘</span>
+      <div class="row">
+        <span class="chip chip-glass" id="heroLevel">سهل</span>
+        <span class="chip chip-glass" id="heroAge">٥–٩</span>
+      </div>
+      <p class="disp t-2xl mt2" id="heroName">المادة</p>
+      <p class="small" id="heroDesc" style="opacity:.92"></p>
+      <div class="row mt2">
+        <div class="bar glass grow"><i id="heroBar"></i></div>
+        <span class="tiny xbold" id="heroPct">٠٪</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- إجراءات سريعة -->
+  <section class="page mt2 grid2">
+    <a class="card center" id="quizLink" style="text-align:center;flex-direction:column;display:flex;gap:6px">
+      <div class="sq t-violet">❓</div>
+      <p class="bold small">اختبار المادة</p>
+      <p class="tiny muted">١٠ أسئلة</p>
+    </a>
+    <button class="card center" id="continueBtn" style="text-align:center;flex-direction:column;display:flex;gap:6px">
+      <div class="sq t-mint">▶️</div>
+      <p class="bold small">تابع التعلّم</p>
+      <p class="tiny muted" id="contLabel">ابدأ الآن</p>
+    </button>
+  </section>
+
+  <!-- الدروس -->
+  <section class="page mt3" style="padding-bottom:16px">
+    <div class="sec-head">
+      <h2 class="disp t-lg">الدروس</h2>
+      <span class="tiny muted" id="lessonCount"></span>
+    </div>
+    <div id="lessonList"></div>
+  </section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App;
+  const id = A.param('s');
+  const s  = SUBJ[id] || SUBJECTS[0];
+  const lessons = LESSONS[s.id] || [];
+
+  A.mountSubbar(s.name, 'المادة', 'learn.html');
+  document.title = s.name + ' · نجومي';
+
+  /* البطاقة العلوية */
+  const hero = document.getElementById('heroCard');
+  hero.classList.add('hero-'+({violet:'primary',mint:'mint',sky:'sky',sun:'sun',coral:'coral',pink:'coral'})[s.tone]);
+  document.getElementById('heroEmoji').textContent = s.emoji;
+  document.getElementById('heroName').textContent  = s.name;
+  document.getElementById('heroDesc').textContent  = s.desc;
+  document.getElementById('heroLevel').textContent = s.level;
+  document.getElementById('heroAge').textContent   = 'العمر '+s.age;
+  const p = A.subjectProgress(s.id);
+  document.getElementById('heroBar').style.width = p.pct+'%';
+  document.getElementById('heroPct').textContent = A.num(p.pct)+'٪';
+
+  /* إجراءات */
+  document.getElementById('quizLink').href = 'quiz.html?s='+s.id;
+  const next = lessons.find(l => !A.lessonDone(s.id, l.id)) || lessons[0];
+  document.getElementById('contLabel').textContent =
+    p.done === p.all ? 'راجع من البداية' : next.title;
+  document.getElementById('continueBtn').onclick = ()=>{
+    A.sfx.tap(); location.href = `lesson.html?s=${s.id}&l=${next.id}`;
+  };
+
+  /* قائمة الدروس */
+  document.getElementById('lessonCount').textContent = A.num(p.done)+' / '+A.num(p.all)+' مكتمل';
+  document.getElementById('lessonList').innerHTML = lessons.map((l,i)=>{
+    const done = A.lessonDone(s.id, l.id);
+    const prevDone = i === 0 || A.lessonDone(s.id, lessons[i-1].id);
+    const isNext = !done && prevDone;
+    return `<a class="card row mt2" href="lesson.html?s=${s.id}&l=${l.id}">
+      <div class="sq-lg ${done?'t-mint':A.tone(s.tone)}">${done?'✅':l.emoji}</div>
+      <div class="grow">
+        <p class="tiny muted bold">الدرس ${A.num(i+1)}</p>
+        <p class="bold">${l.title}</p>
+        <p class="tiny muted">${A.num(l.mins)} دقائق · ${A.num(l.teach.length + 4)} خطوات</p>
+      </div>
+      <span class="chip ${done?'chip-mint':isNext?'chip-primary':''}">${done?'تمّ':isNext?'التالي':'ابدأ'}</span>
+    </a>`;
+  }).join('');
+
+  A.mountTabbar('learn.html');
+})();
+</script>
+</body>
+</html>

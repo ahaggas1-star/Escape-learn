@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>عدّ واحسب · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame" style="padding-bottom:24px">
+  <div id="subbar"></div>
+
+  <!-- ===== البداية ===== -->
+  <section id="intro" class="page">
+    <div class="hero hero-sky fade-up" style="text-align:center">
+      <span class="wm" aria-hidden="true">🔢</span>
+      <div class="float" style="font-size:64px">🧮</div>
+      <p class="disp t-2xl mt2">عدّ واحسب</p>
+      <p class="small" style="opacity:.93">١٠ مسائل · احسب بسرعة واجمع النقاط</p>
+    </div>
+
+    <p class="sec-label mt3">اختر الصعوبة</p>
+    <div class="grid3 mt1" id="pickLevel"></div>
+
+    <div class="card row mt3">
+      <div class="sq t-sun">🏅</div>
+      <div class="grow"><p class="bold small">أفضل نتيجة</p><p class="tiny muted" id="best">لم تلعب بعد</p></div>
+    </div>
+    <button class="btn btn-primary btn-block mt3" id="startBtn">ابدأ ▶</button>
+  </section>
+
+  <!-- ===== اللعب ===== -->
+  <section id="play" class="hidden">
+    <div class="page">
+      <div class="row">
+        <div class="grow"><div class="bar sky"><i id="bar"></i></div></div>
+        <span class="chip chip-mint" id="score">٠</span>
+      </div>
+      <p class="tiny muted mt1" id="count">المسألة ١ من ١٠</p>
+
+      <div class="card-lg mt2" style="text-align:center">
+        <p class="sec-label" id="visual" style="font-size:26px;letter-spacing:3px;min-height:34px"></p>
+        <p class="disp" id="expr" style="font-size:46px;line-height:1.4;direction:ltr"></p>
+        <div class="mt2" id="answerBox"
+             style="min-height:64px;border-radius:16px;border:2px dashed var(--border);display:grid;place-items:center;
+                    font-family:var(--font-display);font-size:34px;font-weight:800"></div>
+      </div>
+
+      <div id="fb" class="mt2"></div>
+
+      <div class="pad mt2" id="pad"></div>
+      <div class="grid2 mt2" style="padding-bottom:20px">
+        <button class="btn btn-primary" id="okBtn" disabled>تحقّق ✓</button>
+        <button class="btn btn-ghost" id="clearBtn">مسح ⌫</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== النتيجة ===== -->
+  <section id="result" class="hidden page" style="padding-bottom:24px"></section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('عدّ واحسب', 'لعبة', 'learn.html');
+
+  const TOTAL = 10;
+  const LEVELS = {
+    easy:   { name:'سهل',   max:5,  ops:['+'],      xp:6 },
+    medium: { name:'متوسط', max:10, ops:['+','-'],  xp:9 },
+    hard:   { name:'تحدٍّ',  max:20, ops:['+','-'],  xp:12 }
+  };
+  let diff = 'easy', probs = [], i = 0, score = 0, right = 0, entry = '';
+
+  function paintLevels(){
+    $('pickLevel').innerHTML = Object.entries(LEVELS).map(([k,v])=>`
+      <button class="filter" data-l="${k}" aria-pressed="${diff===k}" style="min-height:44px">${v.name}</button>`).join('');
+  }
+  paintLevels();
+  $('pickLevel').onclick = e=>{
+    const b = e.target.closest('[data-l]'); if(!b) return;
+    diff = b.dataset.l; A.sfx.tap(); paintLevels();
+  };
+
+  const bestScore = A.S.get().bestCount;
+  $('best').textContent = bestScore ? A.num(bestScore)+' نقطة' : 'لم تلعب بعد — جرّب الآن!';
+
+  /* توليد المسائل */
+  function makeProblem(){
+    const L = LEVELS[diff];
+    const op = L.ops[Math.floor(Math.random()*L.ops.length)];
+    let a = 1 + Math.floor(Math.random()*L.max);
+    let b = 1 + Math.floor(Math.random()*L.max);
+    if(op === '-' && b > a) [a,b] = [b,a];
+    const res = op === '+' ? a+b : a-b;
+    const emoji = ['🍎','⭐','🍬','🎈','🐥','🌻'][Math.floor(Math.random()*6)];
+    const visual = (a+b) <= 12 ? emoji.repeat(a) + (op==='+'?' ➕ ':' ➖ ') + emoji.repeat(b) : '';
+    return { a, b, op, res, visual };
+  }
+
+  $('startBtn').onclick = ()=>{
+    probs = Array.from({length:TOTAL}, makeProblem);
+    i = 0; score = 0; right = 0; entry = '';
+    $('intro').classList.add('hidden');
+    $('play').classList.remove('hidden');
+    A.tryGame('count'); A.sfx.tap();
+    paintPad(); render();
+  };
+
+  function paintPad(){
+    $('pad').innerHTML = [1,2,3,4,5,6,7,8,9,0].map(n=>
+      `<button data-n="${n}"${n===0?' style="grid-column:span 3"':''}>${A.num(n)}</button>`).join('');
+  }
+
+  function render(){
+    entry = '';
+    const p = probs[i];
+    $('bar').style.width = (i/TOTAL*100)+'%';
+    $('count').textContent = 'المسألة '+A.num(i+1)+' من '+A.num(TOTAL);
+    $('score').textContent = A.num(score)+' نقطة';
+    $('visual').textContent = p.visual;
+    $('expr').textContent = `${A.num(p.a)} ${p.op} ${A.num(p.b)} = ؟`;
+    $('answerBox').textContent = '';
+    $('answerBox').style.borderStyle = 'dashed';
+    $('answerBox').style.borderColor = 'var(--border)';
+    $('fb').innerHTML = '';
+    $('okBtn').disabled = true;
+    $('pad').style.pointerEvents = '';
+  }
+
+  $('pad').onclick = e=>{
+    const b = e.target.closest('[data-n]'); if(!b) return;
+    if(entry.length >= 3) return;
+    entry += b.dataset.n; A.sfx.tap();
+    $('answerBox').textContent = A.num(entry);
+    $('answerBox').style.borderStyle = 'solid';
+    $('answerBox').style.borderColor = 'var(--primary)';
+    $('okBtn').disabled = false;
+  };
+  $('clearBtn').onclick = ()=>{
+    entry = ''; $('answerBox').textContent = '';
+    $('answerBox').style.borderStyle = 'dashed';
+    $('answerBox').style.borderColor = 'var(--border)';
+    $('okBtn').disabled = true; A.sfx.tap();
+  };
+
+  $('okBtn').onclick = ()=>{
+    const p = probs[i], ok = +entry === p.res;
+    $('pad').style.pointerEvents = 'none';
+    $('okBtn').disabled = true;
+    if(ok){
+      right++; score += LEVELS[diff].xp; A.markCorrect('math'); A.sfx.right();
+      $('answerBox').style.borderColor = 'var(--mint)';
+      $('answerBox').style.background = 'color-mix(in srgb,var(--mint) 16%,transparent)';
+    } else {
+      A.markWrong(); A.sfx.wrong();
+      $('answerBox').style.borderColor = 'var(--coral)';
+      $('answerBox').style.background = 'color-mix(in srgb,var(--coral) 14%,transparent)';
+    }
+    $('score').textContent = A.num(score)+' نقطة';
+    $('fb').innerHTML = `
+      <div class="card row fade-up" style="background:color-mix(in srgb,var(--${ok?'mint':'coral'}) 16%,var(--surface))">
+        <span style="font-size:26px">${ok?'🎉':'💪'}</span>
+        <div class="grow">
+          <p class="bold small">${ok ? 'صحيح! +'+A.num(LEVELS[diff].xp)+' نقطة' : 'الإجابة الصحيحة: '+A.num(p.res)}</p>
+          <p class="tiny muted">${A.num(p.a)} ${p.op} ${A.num(p.b)} = ${A.num(p.res)}</p>
+        </div>
+        <button class="btn btn-sm btn-primary" id="nx">${i===TOTAL-1?'النتيجة':'التالي ←'}</button>
+      </div>`;
+    document.getElementById('nx').onclick = ()=>{
+      A.sfx.tap();
+      $('answerBox').style.background = '';
+      if(i === TOTAL-1) return finish();
+      i++; render();
+    };
+  };
+
+  function finish(){
+    $('play').classList.add('hidden');
+    $('result').classList.remove('hidden');
+    if(score > A.S.get().bestCount) A.S.set({ bestCount: score });
+    A.logActivity(); A.addXp(score, true);
+    if(right >= 6){ A.confetti(); A.sfx.win(); }
+    A.checkBadges();
+
+    $('result').innerHTML = `
+      <div class="hero hero-sky fade-up" style="text-align:center">
+        <span class="wm" aria-hidden="true">🧮</span>
+        <div class="bump" style="font-size:70px">${right>=8?'🏆':right>=5?'🎉':'💪'}</div>
+        <p class="disp t-2xl mt2">${right>=8?'حاسب ماهر!':right>=5?'عمل جيد!':'تمرين أكثر'}</p>
+        <p class="small" style="opacity:.93">${A.num(right)} إجابة صحيحة من ${A.num(TOTAL)}</p>
+      </div>
+      <div class="grid3 mt3">
+        <div class="stat" style="cursor:default"><b>⭐ النقاط</b><span>+${A.num(score)}</span></div>
+        <div class="stat" style="cursor:default"><b>✅ صحيح</b><span>${A.num(right)}</span></div>
+        <div class="stat" style="cursor:default"><b>🎚 المستوى</b><span style="font-size:15px">${LEVELS[diff].name}</span></div>
+      </div>
+      <button class="btn btn-primary btn-block mt3" id="again">العب مرة أخرى 🔁</button>
+      <div class="grid2 mt2">
+        <a class="btn btn-ghost" href="learn.html">ألعاب أخرى</a>
+        <a class="btn btn-ghost" href="index.html">الرئيسية</a>
+      </div>`;
+    document.getElementById('again').onclick = ()=>{
+      $('result').classList.add('hidden');
+      $('intro').classList.remove('hidden');
+      $('best').textContent = A.num(A.S.get().bestCount)+' نقطة';
+      A.sfx.tap();
+    };
+  }
+
+  A.mountTabbar('learn.html');
+})();
+</script>
+</body>
+</html>

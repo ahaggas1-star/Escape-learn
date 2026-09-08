@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>كوّن الكلمة · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame" style="padding-bottom:24px">
+  <div id="subbar"></div>
+
+  <!-- ===== البداية ===== -->
+  <section id="intro" class="page">
+    <div class="hero hero-mint fade-up" style="text-align:center">
+      <span class="wm" aria-hidden="true">🧩</span>
+      <div class="float" style="font-size:64px">🔤</div>
+      <p class="disp t-2xl mt2">كوّن الكلمة</p>
+      <p class="small" style="opacity:.93">٨ كلمات · رتّب الحروف لتصنع الكلمة الصحيحة</p>
+    </div>
+    <div class="card row mt3">
+      <div class="sq t-sun">✍️</div>
+      <div class="grow"><p class="bold small">كلمات كوّنتها حتى الآن</p><p class="tiny muted" id="built">٠ كلمة</p></div>
+    </div>
+    <div class="card row mt2" style="background:color-mix(in srgb,var(--lemon) 26%,var(--surface))">
+      <span style="font-size:22px">💡</span>
+      <p class="tiny grow">اضغط على الحرف لإضافته، واضغط على الخانة لإرجاعه.</p>
+    </div>
+    <button class="btn btn-primary btn-block mt3" id="startBtn">ابدأ ▶</button>
+  </section>
+
+  <!-- ===== اللعب ===== -->
+  <section id="play" class="hidden page">
+    <div class="row">
+      <div class="grow"><div class="bar mint"><i id="bar"></i></div></div>
+      <span class="chip chip-mint" id="score">٠</span>
+    </div>
+    <p class="tiny muted mt1" id="count">الكلمة ١ من ٨</p>
+
+    <div class="card-lg mt2" style="text-align:center">
+      <div class="float" style="font-size:60px" id="emoji">🌙</div>
+      <p class="soft mt2" id="hint">تلميح</p>
+      <div class="slotbox mt3" id="slots"></div>
+    </div>
+
+    <div id="fb" class="mt2"></div>
+
+    <p class="sec-label mt3">الحروف المتاحة</p>
+    <div class="row mt1" style="flex-wrap:wrap;gap:8px;justify-content:center" id="letters"></div>
+
+    <div class="grid2 mt3" style="padding-bottom:20px">
+      <button class="btn btn-primary" id="okBtn" disabled>تحقّق ✓</button>
+      <button class="btn btn-ghost" id="clearBtn">مسح ⌫</button>
+    </div>
+  </section>
+
+  <!-- ===== النتيجة ===== -->
+  <section id="result" class="hidden page" style="padding-bottom:24px"></section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('كوّن الكلمة', 'لعبة', 'learn.html');
+
+  const TOTAL = 8;
+  let words = [], i = 0, score = 0, right = 0;
+  let target = '', letters = [], slots = [];
+
+  $('built').textContent = A.num(A.S.get().wordsBuilt)+' كلمة';
+
+  $('startBtn').onclick = ()=>{
+    words = A.pick(WORD_GAME, TOTAL);
+    i = 0; score = 0; right = 0;
+    $('intro').classList.add('hidden');
+    $('play').classList.remove('hidden');
+    A.tryGame('word'); A.sfx.tap();
+    render();
+  };
+
+  function render(){
+    const w = words[i];
+    target = w.w;
+    // حروف الكلمة مبعثرة (تُعرض منفصلة كي لا تتصل الأشكال)
+    letters = A.shuffle(target.split('')).map((ch,k)=>({ ch, k, used:false }));
+    slots = target.split('').map(()=> null);
+
+    $('bar').style.width = (i/TOTAL*100)+'%';
+    $('count').textContent = 'الكلمة '+A.num(i+1)+' من '+A.num(TOTAL);
+    $('score').textContent = A.num(score)+' نقطة';
+    $('emoji').textContent = w.e;
+    $('hint').textContent = w.hint;
+    $('fb').innerHTML = '';
+    $('okBtn').disabled = true;
+    paint();
+  }
+
+  function paint(){
+    $('slots').innerHTML = slots.map((s,idx)=>
+      `<span class="slot${s!==null?' filled':''}" data-slot="${idx}">${s!==null?letters[s].ch:''}</span>`).join('');
+    $('letters').innerHTML = letters.map(l=>
+      `<button class="letter${l.used?' used':''}" data-l="${l.k}">${l.ch}</button>`).join('');
+    $('okBtn').disabled = slots.some(s => s === null);
+  }
+
+  $('letters').onclick = e=>{
+    const b = e.target.closest('[data-l]'); if(!b) return;
+    const k = +b.dataset.l;
+    if(letters[k].used) return;
+    const free = slots.indexOf(null);
+    if(free === -1) return;
+    slots[free] = k; letters[k].used = true;
+    A.sfx.tap(); paint();
+  };
+
+  $('slots').onclick = e=>{
+    const s = e.target.closest('[data-slot]'); if(!s) return;
+    const idx = +s.dataset.slot;
+    if(slots[idx] === null) return;
+    letters[slots[idx]].used = false; slots[idx] = null;
+    A.sfx.tap(); paint();
+  };
+
+  $('clearBtn').onclick = ()=>{
+    slots = slots.map(()=> null);
+    letters.forEach(l => l.used = false);
+    A.sfx.tap(); paint();
+  };
+
+  $('okBtn').onclick = ()=>{
+    const guess = slots.map(s => letters[s].ch).join('');
+    const ok = guess === target;
+    A.qsa('.slot').forEach(el => el.classList.add(ok ? 'ok' : 'no'));
+    $('okBtn').disabled = true;
+
+    if(ok){
+      right++; score += 12;
+      const st = A.S.get();
+      A.S.set({ wordsBuilt: st.wordsBuilt + 1 });
+      A.markCorrect('words'); A.sfx.right();
+    } else {
+      A.markWrong(); A.sfx.wrong();
+    }
+    $('score').textContent = A.num(score)+' نقطة';
+
+    $('fb').innerHTML = `
+      <div class="card row fade-up" style="background:color-mix(in srgb,var(--${ok?'mint':'coral'}) 16%,var(--surface))">
+        <span style="font-size:26px">${ok?'🎉':'💪'}</span>
+        <div class="grow">
+          <p class="bold small">${ok ? 'أحسنت! +١٢ نقطة' : 'الكلمة الصحيحة: '+target}</p>
+          <p class="tiny muted">${words[i].hint}</p>
+        </div>
+        <button class="btn btn-sm btn-primary" id="nx">${i===TOTAL-1?'النتيجة':'التالي ←'}</button>
+      </div>`;
+    document.getElementById('nx').onclick = ()=>{
+      A.sfx.tap();
+      if(i === TOTAL-1) return finish();
+      i++; render();
+    };
+  };
+
+  function finish(){
+    $('play').classList.add('hidden');
+    $('result').classList.remove('hidden');
+    A.logActivity(); A.addXp(score, true);
+    if(right >= 5){ A.confetti(); A.sfx.win(); }
+    A.checkBadges();
+
+    $('result').innerHTML = `
+      <div class="hero hero-mint fade-up" style="text-align:center">
+        <span class="wm" aria-hidden="true">🧩</span>
+        <div class="bump" style="font-size:70px">${right>=7?'🏆':right>=4?'🎉':'💪'}</div>
+        <p class="disp t-2xl mt2">${right>=7?'صائغ كلمات!':right>=4?'عمل جميل!':'واصل التدريب'}</p>
+        <p class="small" style="opacity:.93">كوّنت ${A.num(right)} كلمة من ${A.num(TOTAL)}</p>
+      </div>
+      <div class="grid3 mt3">
+        <div class="stat" style="cursor:default"><b>⭐ النقاط</b><span>+${A.num(score)}</span></div>
+        <div class="stat" style="cursor:default"><b>✅ صحيح</b><span>${A.num(right)}</span></div>
+        <div class="stat" style="cursor:default"><b>✍️ الإجمالي</b><span>${A.num(A.S.get().wordsBuilt)}</span></div>
+      </div>
+      <button class="btn btn-primary btn-block mt3" id="again">العب مرة أخرى 🔁</button>
+      <div class="grid2 mt2">
+        <a class="btn btn-ghost" href="learn.html">ألعاب أخرى</a>
+        <a class="btn btn-ghost" href="index.html">الرئيسية</a>
+      </div>`;
+    document.getElementById('again').onclick = ()=>{
+      $('result').classList.add('hidden');
+      $('intro').classList.remove('hidden');
+      $('built').textContent = A.num(A.S.get().wordsBuilt)+' كلمة';
+      A.sfx.tap();
+    };
+  }
+
+  A.mountTabbar('learn.html');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الجوائز · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame">
+  <div id="subbar"></div>
+
+  <!-- المستوى -->
+  <section class="page">
+    <div class="hero hero-primary fade-up">
+      <span class="wm" aria-hidden="true">⭐</span>
+      <div class="row">
+        <span class="chip chip-glass" id="leagueChip">🥉 برونزي</span>
+        <span class="chip chip-glass" style="margin-inline-start:auto" id="coinChip">🪙 ٠</span>
+      </div>
+      <p class="disp t-2xl mt2">المستوى <span id="lvl">١</span></p>
+      <p class="small" style="opacity:.92" id="lvlSub"></p>
+      <div class="row mt2">
+        <div class="bar glass grow"><i id="lvlBar"></i></div>
+        <span class="tiny xbold" id="lvlPct">٠٪</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- صندوق الهدايا -->
+  <section class="page mt2">
+    <button class="card row" id="giftBox" style="align-items:center">
+      <div class="sq-lg t-sun" id="giftIcon" style="font-size:30px">🎁</div>
+      <div class="grow">
+        <p class="bold" id="giftTitle">هديّة اليوم</p>
+        <p class="tiny muted" id="giftSub">اضغط لفتحها — بداخلها مفاجأة!</p>
+      </div>
+      <span class="chip chip-primary" id="giftChip">افتح</span>
+    </button>
+  </section>
+
+  <!-- الإحصاءات -->
+  <section class="page mt3">
+    <h2 class="disp t-lg" style="margin-bottom:10px">إحصاءاتك</h2>
+    <div class="grid2" id="statGrid"></div>
+  </section>
+
+  <!-- الأوسمة -->
+  <section class="page mt3" style="padding-bottom:16px">
+    <div class="sec-head">
+      <h2 class="disp t-lg">الأوسمة</h2>
+      <span class="chip chip-primary" id="badgeCount">٠ / ١٠</span>
+    </div>
+    <div class="grid2" id="badgeGrid"></div>
+  </section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('الجوائز', 'نقاطك وأوسمتك', 'index.html');
+  const st = A.S.get(), lg = A.league();
+
+  /* المستوى */
+  $('lvl').textContent = A.num(A.level());
+  $('leagueChip').textContent = lg.emoji + ' ' + lg.name;
+  $('coinChip').textContent = '🪙 ' + A.num(st.coins);
+  const pct = Math.round(A.levelXp() / A.XP_PER_LEVEL * 100);
+  $('lvlBar').style.width = pct + '%';
+  $('lvlPct').textContent = A.num(pct) + '٪';
+  $('lvlSub').textContent = A.num(st.xp) + ' نقطة · باقٍ ' +
+    A.num(A.XP_PER_LEVEL - A.levelXp()) + ' نقطة للمستوى ' + A.num(A.level()+1);
+
+  /* الهديّة اليومية */
+  const opened = st.giftDay === A.today();
+  function paintGift(){
+    const done = A.S.get().giftDay === A.today();
+    $('giftIcon').textContent = done ? '📭' : '🎁';
+    $('giftTitle').textContent = done ? 'فتحت هديّة اليوم' : 'هديّة اليوم';
+    $('giftSub').textContent = done ? 'عُد غدًا لهديّة جديدة 🌙' : 'اضغط لفتحها — بداخلها مفاجأة!';
+    $('giftChip').textContent = done ? 'تمّ' : 'افتح';
+    $('giftChip').className = 'chip ' + (done ? 'chip-mint' : 'chip-primary');
+  }
+  paintGift();
+  $('giftBox').onclick = ()=>{
+    if(A.S.get().giftDay === A.today()){ A.toast('عُد غدًا للهديّة التالية', '🌙'); return; }
+    const bonus = [20, 30, 40, 50][Math.floor(Math.random()*4)];
+    A.S.set({ giftDay: A.today() });
+    A.addXp(bonus, true);
+    A.confetti(); A.sfx.win();
+    A.toast('حصلت على +' + A.num(bonus) + ' نقطة!', '🎁');
+    paintGift();
+    setTimeout(()=> location.reload(), 1600);
+  };
+
+  /* الإحصاءات */
+  const stats = [
+    { e:'📖', tone:'mint',   label:'دروس مكتملة', v:A.lessonsCount() },
+    { e:'✅', tone:'sky',    label:'إجابات صحيحة', v:st.answered },
+    { e:'🔥', tone:'sun',    label:'أطول سلسلة',   v:A.num(A.streak())+' أيام' },
+    { e:'✍️', tone:'coral',  label:'كلمات كوّنتها', v:st.wordsBuilt },
+    { e:'❓', tone:'violet', label:'أفضل اختبار',   v:A.num(st.bestQuiz)+' / ١٠' },
+    { e:'🃏', tone:'pink',   label:'أقلّ أخطاء ذاكرة', v:st.bestMemory===null?'—':st.bestMemory }
+  ];
+  $('statGrid').innerHTML = stats.map(s=>`
+    <div class="card">
+      <div class="sq ${A.tone(s.tone)}">${s.e}</div>
+      <p class="disp t-lg mt2">${typeof s.v === 'number' ? A.num(s.v) : s.v}</p>
+      <p class="tiny muted">${s.label}</p>
+    </div>`).join('');
+
+  /* الأوسمة */
+  const unlocked = BADGES.filter(b => A.hasBadge(b.id)).length;
+  $('badgeCount').textContent = A.num(unlocked) + ' / ' + A.num(BADGES.length);
+  $('badgeGrid').innerHTML = BADGES.map(b=>{
+    const on = A.hasBadge(b.id);
+    const cls = on ? (b.tier==='silver' ? 'silver' : b.tier==='bronze' ? 'bronze' : '') : 'locked';
+    return `<div class="card" style="text-align:center">
+      <div class="center"><span class="medal ${cls}">${on ? b.emoji : '🔒'}</span></div>
+      <p class="bold small mt2">${b.name}</p>
+      <p class="tiny muted mt1">${b.desc}</p>
+      <span class="chip ${on?'chip-mint':''} mt2" style="margin-top:8px">${on?'مفتوح ✓':'مقفل'}</span>
+    </div>`;
+  }).join('');
+
+  A.mountTabbar('rewards.html');
+})();
+</script>
+</body>
+</html>

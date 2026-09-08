@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تعلّم · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame">
+  <div id="subbar"></div>
+
+  <!-- ========== بحث سريع ========== -->
+  <section class="page">
+    <div class="input-wrap">
+      <span class="ico">🔍</span>
+      <input class="input" id="q" placeholder="ابحث عن مادة أو درس أو لعبة…" autocomplete="off">
+    </div>
+  </section>
+
+  <!-- ========== الفلاتر ========== -->
+  <section class="mt2">
+    <p class="sec-label page">التصنيف</p>
+    <div class="rail" id="fCat" style="padding-top:6px"></div>
+    <p class="sec-label page">المستوى</p>
+    <div class="rail" id="fLevel" style="padding-top:6px"></div>
+    <p class="sec-label page">الحالة</p>
+    <div class="rail" id="fState" style="padding-top:6px"></div>
+  </section>
+
+  <!-- ========== مهمّة اليوم المصغّرة ========== -->
+  <section class="page mt2">
+    <div class="card row" style="align-items:center">
+      <div class="sq-lg t-violet">🎯</div>
+      <div class="grow">
+        <p class="bold small">مهمّة اليوم</p>
+        <p class="tiny muted" id="miniMission">٠ / ٣ أنشطة</p>
+        <div class="bar thin mt1"><i id="miniBar"></i></div>
+      </div>
+      <span class="chip chip-primary">+١٢٠</span>
+    </div>
+  </section>
+
+  <!-- ========== المواد ========== -->
+  <section class="page mt3">
+    <div class="sec-head">
+      <h2 class="disp t-lg">المواد</h2>
+      <span class="tiny muted" id="countLabel"></span>
+    </div>
+    <div id="subjectGrid" class="grid2"></div>
+    <div id="noResults" class="empty hidden">لا توجد نتائج مطابقة 🔍<br><span class="tiny">جرّب تغيير الفلاتر</span></div>
+  </section>
+
+  <!-- ========== الألعاب ========== -->
+  <section class="page mt3" id="games">
+    <div class="sec-head">
+      <h2 class="disp t-lg">الألعاب</h2>
+      <span class="chip chip-mint">تعمل الآن</span>
+    </div>
+    <div id="gameList"></div>
+  </section>
+
+  <!-- ========== تلميح ========== -->
+  <section class="page mt3" style="padding-bottom:16px">
+    <div class="card row" style="background:linear-gradient(135deg,color-mix(in srgb,var(--sky) 18%,var(--surface)),var(--surface))">
+      <div class="sq" style="background:rgba(255,255,255,.65)">💡</div>
+      <p class="tiny grow"><b>تلميح:</b> ابدأ بمادة واحدة وأكمل دروسها بالترتيب — ثم اختبر نفسك بلعبة سريعة.</p>
+    </div>
+  </section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App;
+  A.mountSubbar('استكشف وتعلّم', 'كل المواد والألعاب');
+
+  /* --- حالة الفلاتر --- */
+  const F = { cat:'all', level:'all', state:'all', q:'' };
+  const CATS   = [['all','الكل'],['مشهور','الأكثر لعبًا'],['جديد','جديد'],['قراءة','قراءة'],['حساب','حساب']];
+  const LEVELS = [['all','أيّ مستوى'],['سهل','سهل'],['متوسط','متوسط'],['تحدٍّ','تحدٍّ']];
+  const STATES = [['all','الكل'],['prog','قيد التقدّم'],['new','لم يبدأ'],['done','مكتمل']];
+
+  function chips(host, list, key){
+    document.getElementById(host).innerHTML = list.map(([v,l])=>
+      `<button class="filter" data-v="${v}" aria-pressed="${F[key]===v}">${l}</button>`).join('');
+    document.getElementById(host).onclick = e=>{
+      const b = e.target.closest('[data-v]'); if(!b) return;
+      F[key] = b.dataset.v; A.sfx.tap();
+      chips(host, list, key); render();
+    };
+  }
+  chips('fCat', CATS, 'cat');
+  chips('fLevel', LEVELS, 'level');
+  chips('fState', STATES, 'state');
+
+  /* --- عرض المواد --- */
+  function matches(s){
+    const p = A.subjectProgress(s.id);
+    if(F.cat !== 'all' && s.tag !== F.cat) return false;
+    if(F.level !== 'all' && s.level !== F.level) return false;
+    if(F.state === 'prog' && !(p.done > 0 && p.done < p.all)) return false;
+    if(F.state === 'new'  && p.done !== 0) return false;
+    if(F.state === 'done' && p.done !== p.all) return false;
+    if(F.q && !((s.name+' '+s.desc+' '+s.tag).includes(F.q))) return false;
+    return true;
+  }
+  function render(){
+    const list = SUBJECTS.filter(matches);
+    document.getElementById('countLabel').textContent = A.num(list.length)+' مادة';
+    document.getElementById('noResults').classList.toggle('hidden', list.length > 0);
+    document.getElementById('subjectGrid').innerHTML = list.map(s=>{
+      const p = A.subjectProgress(s.id);
+      return `<a class="tile tile-tall ${A.tone(s.tone)}" href="subject.html?s=${s.id}">
+        <div class="row" style="gap:6px;justify-content:flex-start">
+          <span class="chip chip-on-tile">${s.level}</span>
+          <span class="chip chip-on-tile">${s.age}</span>
+        </div>
+        <h3 class="mt2">${s.name}</h3>
+        <p class="tiny mt1" style="opacity:.85">${s.desc}</p>
+        <p class="tiny mt2 xbold">${A.num(p.done)} / ${A.num(p.all)} دروس · ${A.num(p.pct)}٪</p>
+        <div class="bar thin mt1" style="background:rgba(255,255,255,.5)"><i style="width:${p.pct}%;background:currentColor"></i></div>
+        <span class="emo">${s.emoji}</span>
+      </a>`;
+    }).join('');
+  }
+  render();
+
+  document.getElementById('q').addEventListener('input', e=>{ F.q = e.target.value.trim(); render(); });
+
+  /* --- مهمّة اليوم --- */
+  const acts = Math.min(A.todayActs(), A.DAILY_GOAL);
+  document.getElementById('miniMission').textContent = A.num(acts)+' / '+A.num(A.DAILY_GOAL)+' أنشطة اليوم';
+  document.getElementById('miniBar').style.width = (acts/A.DAILY_GOAL*100)+'%';
+
+  /* --- الألعاب --- */
+  document.getElementById('gameList').innerHTML = GAMES.map(g=>{
+    const tried = !!A.S.get().gamesTried[g.id];
+    return `<a class="card row mt2" href="${g.href}">
+      <div class="sq-lg ${A.tone(g.tone)}">${g.emoji}</div>
+      <div class="grow">
+        <p class="bold">${g.name}</p>
+        <p class="tiny muted">${g.desc} · لُعبت ${A.num(g.plays)} مرة اليوم</p>
+      </div>
+      <span class="chip ${tried?'chip-mint':'chip-primary'}">${tried?'جرّبتها':'العب'}</span>
+    </a>`;
+  }).join('');
+
+  A.mountTabbar('learn.html');
+})();
+</script>
+</body>
+</html>
