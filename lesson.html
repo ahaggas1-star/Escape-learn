@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>درس · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame" style="padding-bottom:24px">
+
+  <!-- شريط التقدّم -->
+  <header class="safe-top page" style="padding-bottom:10px">
+    <div class="row">
+      <button class="back-btn" id="exitBtn" aria-label="خروج">✕</button>
+      <div class="grow">
+        <div class="bar"><i id="progBar"></i></div>
+      </div>
+      <span class="chip chip-primary" id="stepLabel">١ / ٦</span>
+    </div>
+    <p class="tiny muted mt1" id="crumb"></p>
+  </header>
+
+  <!-- محتوى الخطوة -->
+  <section class="page grow" id="stage" style="display:flex;flex-direction:column"></section>
+
+  <!-- شريط الأزرار -->
+  <section class="page mt2" style="padding-bottom:20px">
+    <button class="btn btn-primary btn-block" id="mainBtn">التالي ←</button>
+  </section>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App;
+  const sid = A.param('s') || 'math';
+  const lid = A.param('l');
+  const subject = SUBJ[sid] || SUBJECTS[0];
+  const lessons = LESSONS[subject.id] || [];
+  const lesson  = lessons.find(l => l.id === lid) || lessons[0];
+
+  document.title = lesson.title + ' · نجومي';
+
+  /* بناء خطوات الدرس: بطاقات تعليم ثم أسئلة تدريب */
+  const bank  = (QUESTIONS[lesson.bank] || []).map(A.buildQuestion);
+  const drill = A.shuffle(bank).slice(0, 4);
+  const steps = [
+    ...lesson.teach.map(t => ({ kind:'teach', data:t })),
+    ...drill.map(q => ({ kind:'quiz', data:q })),
+    { kind:'done' }
+  ];
+
+  let i = 0, correct = 0, wrong = 0, answered = false;
+  const stage = document.getElementById('stage');
+  const mainBtn = document.getElementById('mainBtn');
+
+  document.getElementById('crumb').textContent = subject.name + ' · ' + lesson.title;
+  document.getElementById('exitBtn').onclick = ()=>{
+    A.sfx.tap();
+    location.href = 'subject.html?s=' + subject.id;
+  };
+
+  function paintProgress(){
+    document.getElementById('progBar').style.width = (i / (steps.length-1) * 100) + '%';
+    document.getElementById('stepLabel').textContent =
+      A.num(Math.min(i+1, steps.length-1)) + ' / ' + A.num(steps.length-1);
+  }
+
+  function render(){
+    paintProgress();
+    const st = steps[i];
+    answered = false;
+
+    if(st.kind === 'teach'){
+      mainBtn.textContent = 'فهمت! التالي ←';
+      mainBtn.disabled = false;
+      mainBtn.className = 'btn btn-primary btn-block';
+      stage.innerHTML = `
+        <div class="card-lg fade-up" style="text-align:center;margin-top:8px">
+          <div class="float" style="font-size:72px;line-height:1.2">${st.data.e}</div>
+          <h2 class="disp t-xl mt2">${st.data.t}</h2>
+          <p class="soft mt2" style="line-height:2;font-size:16px">${st.data.b}</p>
+        </div>
+        <div class="card row mt2" style="background:color-mix(in srgb,var(--lemon) 26%,var(--surface))">
+          <span style="font-size:22px">💡</span>
+          <p class="tiny grow">اقرأ الشرح بصوت عالٍ — يساعدك على الحفظ!</p>
+        </div>`;
+    }
+
+    else if(st.kind === 'quiz'){
+      const q = st.data;
+      mainBtn.textContent = 'اختر إجابة أولًا';
+      mainBtn.disabled = true;
+      mainBtn.className = 'btn btn-ghost btn-block';
+      stage.innerHTML = `
+        <p class="sec-label mt2">تدرّب</p>
+        <div class="card-lg fade-up" style="margin-top:6px">
+          <h2 class="disp t-lg" style="line-height:1.8">${q.q}</h2>
+        </div>
+        <div class="col mt2" style="gap:10px" id="opts">
+          ${q.options.map((o,k)=>`
+            <button class="answer" data-k="${k}">
+              <span class="key">${'أبجد'[k]}</span>
+              <span class="grow">${o.text}</span>
+              <span class="mark"></span>
+            </button>`).join('')}
+        </div>
+        <div id="fb" class="mt2"></div>`;
+
+      document.getElementById('opts').onclick = e=>{
+        const btn = e.target.closest('.answer');
+        if(!btn || answered) return;
+        answered = true;
+        const k = +btn.dataset.k, ok = k === q.answer;
+        A.qsa('.answer').forEach((b,idx)=>{
+          b.disabled = true;
+          if(idx === q.answer){ b.classList.add('correct'); b.querySelector('.mark').textContent = '✓'; }
+          else if(idx === k){ b.classList.add('wrong'); b.querySelector('.mark').textContent = '✕'; }
+          else b.classList.add('dim');
+        });
+        if(ok){ correct++; A.markCorrect(subject.id); A.sfx.right(); }
+        else  { wrong++;  A.markWrong(); A.sfx.wrong(); }
+        document.getElementById('fb').innerHTML = `
+          <div class="card row fade-up" style="background:color-mix(in srgb,var(--${ok?'mint':'coral'}) 16%,var(--surface))">
+            <span style="font-size:26px">${ok?'🎉':'💪'}</span>
+            <div class="grow">
+              <p class="bold small">${ok?'إجابة صحيحة!':'ليست صحيحة… لا بأس'}</p>
+              <p class="tiny muted">${q.hint}</p>
+            </div>
+          </div>`;
+        mainBtn.disabled = false;
+        mainBtn.className = 'btn btn-primary btn-block';
+        mainBtn.textContent = 'التالي ←';
+      };
+    }
+
+    else { /* شاشة الإنهاء */
+      const first = !A.lessonDone(subject.id, lesson.id);
+      const xp = 30 + correct * 10;
+      A.completeLesson(subject.id, lesson.id);
+      A.logActivity();
+      if(first) A.addXp(xp, true); else A.addXp(10, true);
+      A.sfx.win(); A.confetti();
+
+      const idx = lessons.findIndex(l => l.id === lesson.id);
+      const nxt = lessons[idx+1];
+      mainBtn.className = 'btn btn-primary btn-block';
+      mainBtn.textContent = nxt ? 'الدرس التالي ←' : 'عُد إلى المادة ←';
+      mainBtn.disabled = false;
+
+      stage.innerHTML = `
+        <div class="card-lg fade-up" style="text-align:center;margin-top:10px">
+          <div class="bump" style="font-size:80px">🎉</div>
+          <h2 class="disp t-2xl mt2">أحسنت!</h2>
+          <p class="soft">أنهيت درس «${lesson.title}»</p>
+          <div class="grid3 mt3">
+            <div class="stat" style="cursor:default"><b>✅ صحيح</b><span>${A.num(correct)}</span></div>
+            <div class="stat" style="cursor:default"><b>❌ خطأ</b><span>${A.num(wrong)}</span></div>
+            <div class="stat" style="cursor:default"><b>⭐ نقاط</b><span>+${A.num(first?xp:10)}</span></div>
+          </div>
+          ${!first?'<p class="tiny muted mt2">أعدت الدرس — تحصل على ١٠ نقاط للمراجعة.</p>':''}
+        </div>
+        <div class="grid2 mt2">
+          <a class="card center" href="quiz.html?s=${subject.id}" style="flex-direction:column;display:flex;gap:6px;text-align:center">
+            <div class="sq t-violet">❓</div><p class="bold small">اختبر نفسك</p>
+          </a>
+          <a class="card center" href="index.html" style="flex-direction:column;display:flex;gap:6px;text-align:center">
+            <div class="sq t-sky">🏠</div><p class="bold small">الرئيسية</p>
+          </a>
+        </div>`;
+
+      mainBtn.onclick = ()=>{
+        A.sfx.tap();
+        location.href = nxt ? `lesson.html?s=${subject.id}&l=${nxt.id}` : `subject.html?s=${subject.id}`;
+      };
+      document.getElementById('progBar').style.width = '100%';
+      return;
+    }
+
+    mainBtn.onclick = ()=>{ A.sfx.tap(); i++; render(); };
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

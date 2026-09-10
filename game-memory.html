@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة الذاكرة · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame" style="padding-bottom:24px">
+  <div id="subbar"></div>
+
+  <!-- ===== البداية ===== -->
+  <section id="intro" class="page">
+    <div class="hero hero-coral fade-up" style="text-align:center">
+      <span class="wm" aria-hidden="true">🃏</span>
+      <div class="float" style="font-size:64px">🧠</div>
+      <p class="disp t-2xl mt2">لعبة الذاكرة</p>
+      <p class="small" style="opacity:.93">اقلب البطاقات وطابِق الأزواج المتشابهة</p>
+    </div>
+    <p class="sec-label mt3">اختر المجموعة</p>
+    <div class="grid2 mt1" id="pickSet"></div>
+    <div class="card row mt3">
+      <div class="sq t-sun">🏅</div>
+      <div class="grow"><p class="bold small">أقلّ عدد أخطاء</p><p class="tiny muted" id="best">لم تلعب بعد</p></div>
+    </div>
+    <button class="btn btn-primary btn-block mt3" id="startBtn">ابدأ ▶</button>
+  </section>
+
+  <!-- ===== اللعب ===== -->
+  <section id="play" class="hidden page">
+    <div class="grid3">
+      <div class="stat" style="cursor:default"><b>✅ أزواج</b><span id="pairs">٠ / ٨</span></div>
+      <div class="stat" style="cursor:default"><b>❌ أخطاء</b><span id="misses">٠</span></div>
+      <div class="stat" style="cursor:default"><b>⏱ الوقت</b><span id="time">٠٠:٠٠</span></div>
+    </div>
+    <div class="mem-grid mt3" id="grid"></div>
+    <button class="btn btn-ghost btn-block mt3" id="restart" style="margin-bottom:20px">إعادة الترتيب 🔁</button>
+  </section>
+
+  <!-- ===== النتيجة ===== -->
+  <section id="result" class="hidden page" style="padding-bottom:24px"></section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('لعبة الذاكرة', 'لعبة', 'learn.html');
+
+  let setIdx = 0, cards = [], first = null, lock = false;
+  let pairs = 0, misses = 0, t0 = 0, timer = null;
+
+  function paintSets(){
+    $('pickSet').innerHTML = MEMORY_SETS.map((s,k)=>`
+      <button class="tile ${A.tone(['pink','mint','sky','sun','violet','coral'][k % 6])}" data-k="${k}" style="min-height:92px;${setIdx===k?'outline:3px solid var(--primary);outline-offset:2px':''}">
+        <h3 style="font-size:16px">${s.name}</h3>
+        <p class="tiny mt1" style="opacity:.8">${s.items.slice(0,4).join(' ')}</p>
+      </button>`).join('');
+  }
+  paintSets();
+  $('pickSet').onclick = e=>{
+    const b = e.target.closest('[data-k]'); if(!b) return;
+    setIdx = +b.dataset.k; A.sfx.tap(); paintSets();
+  };
+
+  const bm = A.S.get().bestMemory;
+  $('best').textContent = bm === null ? 'لم تلعب بعد — جرّب الآن!' : A.num(bm)+' أخطاء';
+
+  $('startBtn').onclick = ()=>{
+    $('intro').classList.add('hidden');
+    $('play').classList.remove('hidden');
+    A.tryGame('memory'); A.sfx.tap();
+    deal();
+  };
+  $('restart').onclick = ()=>{ A.sfx.tap(); deal(); };
+
+  function deal(){
+    const items = MEMORY_SETS[setIdx].items;
+    cards = A.shuffle([...items, ...items]);
+    first = null; lock = false; pairs = 0; misses = 0;
+    $('pairs').textContent = '٠ / '+A.num(items.length);
+    $('misses').textContent = '٠';
+    $('grid').innerHTML = cards.map((c,k)=>`
+      <button class="mem" data-k="${k}" aria-label="بطاقة ${A.num(k+1)}">
+        <span class="mem-in">
+          <span class="mem-face mem-back">⭐</span>
+          <span class="mem-face mem-front">${c}</span>
+        </span>
+      </button>`).join('');
+    clearInterval(timer);
+    t0 = Date.now();
+    $('time').textContent = '٠٠:٠٠';
+    timer = setInterval(()=>{
+      const s = Math.floor((Date.now()-t0)/1000);
+      $('time').textContent = A.num(String(Math.floor(s/60)).padStart(2,'0'))+':'+A.num(String(s%60).padStart(2,'0'));
+    }, 500);
+  }
+
+  $('grid').onclick = e=>{
+    const btn = e.target.closest('.mem');
+    if(!btn || lock || btn.classList.contains('flip') || btn.classList.contains('done')) return;
+    btn.classList.add('flip');
+    A.sfx.flip();
+
+    if(!first){ first = btn; return; }
+    const a = cards[+first.dataset.k], b = cards[+btn.dataset.k];
+
+    if(a === b){
+      first.classList.add('done'); btn.classList.add('done');
+      first = null; pairs++;
+      $('pairs').textContent = A.num(pairs)+' / '+A.num(MEMORY_SETS[setIdx].items.length);
+      A.sfx.right();
+      if(pairs === MEMORY_SETS[setIdx].items.length) setTimeout(finish, 500);
+    } else {
+      lock = true; misses++;
+      $('misses').textContent = A.num(misses);
+      A.sfx.wrong();
+      const f = first; first = null;
+      setTimeout(()=>{ f.classList.remove('flip'); btn.classList.remove('flip'); lock = false; }, 750);
+    }
+  };
+
+  function finish(){
+    clearInterval(timer);
+    const secs = Math.floor((Date.now()-t0)/1000);
+    const xp = Math.max(20, 80 - misses*6 - Math.floor(secs/5));
+    const st = A.S.get();
+    if(st.bestMemory === null || misses < st.bestMemory) A.S.set({ bestMemory: misses });
+    A.logActivity(); A.addXp(xp, true);
+    A.confetti(); A.sfx.win(); A.checkBadges();
+
+    $('play').classList.add('hidden');
+    $('result').classList.remove('hidden');
+    $('result').innerHTML = `
+      <div class="hero hero-coral fade-up" style="text-align:center">
+        <span class="wm" aria-hidden="true">🃏</span>
+        <div class="bump" style="font-size:70px">${misses<=2?'🏆':misses<=5?'🎉':'👏'}</div>
+        <p class="disp t-2xl mt2">${misses<=2?'ذاكرة مذهلة!':misses<=5?'أحسنت!':'أنهيتها!'}</p>
+        <p class="small" style="opacity:.93">طابقت كل الأزواج في ${A.num(secs)} ثانية</p>
+      </div>
+      <div class="grid3 mt3">
+        <div class="stat" style="cursor:default"><b>⭐ النقاط</b><span>+${A.num(xp)}</span></div>
+        <div class="stat" style="cursor:default"><b>❌ أخطاء</b><span>${A.num(misses)}</span></div>
+        <div class="stat" style="cursor:default"><b>⏱ الوقت</b><span>${A.num(secs)}ث</span></div>
+      </div>
+      <button class="btn btn-primary btn-block mt3" id="again">العب مرة أخرى 🔁</button>
+      <div class="grid2 mt2">
+        <a class="btn btn-ghost" href="learn.html">ألعاب أخرى</a>
+        <a class="btn btn-ghost" href="index.html">الرئيسية</a>
+      </div>`;
+    document.getElementById('again').onclick = ()=>{
+      $('result').classList.add('hidden');
+      $('intro').classList.remove('hidden');
+      $('best').textContent = A.num(A.S.get().bestMemory)+' أخطاء';
+      A.sfx.tap();
+    };
+  }
+
+  window.addEventListener('pagehide', ()=> clearInterval(timer));
+  A.mountTabbar('learn.html');
+})();
+</script>
+</body>
+</html>

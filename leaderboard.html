@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الترتيب · نجومي</title>
+<meta name="theme-color" content="#FFF8F1">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/app.css">
+<script>(function(){var t=null;try{t=(JSON.parse(localStorage.getItem('nujoomi.v1')||'{}')).theme}catch(e){}
+t=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+if(t==='dark')document.documentElement.classList.add('dark')})();</script>
+</head>
+<body>
+<main class="frame">
+  <div id="subbar"></div>
+
+  <!-- الدوري -->
+  <section class="page">
+    <div class="hero hero-sun fade-up" style="text-align:center">
+      <span class="wm" aria-hidden="true">🏆</span>
+      <div class="float" style="font-size:56px" id="lgEmoji">🥉</div>
+      <p class="disp t-xl mt2">دوري <span id="lgName">برونزي</span></p>
+      <p class="small" style="opacity:.93" id="lgSub"></p>
+    </div>
+  </section>
+
+  <!-- منصّة التتويج -->
+  <section class="page mt3">
+    <div class="grid3" style="align-items:end;gap:10px" id="podium"></div>
+  </section>
+
+  <!-- القائمة -->
+  <section class="page mt3" style="padding-bottom:16px">
+    <div class="sec-head">
+      <h2 class="disp t-lg">ترتيب هذا الأسبوع</h2>
+      <span class="chip chip-primary" id="myRank">—</span>
+    </div>
+    <div class="card list" id="board"></div>
+    <div class="card row mt3" style="background:color-mix(in srgb,var(--lemon) 26%,var(--surface))">
+      <span style="font-size:22px">💡</span>
+      <p class="tiny grow">اجمع نقاطًا من الدروس والألعاب لترتفع في الترتيب. الأصدقاء هنا للتجربة فقط.</p>
+    </div>
+  </section>
+
+  <div id="tabbar"></div>
+</main>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const A = window.App, $ = id => document.getElementById(id);
+  A.mountSubbar('الترتيب', 'تنافس مع أصدقائك', 'index.html');
+  const st = A.S.get(), lg = A.league();
+
+  $('lgEmoji').textContent = lg.emoji;
+  $('lgName').textContent  = lg.name;
+  const nextAt = st.xp >= 1500 ? null : st.xp >= 800 ? 1500 : st.xp >= 300 ? 800 : 300;
+  $('lgSub').textContent = nextAt
+    ? 'باقٍ ' + A.num(nextAt - st.xp) + ' نقطة للدوري التالي'
+    : 'وصلت إلى أعلى دوري! 🎉';
+
+  /* القائمة مع اللاعب */
+  const me = { name: st.name, emoji: st.avatar, xp: st.xp, streak: A.streak(), me: true };
+  const rows = [...FRIENDS, me].sort((a,b)=> b.xp - a.xp);
+  const myIdx = rows.findIndex(r => r.me);
+  $('myRank').textContent = 'ترتيبك ' + A.num(myIdx + 1);
+
+  /* منصّة التتويج (٢ ، ١ ، ٣) */
+  const top = rows.slice(0,3);
+  const order = [top[1], top[0], top[2]].filter(Boolean);
+  const heights = { 0:74, 1:100, 2:60 };
+  $('podium').innerHTML = order.map((r,k)=>{
+    const rank = rows.indexOf(r) + 1;
+    const medal = ['🥇','🥈','🥉'][rank-1] || '';
+    return `<div style="text-align:center">
+      <div style="font-size:34px">${r.emoji}</div>
+      <p class="tiny bold clamp2">${A.escapeHtml(r.name)}${r.me?' (أنت)':''}</p>
+      <div class="mt1" style="height:${heights[k]}px;border-radius:14px 14px 0 0;display:grid;place-items:center;
+        background:${r.me?'linear-gradient(180deg,var(--primary),#5A2FE0)':'linear-gradient(180deg,var(--sun),#F08C0A)'};color:#fff">
+        <div><div style="font-size:22px">${medal}</div><b style="font-size:13px">${A.num(r.xp)}</b></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* الجدول الكامل */
+  $('board').innerHTML = rows.map((r,k)=>`
+    <div class="list-row"${r.me?' style="background:color-mix(in srgb,var(--primary) 9%,transparent)"':''}>
+      <span class="disp" style="width:24px;text-align:center;color:var(--muted)">${A.num(k+1)}</span>
+      <div class="sq" style="border-radius:50%;background:color-mix(in srgb,var(--sun) 22%,var(--surface))">${r.emoji}</div>
+      <div class="grow">
+        <p class="bold small">${A.escapeHtml(r.name)}${r.me?' <span class="chip chip-primary">أنت</span>':''}</p>
+        <p class="tiny muted">سلسلة ${A.num(r.streak)} ${r.streak===1?'يوم':'أيام'}</p>
+      </div>
+      <span class="chip ${k<3?'chip-sun':''}">⭐ ${A.num(r.xp)}</span>
+    </div>`).join('');
+
+  A.mountTabbar('leaderboard.html');
+})();
+</script>
+</body>
+</html>
